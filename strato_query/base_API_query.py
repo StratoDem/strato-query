@@ -111,7 +111,7 @@ class APIJoinParam(APIQueryParams):
 
 
 class APIJoinQueryParams(APIQueryParams):
-    def __init__(self, join: APIJoinParam, **kwargs):
+    def __init__(self, join, **kwargs):
         assert isinstance(join, APIJoinParam)
 
         self._join = join
@@ -133,7 +133,7 @@ class APIJoinQueryParams(APIQueryParams):
         return self._join.to_api_struct()
 
 
-class APIMultiJOinParams(APIQueryParams):
+class APIMultiJoinParams(APIQueryParams):
     def __init__(self, join, on: dict, **kwargs):
         assert isinstance(on, dict)
 
