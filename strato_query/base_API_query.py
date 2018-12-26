@@ -10,11 +10,14 @@ December 26, 2018
 """
 
 import abc
+import os
 from typing import Tuple, Dict, Optional, Union, List
 
 import requests
 
 import pandas
+
+import config as sdc
 
 from strato_query.core import constants as cc
 
@@ -23,6 +26,7 @@ __all__ = [
     'APIQueryParams', 'BaseAPIQuery',
 ]
 
+API_TOKEN = os.environ.get('API_TOKEN', sdc.debug_token)
 T_DF = pandas.DataFrame
 
 
@@ -146,9 +150,9 @@ class BaseAPIQuery:
     @staticmethod
     def query_api_df(query_params: APIQueryParams) -> pandas.DataFrame:
         r = requests.post(
-            url=cc.api_url,
+            url=cc.API_URL,
             json=dict(
-                token=SDConfig.api_token,
+                token=API_TOKEN,
                 query=query_params.to_api_struct()))
 
         assert r.status_code == 200, (r.status_code, r.content, query_params.to_api_struct())
@@ -164,9 +168,9 @@ class BaseAPIQuery:
     @staticmethod
     def query_api_multiple(queries: Dict[str, APIQueryParams]) -> Dict[str, pandas.DataFrame]:
         r = requests.post(
-            url=cc.api_url,
+            url=cc.API_URL,
             json=dict(
-                token=SDConfig.api_token,
+                token=API_TOKEN,
                 queries={k: v.to_api_struct() for k, v in queries.items()}))
 
         assert r.status_code == 200, (r.status_code, r.content, queries)
