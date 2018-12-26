@@ -18,6 +18,7 @@ setup(
     author_email='tech@stratodem.com',
     packages=[
         'strato_query',
+        'strato_query.core',
     ],
     license='MIT',
     description='StratoDem DB API tools',
