@@ -98,8 +98,8 @@ class APIQueryParams(abc.ABC):
         return self._on
 
     @property
-    def join(self) -> dict:
-        return self._join.to_api_struct()
+    def join(self) -> Union[None, dict]:
+        return None if self._join is None else self._join.to_api_struct()
 
 
 class BaseAPIQuery:
