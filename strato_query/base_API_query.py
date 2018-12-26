@@ -46,7 +46,7 @@ class APIQueryParams(abc.ABC):
         assert isinstance(data_filters, tuple)
         assert isinstance(aggregations, tuple)
         assert isinstance(query_type, str)
-        assert isinstance(on, dict)
+        assert on is None or isinstance(on, dict)
 
         self._query_type = query_type
         self._data_fields = data_fields
