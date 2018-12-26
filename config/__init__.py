@@ -21,11 +21,6 @@ class ProfileWarning(Warning):
     (and other sub-modules use it)"""
     pass
 
-
-user = 'NOT_SPECIFIED'
-DEBUG = False
-debug_token = 'debug-token'
-
 try:
     from .profile import *
 except ImportError:
