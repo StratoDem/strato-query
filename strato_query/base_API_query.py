@@ -133,6 +133,35 @@ class APIJoinQueryParams(APIQueryParams):
         return self._join.to_api_struct()
 
 
+class APIMultiJOinParams(APIQueryParams):
+    def __init__(self, join, on: dict, **kwargs):
+        assert isinstance(on, dict)
+
+        self._join = join
+        self._on = on
+
+        super().__init__(**kwargs)
+
+    def to_api_struct(self) -> dict:
+        return dict(
+            query_type=self.query_type,
+            data_fields=self.data_fields,
+            table=self.table,
+            groupby=self.groupby,
+            data_filters=self.data_filters,
+            aggregations=self.aggregations,
+            join=self.join,
+            on=self.on)
+
+    @property
+    def join(self) -> dict:
+        return self._join.to_api_struct()
+
+    @property
+    def on(self) -> dict:
+        return self._on
+
+
 class BaseAPIQuery:
     @classmethod
     def submit_query(cls, query_params: Optional[APIQueryParams]=None,
