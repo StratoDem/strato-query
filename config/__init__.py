@@ -22,7 +22,6 @@ class ProfileWarning(Warning):
     pass
 
 
-try:
-    from .profile import *
-except ImportError:
-    warnings.warn('profile.py is not configured', ProfileWarning)
+user = 'NOT_SPECIFIED'
+DEBUG = False
+debug_token = 'debug-token'
