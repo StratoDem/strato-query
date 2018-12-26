@@ -14,6 +14,17 @@ from typing import Tuple, Dict, Optional, Union, List
 
 import requests
 
+import pandas
+
+from strato_query.core import constants as cc
+
+
+__all__ = [
+    'APIQueryParams', 'BaseAPIQuery',
+]
+
+T_DF = pandas.DataFrame
+
 
 class APIQueryParams(abc.ABC):
     def __init__(self,
@@ -135,7 +146,7 @@ class BaseAPIQuery:
     @staticmethod
     def query_api_df(query_params: APIQueryParams) -> pandas.DataFrame:
         r = requests.post(
-            url=SDConfig.api_url,
+            url=cc.api_url,
             json=dict(
                 token=SDConfig.api_token,
                 query=query_params.to_api_struct()))
@@ -153,7 +164,7 @@ class BaseAPIQuery:
     @staticmethod
     def query_api_multiple(queries: Dict[str, APIQueryParams]) -> Dict[str, pandas.DataFrame]:
         r = requests.post(
-            url=SDConfig.api_url,
+            url=cc.api_url,
             json=dict(
                 token=SDConfig.api_token,
                 queries={k: v.to_api_struct() for k, v in queries.items()}))
@@ -170,3 +181,18 @@ class BaseAPIQuery:
             df_dict[k] = df_
 
         return df_dict
+
+
+if __name__ == '__main__':
+    print(BaseAPIQuery.submit_query(
+        query_params=APIQueryParams(
+            query_type='COUNT',
+            data_fields=('year', 'population'),
+            table='populationforecast_us_annual_population_age',
+            data_filters=(
+                dict(filter_type='eq', filter_variable='age_g', filter_value=18),
+                dict(filter_type='between', filter_variable='year', filter_value=[2013, 2018])
+            ),
+            aggregations=(dict(aggregation_func='sum', variable_name='population'),),
+            groupby=('year',),
+        )))
