@@ -9,6 +9,8 @@ Notes :
 December 26, 2018
 """
 
+import warnings
+
 
 check_global_configure = True
 check_configure = True
@@ -23,3 +25,8 @@ class ProfileWarning(Warning):
 user = 'NOT_SPECIFIED'
 DEBUG = False
 debug_token = 'debug-token'
+
+try:
+    from .profile import *
+except ImportError:
+    warnings.warn('profile.py is not configured', ProfileWarning)
