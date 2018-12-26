@@ -9,4 +9,4 @@ Notes :
 December 26, 2018
 """
 
-api_url = 'https://api.stratodem.com/api'
+API_URL = 'https://api.stratodem.com/api'
