@@ -8,3 +8,19 @@ Notes :
 
 December 26, 2018
 """
+
+from setuptools import setup
+
+setup(
+    name='strato_query',
+    version='1.0.0',
+    author='Michael Clawar, Raaid Arshad, Eric Linden',
+    author_email='tech@stratodem.com',
+    packages=[
+        'strato_query',
+        'strato_query.core',
+    ],
+    license='MIT',
+    description='StratoDem DB API tools',
+    url='https://github.com/StratoDem/strato-query',
+)
