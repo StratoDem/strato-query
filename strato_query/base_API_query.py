@@ -112,8 +112,6 @@ class APIJoinParam(APIQueryParams):
 
 class APIJoinQueryParams(APIQueryParams):
     def __init__(self, join, **kwargs):
-        assert isinstance(join, APIJoinParam)
-
         self._join = join
 
         super().__init__(**kwargs)
