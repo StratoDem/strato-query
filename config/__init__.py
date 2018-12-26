@@ -20,6 +20,5 @@ class ProfileWarning(Warning):
 
 
 user = 'NOT_SPECIFIED'
-DEBUG_EMAIL = 'tech@stratodem.com'
 DEBUG = False
 debug_token = 'debug-token'
