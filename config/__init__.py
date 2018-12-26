@@ -21,6 +21,7 @@ class ProfileWarning(Warning):
     (and other sub-modules use it)"""
     pass
 
+
 try:
     from .profile import *
 except ImportError:
