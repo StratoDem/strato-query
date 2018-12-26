@@ -1,10 +1,10 @@
 """
 StratoDem Analytics : base_API_query
 Principal Author(s) : Eric Linden
-Secondary Author(s) : 
+Secondary Author(s) :
 Description :
 
-Notes : 
+Notes :
 
 December 26, 2018
 """
@@ -136,9 +136,12 @@ class APIJoinQueryParams(APIQueryParams):
 class BaseAPIQuery:
     @classmethod
     def submit_query(cls, query_params: Optional[APIQueryParams]=None,
-                     queries_params: Optional[Dict[str, APIQueryParams]]=None) -> Union[T_DF, Dict[str, T_DF]]:
-        assert query_params is None or isinstance(query_params, APIQueryParams)
-        assert queries_params is None or isinstance(queries_params, APIQueryParams)
+                     queries_params: Optional[Dict[str, APIQueryParams]]=None
+                     ) -> Union[T_DF, Dict[str, T_DF]]:
+        assert query_params is None or isinstance(query_params,
+                                                  APIQueryParams)
+        assert queries_params is None or isinstance(queries_params,
+                                                    APIQueryParams)
         assert not(query_params is None and queries_params is None)
         assert not(query_params is not None and queries_params is not None)
 
@@ -155,7 +158,9 @@ class BaseAPIQuery:
                 token=API_TOKEN,
                 query=query_params.to_api_struct()))
 
-        assert r.status_code == 200, (r.status_code, r.content, query_params.to_api_struct())
+        assert r.status_code == 200, (r.status_code,
+                                      r.content,
+                                      query_params.to_api_struct())
 
         json_data = r.json()
         assert json_data['success'], json_data
@@ -166,7 +171,8 @@ class BaseAPIQuery:
         return df_
 
     @staticmethod
-    def query_api_multiple(queries: Dict[str, APIQueryParams]) -> Dict[str, pandas.DataFrame]:
+    def query_api_multiple(queries: Dict[str, APIQueryParams]
+                           ) -> Dict[str, pandas.DataFrame]:
         r = requests.post(
             url=cc.API_URL,
             json=dict(
@@ -194,9 +200,14 @@ if __name__ == '__main__':
             data_fields=('year', 'population'),
             table='populationforecast_us_annual_population_age',
             data_filters=(
-                dict(filter_type='eq', filter_variable='age_g', filter_value=18),
-                dict(filter_type='between', filter_variable='year', filter_value=[2013, 2018])
+                dict(filter_type='eq',
+                     filter_variable='age_g',
+                     filter_value=18),
+                dict(filter_type='between',
+                     filter_variable='year',
+                     filter_value=[2013, 2018])
             ),
-            aggregations=(dict(aggregation_func='sum', variable_name='population'),),
+            aggregations=(dict(aggregation_func='sum',
+                               variable_name='population'),),
             groupby=('year',),
         )))

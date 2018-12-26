@@ -1,10 +1,10 @@
 """
 StratoDem Analytics : __init__.py
 Principal Author(s) : Eric Linden
-Secondary Author(s) : 
+Secondary Author(s) :
 Description :
 
-Notes : 
+Notes :
 
 December 26, 2018
 """
@@ -15,7 +15,8 @@ check_configure = True
 
 
 class ProfileWarning(Warning):
-    """Normal ImportWarning is ignored by default (and other sub-modules use it)"""
+    """Normal ImportWarning is ignored by default
+    (and other sub-modules use it)"""
     pass
 
 

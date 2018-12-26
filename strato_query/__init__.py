@@ -1,10 +1,10 @@
 """
 StratoDem Analytics : __init__
 Principal Author(s) : Eric Linden
-Secondary Author(s) : 
+Secondary Author(s) :
 Description :
 
-Notes : 
+Notes :
 
 December 26, 2018
 """
