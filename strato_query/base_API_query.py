@@ -38,8 +38,8 @@ class APIQueryParams(abc.ABC):
                  data_filters: Tuple[dict, ...],
                  aggregations: Tuple[dict, ...],
                  query_type: str,
-                 on: Optional[dict] = None,
-                 join: Optional['APIQueryParams'] = None):
+                 on: Optional[dict] = "None",
+                 join: Optional['APIQueryParams'] = "None"):
         assert isinstance(data_fields, tuple)
         assert isinstance(table, str)
         assert isinstance(groupby, tuple)
