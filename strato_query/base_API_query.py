@@ -46,7 +46,7 @@ class APIQueryParams(abc.ABC):
         assert isinstance(data_filters, tuple)
         assert isinstance(aggregations, tuple)
         assert isinstance(query_type, str)
-        assert on is None or isinstance(on, dict)
+        assert on == "None" or isinstance(on, dict)
 
         self._query_type = query_type
         self._data_fields = data_fields
@@ -99,7 +99,7 @@ class APIQueryParams(abc.ABC):
 
     @property
     def join(self) -> Union[None, dict]:
-        return None if self._join is None else self._join.to_api_struct()
+        return "None" if self._join == "None" else self._join.to_api_struct()
 
 
 class BaseAPIQuery:
