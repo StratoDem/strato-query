@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.1.2] - 2018-12-27
+### Adds
+- Adds optional `median_variable_name` parameter to `APIQueryParams` to allow for median queries
+
 ## [2.1.1] - 2018-12-27
 ### Adds
 - Adds optional `order` parameter to `APIQueryParams` to allow for sorting results
