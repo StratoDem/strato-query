@@ -38,6 +38,7 @@ class APIQueryParams(abc.ABC):
                  data_filters: Tuple[dict, ...],
                  aggregations: Tuple[dict, ...],
                  query_type: str,
+                 order: Optional[Tuple[str, ...]] = None,
                  on: Optional[dict] = None,
                  join: Optional['APIQueryParams'] = None):
         assert isinstance(data_fields, tuple)
@@ -46,6 +47,7 @@ class APIQueryParams(abc.ABC):
         assert isinstance(data_filters, tuple)
         assert isinstance(aggregations, tuple)
         assert isinstance(query_type, str)
+        assert order is None or isinstance(order, tuple)
         assert on is None or isinstance(on, dict)
 
         self._query_type = query_type
@@ -56,6 +58,7 @@ class APIQueryParams(abc.ABC):
         self._aggregations = aggregations
         self._on = on
         self._join = join
+        self._order = order
 
     def to_api_struct(self) -> dict:
         return_dict = dict(
@@ -70,6 +73,8 @@ class APIQueryParams(abc.ABC):
             return_dict['on'] = self.on
         if self.join is not None:
             return_dict['join'] = self.join
+        if self.order is not None:
+            return_dict['order'] = self.order
 
         return return_dict
 
@@ -105,6 +110,10 @@ class APIQueryParams(abc.ABC):
     @property
     def join(self) -> Union[None, dict]:
         return None if self._join is None else self._join.to_api_struct()
+
+    @property
+    def order(self) -> Union[None, Tuple[str, ...]]:
+        return self._order
 
 
 class BaseAPIQuery:

@@ -2,13 +2,17 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.1.1] - 2018-12-27
+### Adds
+- Adds optional `order` parameter to `APIQueryParams` to allow for sorting results
+
 ## [2.1.0] - 2018-12-27
 ### Changes
 - Changes the `InFilter` so it will raise an error if it receives an empty list or `None` as the `val`.
 
 ## [2.0.0] - 2018-12-26
 ### Changes
-- **Breaking change**. Combines the query param classes into one while allowing for unlimited nesting of joins. 
+- **Breaking change**. Combines the query param classes into one while allowing for unlimited nesting of joins.
 
 Example use:
 
@@ -47,10 +51,10 @@ class ExampleAPIJoinQuery(BaseAPIQuery):
                 )
             )
         )
-        
+
         return df
-``` 
+```
 
 ## [1.0.0] - 2018-12-26
 ### v1 release
-- Version 1.0.0 release 
+- Version 1.0.0 release
