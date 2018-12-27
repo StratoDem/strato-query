@@ -23,7 +23,7 @@ from strato_query.core import constants as cc
 
 
 __all__ = [
-    'APIQueryParams', 'APIJoinParam', 'APIJoinQueryParams', 'BaseAPIQuery',
+    'APIQueryParams', 'BaseAPIQuery',
 ]
 
 API_TOKEN = os.environ.get('API_TOKEN', sdc.debug_token)
@@ -37,13 +37,16 @@ class APIQueryParams(abc.ABC):
                  groupby: Tuple[str, ...],
                  data_filters: Tuple[dict, ...],
                  aggregations: Tuple[dict, ...],
-                 query_type: str):
+                 query_type: str,
+                 on: Optional[dict] = None,
+                 join: Optional['APIQueryParams'] = None):
         assert isinstance(data_fields, tuple)
         assert isinstance(table, str)
         assert isinstance(groupby, tuple)
         assert isinstance(data_filters, tuple)
         assert isinstance(aggregations, tuple)
         assert isinstance(query_type, str)
+        assert on is None or isinstance(on, dict)
 
         self._query_type = query_type
         self._data_fields = data_fields
@@ -51,15 +54,24 @@ class APIQueryParams(abc.ABC):
         self._groupby = groupby
         self._data_filters = data_filters
         self._aggregations = aggregations
+        self._on = on
+        self._join = join
 
     def to_api_struct(self) -> dict:
-        return dict(
+        return_dict = dict(
             query_type=self.query_type,
             data_fields=self.data_fields,
             table=self.table,
             groupby=self.groupby,
             data_filters=self.data_filters,
             aggregations=self.aggregations)
+
+        if self.on is not None:
+            return_dict['on'] = self.on
+        if self.join is not None:
+            return_dict['join'] = self.join
+
+        return return_dict
 
     # /// Properties
     @property
@@ -86,51 +98,13 @@ class APIQueryParams(abc.ABC):
     def aggregations(self) -> Tuple[dict, ...]:
         return self._aggregations
 
-
-class APIJoinParam(APIQueryParams):
-    def __init__(self, on: dict, **kwargs):
-        assert isinstance(on, dict)
-
-        self._on = on
-
-        super().__init__(**kwargs)
-
-    def to_api_struct(self) -> dict:
-        return dict(
-            query_type=self.query_type,
-            data_fields=self.data_fields,
-            table=self.table,
-            groupby=self.groupby,
-            data_filters=self.data_filters,
-            aggregations=self.aggregations,
-            on=self.on)
-
     @property
     def on(self) -> dict:
         return self._on
 
-
-class APIJoinQueryParams(APIQueryParams):
-    def __init__(self, join: APIJoinParam, **kwargs):
-        assert isinstance(join, APIJoinParam)
-
-        self._join = join
-
-        super().__init__(**kwargs)
-
-    def to_api_struct(self) -> dict:
-        return dict(
-            query_type=self.query_type,
-            data_fields=self.data_fields,
-            table=self.table,
-            groupby=self.groupby,
-            data_filters=self.data_filters,
-            aggregations=self.aggregations,
-            join=self.join)
-
     @property
-    def join(self) -> dict:
-        return self._join.to_api_struct()
+    def join(self) -> Union[None, dict]:
+        return None if self._join is None else self._join.to_api_struct()
 
 
 class BaseAPIQuery:
