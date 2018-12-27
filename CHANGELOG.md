@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file. This projec
 
 ## [2.1.0] - 2018-12-27
 ### Changes
-- Changes the `InFilter` so it will raise an error if it receives an empty list as the `val`.
+- Changes the `InFilter` so it will raise an error if it receives an empty list or `None` as the `val`.
 
 ## [2.0.0] - 2018-12-26
 ### Changes
