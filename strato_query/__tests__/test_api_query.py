@@ -41,3 +41,40 @@ class TestAPIQuery(unittest.TestCase, BaseAPIQuery):
         df_sorted = df.sort_values(by='YEAR', ascending=True)
         assert all(x == y for x, y in zip(
             df_sorted['YEAR'].values, [x for x in range(2013, 2019)]))
+
+    @classmethod
+    def test_multi_join(cls):
+        df = cls.query_api_df(
+            query_params=APIQueryParams(
+                table='geocookbook_county_na_county_metro',
+                data_fields=('GEOID5',),
+                data_filters=(InFilter(var='cbsa', val=[14454]).to_dict(),),
+                query_type='COUNT',
+                aggregations=(),
+                groupby=(),
+                join=APIQueryParams(
+                    table='geocookbook_county_na_county_name',
+                    data_fields=('GEOID5', 'GEOID2', 'GEOID5_NAME'),
+                    data_filters=(),
+                    query_type='COUNT',
+                    aggregations=(),
+                    groupby=(),
+                    on=dict(left=('GEOID5',), right=('GEOID5',)),
+                    join=APIQueryParams(
+                        table='geocookbook_state_na_state_name',
+                        data_fields=('GEOID2', 'GEOID2_INIT'),
+                        data_filters=(),
+                        query_type='COUNT',
+                        aggregations=(),
+                        groupby=(),
+                        on=dict(left=('GEOID2',), right=('GEOID2',)),
+                    )
+                )
+            )
+        )
+
+        df['NAME'] = df['GEOID5_NAME'] + ', ' + df['GEOID2_INIT']
+
+        assert len(df) == 3
+        assert df['GEOID5'].values[1] == 25023
+        assert df['NAME'].values[1] == 'Plymouth County, MA'
