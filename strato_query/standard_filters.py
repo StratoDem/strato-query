@@ -53,6 +53,9 @@ class BetweenFilter(BaseFilter):
 
 class InFilter(BaseFilter):
     def __init__(self, var: str, val: List[Union[float, int, str]]):
+        if len(val) < 1:
+            raise ValueError('InFilter does not accept an empty list of values. \n'
+                             'var: {}, val: {}'.format(var, val))
         super().__init__(filter_type='in',
                          filter_value=val,
                          filter_variable=var)
