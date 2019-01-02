@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.2.1] - 2019-01-02
+### Adds
+- Adds new filters to `__all__` declaration
+
 ## [2.2.0] - 2019-01-02
 ### Adds
 - Adds new filters for "not in" and "not equal"
