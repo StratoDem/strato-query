@@ -21,6 +21,8 @@ __all__ = [
     'LessThanFilter',
     'GtrThanOrEqFilter',
     'LessThanOrEqFilter',
+    'NotEqFilter',
+    'NotInFilter',
 ]
 
 
