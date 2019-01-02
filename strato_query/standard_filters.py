@@ -87,3 +87,20 @@ class LessThanOrEqFilter(BaseFilter):
         super().__init__(filter_type='le',
                          filter_value=val,
                          filter_variable=var)
+
+
+class NotEqFilter(BaseFilter):
+    def __init__(self, var: str, val: Union[float, int, str]):
+        super().__init__(filter_type='ne',
+                         filter_value=val,
+                         filter_variable=var)
+
+
+class NotInFilter(BaseFilter):
+    def __init__(self, var: str, val: List[Union[float, int, str]]):
+        if val is None or len(val) < 1:
+            raise ValueError('NotInFilter does not accept an empty list, nor a None value. \n'
+                             'var: {}, val: {}'.format(var, val))
+        super().__init__(filter_type='nin',
+                         filter_value=val,
+                         filter_variable=var)

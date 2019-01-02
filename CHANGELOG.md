@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.2.0] - 2019-01-02
+### Adds
+- Adds new filters for "not in" and "not equal"
+
 ## [2.1.2] - 2018-12-27
 ### Adds
 - Adds optional `median_variable_name` parameter to `APIQueryParams` to allow for median queries
