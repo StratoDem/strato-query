@@ -38,8 +38,6 @@ class APIQueryParams(abc.ABC):
                  data_filters: Tuple[dict, ...],
                  aggregations: Tuple[dict, ...],
                  query_type: str,
-                 median_variable_name: Optional[str] = None,
-                 mean_variable_name: Optional[str] = None,
                  order: Optional[Tuple[str, ...]] = None,
                  on: Optional[dict] = None,
                  join: Optional['APIQueryParams'] = None):
@@ -51,8 +49,6 @@ class APIQueryParams(abc.ABC):
         assert isinstance(query_type, str)
         assert order is None or isinstance(order, tuple)
         assert on is None or isinstance(on, dict)
-        assert median_variable_name is None or isinstance(median_variable_name, str)
-        assert mean_variable_name is None or isinstance(mean_variable_name, str)
 
         self._query_type = query_type
         self._data_fields = data_fields
@@ -63,8 +59,6 @@ class APIQueryParams(abc.ABC):
         self._on = on
         self._join = join
         self._order = order
-        self._median_variable_name = median_variable_name
-        self._mean_variable_name = mean_variable_name
 
     def to_api_struct(self) -> dict:
         return_dict = dict(
@@ -81,10 +75,6 @@ class APIQueryParams(abc.ABC):
             return_dict['join'] = self.join
         if self.order is not None:
             return_dict['order'] = self.order
-        if self.median_variable_name is not None:
-            return_dict['median_variable_name'] = self.median_variable_name
-        if self.mean_variable_name is not None:
-            return_dict['mean_variable_name'] = self.mean_variable_name
 
         return return_dict
 
@@ -125,13 +115,43 @@ class APIQueryParams(abc.ABC):
     def order(self) -> Union[None, Tuple[str, ...]]:
         return self._order
 
-    @property
-    def median_variable_name(self) -> Union[None, str]:
-        return self._median_variable_name
+
+class APIMeanQueryParams(APIQueryParams):
+    def __init__(self, mean_variable_name: str, **kwargs):
+        assert mean_variable_name is None or isinstance(mean_variable_name, str)
+
+        self._mean_variable_name = mean_variable_name
+
+        super().__init__(**kwargs)
+
+    def to_api_struct(self):
+        return_dict = super().to_api_struct()
+        return_dict['mean_variable_name'] = self.mean_variable_name
+
+        return return_dict
 
     @property
     def mean_variable_name(self) -> Union[None, str]:
         return self._mean_variable_name
+
+
+class APIMedianQueryParams(APIQueryParams):
+    def __init__(self, median_variable_name: str, **kwargs):
+        assert median_variable_name is None or isinstance(median_variable_name, str)
+
+        self._median_variable_name = median_variable_name
+
+        super().__init__(**kwargs)
+
+    def to_api_struct(self):
+        return_dict = super().to_api_struct()
+        return_dict['median_variable_name'] = self.median_variable_name
+
+        return return_dict
+
+    @property
+    def median_variable_name(self) -> Union[None, str]:
+        return self._median_variable_name
 
 
 class BaseAPIQuery:
