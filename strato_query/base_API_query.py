@@ -118,7 +118,7 @@ class APIQueryParams(abc.ABC):
 
 class APIMeanQueryParams(APIQueryParams):
     def __init__(self, mean_variable_name: str, **kwargs):
-        assert mean_variable_name is None or isinstance(mean_variable_name, str)
+        assert isinstance(mean_variable_name, str)
 
         self._mean_variable_name = mean_variable_name
 
@@ -131,13 +131,13 @@ class APIMeanQueryParams(APIQueryParams):
         return return_dict
 
     @property
-    def mean_variable_name(self) -> Union[None, str]:
+    def mean_variable_name(self) -> str:
         return self._mean_variable_name
 
 
 class APIMedianQueryParams(APIQueryParams):
     def __init__(self, median_variable_name: str, **kwargs):
-        assert median_variable_name is None or isinstance(median_variable_name, str)
+        assert isinstance(median_variable_name, str)
 
         self._median_variable_name = median_variable_name
 
@@ -150,7 +150,7 @@ class APIMedianQueryParams(APIQueryParams):
         return return_dict
 
     @property
-    def median_variable_name(self) -> Union[None, str]:
+    def median_variable_name(self) -> str:
         return self._median_variable_name
 
 
