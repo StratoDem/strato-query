@@ -23,7 +23,7 @@ from strato_query.core import constants as cc
 
 
 __all__ = [
-    'APIQueryParams', 'BaseAPIQuery',
+    'APIQueryParams', 'BaseAPIQuery', 'APIMeanQueryParams', 'APIMedianQueryParams',
 ]
 
 API_TOKEN = os.environ.get('API_TOKEN', sdc.debug_token)
