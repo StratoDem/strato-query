@@ -5,7 +5,8 @@ All notable changes to this project will be documented in this file. This projec
 ## [2.3.0] - 2019-01-03
 ### Adds
 - Adds new filters to `__all__` declaration
-- Adds `mean_variable_name` as a new optional param to `APIQueryParams`
+- Adds new classes, `APIMeanQueryParams` and `APIMedianQueryParams`, which require the values necessary for the related queries
+- Adds new tests for the new query types 
 
 ## [2.2.0] - 2019-01-02
 ### Adds
