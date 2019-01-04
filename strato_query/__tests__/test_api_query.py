@@ -78,3 +78,48 @@ class TestAPIQuery(unittest.TestCase, BaseAPIQuery):
         assert len(df) == 3
         assert df['GEOID5'].values[1] == 25023
         assert df['NAME'].values[1] == 'Plymouth County, MA'
+
+    @classmethod
+    def test_median_query(cls):
+        year_filter = GtrThanOrEqFilter(
+            var='year',
+            val=2013).to_dict()
+
+        df = cls.submit_query(
+            query_params=APIMedianQueryParams(
+                query_type='MEDIAN',
+                median_variable_name='income_g',
+                data_fields=('year', 'median_value'),
+                table='incomeforecast_county_annual_income_group',
+                data_filters=(year_filter,),
+                aggregations=(),
+                groupby=('year',),
+            )
+        )
+
+        df_sorted = df.sort_values(by='YEAR', ascending=True)
+        assert all(x == y for x, y in zip(
+            df_sorted['YEAR'].values, [x for x in range(2013, 2019)]))
+
+    @classmethod
+    def test_mean_query(cls):
+        age_filter = NotInFilter(
+            var='age_g_bottom_coded',
+            val=[16, 17, 18]).to_dict()
+        year_filter = EqFilter(
+            var='year',
+            val=2015).to_dict()
+
+        df = cls.submit_query(
+            query_params=APIMeanQueryParams(
+                query_type='MEAN',
+                mean_variable_name='net_worth_g',
+                data_fields=('year', 'age_g_bottom_coded', 'mean_value'),
+                table='networth_county_annual_net_worth_age_mean',
+                data_filters=(year_filter, age_filter),
+                aggregations=(),
+                groupby=('year', 'age_g_bottom_coded'),
+            )
+        )
+
+        assert df['YEAR'].unique() == 2015
