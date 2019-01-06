@@ -2,11 +2,15 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.3.1] - 2019-01-06
+### Changes
+- `BaseAPIQuery.submit_query` now includes optional `headers` argument to send with request
+
 ## [2.3.0] - 2019-01-03
 ### Adds
 - Adds new filters to `__all__` declaration
 - Adds new classes, `APIMeanQueryParams` and `APIMedianQueryParams`, which require the values necessary for the related queries
-- Adds new tests for the new query types 
+- Adds new tests for the new query types
 
 ## [2.2.0] - 2019-01-02
 ### Adds
