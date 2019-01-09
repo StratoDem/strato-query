@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.4.0] - 2019-01-09
+### Adds
+- Adds example queries to demonstrate different ways of using `strato-query`
+
 ## [2.3.1] - 2019-01-06
 ### Changes
 - `BaseAPIQuery.submit_query` now includes optional `headers` argument to send with request
