@@ -18,11 +18,11 @@ class ExampleAPIQuery(BaseAPIQuery):
         age_filter = GtrThanOrEqFilter(
             var='age_g',
             val=14).to_dict()
-            
+
         year_filter = EqFilter(
             var='year',
             val=2018).to_dict()
-            
+
         mile_radius_filter = dict(
             filter_type='mile_radius',
             filter_value=dict(
@@ -30,7 +30,7 @@ class ExampleAPIQuery(BaseAPIQuery):
                 longitude=-81.851531,
                 miles=5),
             filter_variable='')
-            
+
         df = cls.query_api_df(
             query_params=APIQueryParams(
                 table='populationforecast_tract_annual_population_age',
@@ -43,4 +43,37 @@ class ExampleAPIQuery(BaseAPIQuery):
         )
 
         return df
+```
+
+### Median household income for 80+ households across the US, by year
+```python
+# Finds median household income in the US for those 80+ from 2010 to 2013
+df = cls.query_api_df(
+    query_params=APIMedianQueryParams(
+        query_type='MEDIAN',
+        table='incomeforecast_us_annual_income_group_age',
+        data_fields=('year', {'median_value': 'median_income'}),
+        median_variable_name='income_g',
+        data_filters=(
+            GtrThanOrEqFilter(var='age_g', val=17).to_dict(),
+            BetweenFilter(var='year', val=[2010, 2013]).to_dict(),
+        ),
+        groupby=('year',),
+        order=('year',),
+        aggregations=(),
+    )
+)
+
+print('Median US household income 80+:')
+print(df.head())
+```
+
+Output:
+```
+Median US household income 80+:
+   MEDIAN_VALUE  YEAR
+0         27645  2010
+1         29269  2011
+2         30474  2012
+3         30712  2013
 ```
