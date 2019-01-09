@@ -11,6 +11,93 @@ tools to help create queries to StratoDem's API
 $ API_TOKEN=my-api-token-here python examples/examples.py
 ```
 
+### Median household income for 80+ households across the US, by year
+```python
+from strato_query.base_API_query import *
+from strato_query.standard_filters import *
+
+
+# Finds median household income in the US for those 80+ from 2010 to 2013
+df = BaseAPIQuery.query_api_df(
+    query_params=APIMedianQueryParams(
+        query_type='MEDIAN',
+        table='incomeforecast_us_annual_income_group_age',
+        data_fields=('year', {'median_value': 'median_income'}),
+        median_variable_name='income_g',
+        data_filters=(
+            GtrThanOrEqFilter(var='age_g', val=17).to_dict(),
+            BetweenFilter(var='year', val=[2010, 2013]).to_dict(),
+        ),
+        groupby=('year',),
+        order=('year',),
+        aggregations=(),
+    )
+)
+
+print('Median US household income 80+:')
+print(df.head())
+```
+
+Output:
+```
+Median US household income 80+:
+   MEDIAN_VALUE  YEAR
+0         27645  2010
+1         29269  2011
+2         30474  2012
+3         30712  2013
+```
+
+### Population density in the Boston MSA
+```python
+from strato_query.base_API_query import *
+from strato_query.standard_filters import *
+
+
+df = BaseAPIQuery.query_api_df(
+    query_params=APIQueryParams(
+        query_type='COUNT',
+        table='populationforecast_metro_annual_population_age_edu',
+        data_fields=('year', 'cbsa', {'population': 'population'}),
+        data_filters=(
+            LessThanFilter(var='year', val=2015).to_dict(),
+            EqFilter(var='cbsa', val=14454).to_dict(),
+        ),
+        aggregations=(dict(aggregation_func='sum', variable_name='population'),),
+        groupby=('cbsa', 'year'),
+        order=('year',),
+        join=APIQueryParams(
+            query_type='AREA',
+            table='geocookbook_metro_na_shapes_full',
+            data_fields=('cbsa', 'area', 'name'),
+            data_filters=(),
+            groupby=('cbsa', 'name'),
+            aggregations=(),
+            on=dict(left=('cbsa',), right=('cbsa',)),
+        )
+    )
+)
+
+df['POP_PER_SQ_MI'] = df['POPULATION'].div(df['AREA'])
+df_final = df[['YEAR', 'NAME', 'POP_PER_SQ_MI']]
+
+print('Population density in the Boston MSA up to 2015:')
+print(df_final.head())
+print('Results truncated')
+```
+
+Output:
+```
+Population density in the Boston MSA up to 2015:
+   YEAR        NAME  POP_PER_SQ_MI
+0  2000  Boston, MA    1139.046639
+1  2001  Boston, MA    1149.129937
+2  2002  Boston, MA    1153.094740
+3  2003  Boston, MA    1152.352351
+4  2004  Boston, MA    1149.932307
+Results truncated
+```
+
 ### Example use of query base class with API call and example filter
 ```python
 from strato_query.base_API_query import *
@@ -49,41 +136,4 @@ class ExampleAPIQuery(BaseAPIQuery):
         )
 
         return df
-```
-
-### Median household income for 80+ households across the US, by year
-```python
-from strato_query.base_API_query import *
-from strato_query.standard_filters import *
-
-
-# Finds median household income in the US for those 80+ from 2010 to 2013
-df = BaseAPIQuery.query_api_df(
-    query_params=APIMedianQueryParams(
-        query_type='MEDIAN',
-        table='incomeforecast_us_annual_income_group_age',
-        data_fields=('year', {'median_value': 'median_income'}),
-        median_variable_name='income_g',
-        data_filters=(
-            GtrThanOrEqFilter(var='age_g', val=17).to_dict(),
-            BetweenFilter(var='year', val=[2010, 2013]).to_dict(),
-        ),
-        groupby=('year',),
-        order=('year',),
-        aggregations=(),
-    )
-)
-
-print('Median US household income 80+:')
-print(df.head())
-```
-
-Output:
-```
-Median US household income 80+:
-   MEDIAN_VALUE  YEAR
-0         27645  2010
-1         29269  2011
-2         30474  2012
-3         30712  2013
 ```
