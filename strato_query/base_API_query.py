@@ -156,9 +156,9 @@ class APIMedianQueryParams(APIQueryParams):
 
 class BaseAPIQuery:
     @classmethod
-    def submit_query(cls, query_params: Optional[APIQueryParams]=None,
-                     queries_params: Optional[Dict[str, APIQueryParams]]=None
-                     ) -> Union[T_DF, Dict[str, T_DF]]:
+    def submit_query(cls, query_params: Optional[APIQueryParams] = None,
+                     queries_params: Optional[Dict[str, APIQueryParams]] = None,
+                     headers: Optional[Dict[str, str]] = None) -> Union[T_DF, Dict[str, T_DF]]:
         assert query_params is None or isinstance(query_params,
                                                   APIQueryParams)
         assert queries_params is None or isinstance(queries_params,
@@ -167,17 +167,19 @@ class BaseAPIQuery:
         assert not(query_params is not None and queries_params is not None)
 
         if query_params is not None:
-            return cls.query_api_df(query_params=query_params)
+            return cls.query_api_df(query_params=query_params, headers=headers)
         elif queries_params is not None:
-            return cls.query_api_multiple(queries=queries_params)
+            return cls.query_api_multiple(queries=queries_params, headers=headers)
 
     @staticmethod
-    def query_api_df(query_params: APIQueryParams) -> pandas.DataFrame:
+    def query_api_df(query_params: APIQueryParams,
+                     headers: Optional[Dict[str, str]] = None) -> pandas.DataFrame:
         r = requests.post(
             url=cc.API_URL,
             json=dict(
                 token=API_TOKEN,
-                query=query_params.to_api_struct()))
+                query=query_params.to_api_struct()),
+            headers=headers)
 
         assert r.status_code == 200, (r.status_code,
                                       r.content,
@@ -192,13 +194,14 @@ class BaseAPIQuery:
         return df_
 
     @staticmethod
-    def query_api_multiple(queries: Dict[str, APIQueryParams]
-                           ) -> Dict[str, pandas.DataFrame]:
+    def query_api_multiple(queries: Dict[str, APIQueryParams],
+                           headers: Optional[Dict[str, str]] = None) -> Dict[str, pandas.DataFrame]:
         r = requests.post(
             url=cc.API_URL,
             json=dict(
                 token=API_TOKEN,
-                queries={k: v.to_api_struct() for k, v in queries.items()}))
+                queries={k: v.to_api_struct() for k, v in queries.items()}),
+            headers=headers)
 
         assert r.status_code == 200, (r.status_code, r.content, queries)
 
