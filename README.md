@@ -47,8 +47,12 @@ class ExampleAPIQuery(BaseAPIQuery):
 
 ### Median household income for 80+ households across the US, by year
 ```python
+from strato_query.base_API_query import *
+from strato_query.standard_filters import *
+
+
 # Finds median household income in the US for those 80+ from 2010 to 2013
-df = cls.query_api_df(
+df = BaseAPIQuery.query_api_df(
     query_params=APIMedianQueryParams(
         query_type='MEDIAN',
         table='incomeforecast_us_annual_income_group_age',
