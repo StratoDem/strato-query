@@ -9,7 +9,7 @@ Notes :
 December 26, 2018
 """
 
-import warnings
+# import warnings
 
 
 check_global_configure = True
