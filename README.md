@@ -4,6 +4,12 @@ tools to help create queries to StratoDem's API
 ## Installation and usage
 `$ pip install strato-query`
 
+### Authentication
+`strato_query` looks for an `API_TOKEN` environment variable.
+```bash
+# Example passing a StratoDem Analytics API token to a Python file using the API
+$ API_TOKEN=my-api-token-here python examples/examples.py
+```
 
 ### Example use of query base class with API call and example filter
 ```python
