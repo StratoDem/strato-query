@@ -110,3 +110,10 @@ ngrok
 testvenv/
 *.xml
 node_modules/
+.Rproj.user
+
+# R packages
+.RData
+.Rhistory
+.Rproj.user/
+*.Rproj
