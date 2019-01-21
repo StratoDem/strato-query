@@ -52,3 +52,20 @@ eq_filter = function(filter_variable, filter_value) {
 between_filter = function(filter_variable, filter_value) {
   return(api_filter(filter_variable = filter_variable, filter_type = 'between', filter_value = filter_value))
 }
+
+#' Helper function to create a drivetime filter
+#' @param latitude Latitude of target
+#' @param longitude Longitude of target
+#' @param minutes Minutes drivetime
+#' @keywords query
+#' @export
+#' @return filter structure
+#' @examples
+#' drivetime_filter(latitude = 42.7, longitude = -120.38, minutes = 30)
+drivetime_filter = function(latitude, longitude, minutes) {
+  return(
+    api_filter(
+      filter_variable = '',
+      filter_type = 'drivetime',
+      filter_value = list(latitude = unbox(latitude), longitude = unbox(longitude), minutes = unbox(minutes))))
+}

@@ -117,3 +117,4 @@ node_modules/
 .Rhistory
 .Rproj.user/
 *.Rproj
+sampleUsage.R
