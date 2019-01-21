@@ -2,10 +2,10 @@
 % Please edit documentation in R/params.R
 \name{median_query_params}
 \alias{median_query_params}
-\title{This function structures an API query to submit to the StratoDem Analytics API}
+\title{This function structures an API query that gets the median value of the target "median_variable_name" to submit to the StratoDem Analytics API}
 \usage{
 median_query_params(table, data_fields, data_filters, median_variable_name,
-  aggregations = list(), groupby = list())
+  aggregations = list(), groupby = list(), order = list())
 }
 \arguments{
 \item{table}{Table name}
@@ -19,14 +19,24 @@ median_query_params(table, data_fields, data_filters, median_variable_name,
 \item{aggregations}{List of aggregations for the query}
 
 \item{groupby}{List of variables for GROUP BY}
+
+\item{order}{List of variables for ORDER}
 }
 \value{
 query parameters
 }
 \description{
-This function structures an API query to submit to the StratoDem Analytics API
+This function structures an API query that gets the median value of the target "median_variable_name" to submit to the StratoDem Analytics API
 }
 \examples{
-median_query_params('my-table', data_fields=list(), data_filters=list())
+# Returns median household income by county in 2018
+api_query_params(
+  table = 'incomeforecast_county_annual_income_g',
+  data_fields = api_fields(fields_list = list('geoid5', list(median_value = 'median_hhi'))),
+  data_filters = list(eq_filter(filter_variable = 'year', filter_value = 2018)),
+  aggregations = list(),
+  median_variable_name = 'income_g',
+  groupby = c('geoid5'),
+  order = c('geoid5'))
 }
 \keyword{query}

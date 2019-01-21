@@ -29,7 +29,19 @@ in_filter = function(filter_variable, filter_value) {
   return(api_filter(filter_variable = filter_variable, filter_type = 'in', filter_value = filter_value))
 }
 
-#' Helper function to create an EQ filter
+#' Helper function to create a "not in" filter
+#' @param filter_variable Variable filtered on
+#' @param filter_value Value used for filter
+#' @keywords query
+#' @export
+#' @return filter structure
+#' @examples
+#' nin_filter(filter_variable = 'year', filter_value = c(2018, 2023))
+nin_filter = function(filter_variable, filter_value) {
+  return(api_filter(filter_variable = filter_variable, filter_type = 'nin', filter_value = filter_value))
+}
+
+#' Helper function to create an "equal to" filter
 #' @param filter_variable Variable filtered on
 #' @param filter_value Value used for filter
 #' @keywords query
@@ -39,6 +51,66 @@ in_filter = function(filter_variable, filter_value) {
 #' eq_filter(filter_variable = 'year', filter_value = 2018)
 eq_filter = function(filter_variable, filter_value) {
   return(api_filter(filter_variable = filter_variable, filter_type = 'eq', filter_value = unbox(filter_value)))
+}
+
+#' Helper function to create a "not equal to" filter
+#' @param filter_variable Variable filtered on
+#' @param filter_value Value used for filter
+#' @keywords query
+#' @export
+#' @return filter structure
+#' @examples
+#' ne_filter(filter_variable = 'year', filter_value = 2018)
+ne_filter = function(filter_variable, filter_value) {
+  return(api_filter(filter_variable = filter_variable, filter_type = 'ne', filter_value = unbox(filter_value)))
+}
+
+#' Helper function to create a "greater than" filter
+#' @param filter_variable Variable filtered on
+#' @param filter_value Value used for filter
+#' @keywords query
+#' @export
+#' @return filter structure
+#' @examples
+#' gt_filter(filter_variable = 'year', filter_value = 2018)
+gt_filter = function(filter_variable, filter_value) {
+  return(api_filter(filter_variable = filter_variable, filter_type = 'gt', filter_value = unbox(filter_value)))
+}
+
+#' Helper function to create a "greater than or equal to" filter
+#' @param filter_variable Variable filtered on
+#' @param filter_value Value used for filter
+#' @keywords query
+#' @export
+#' @return filter structure
+#' @examples
+#' ge_filter(filter_variable = 'year', filter_value = 2018)
+ge_filter = function(filter_variable, filter_value) {
+  return(api_filter(filter_variable = filter_variable, filter_type = 'ge', filter_value = unbox(filter_value)))
+}
+
+#' Helper function to create a "less than" filter
+#' @param filter_variable Variable filtered on
+#' @param filter_value Value used for filter
+#' @keywords query
+#' @export
+#' @return filter structure
+#' @examples
+#' lt_filter(filter_variable = 'year', filter_value = 2018)
+lt_filter = function(filter_variable, filter_value) {
+  return(api_filter(filter_variable = filter_variable, filter_type = 'lt', filter_value = unbox(filter_value)))
+}
+
+#' Helper function to create a "less than or equal to" filter
+#' @param filter_variable Variable filtered on
+#' @param filter_value Value used for filter
+#' @keywords query
+#' @export
+#' @return filter structure
+#' @examples
+#' le_filter(filter_variable = 'year', filter_value = 2018)
+le_filter = function(filter_variable, filter_value) {
+  return(api_filter(filter_variable = filter_variable, filter_type = 'le', filter_value = unbox(filter_value)))
 }
 
 #' Helper function to create a between filter
@@ -68,4 +140,21 @@ drivetime_filter = function(latitude, longitude, minutes) {
       filter_variable = '',
       filter_type = 'drivetime',
       filter_value = list(latitude = unbox(latitude), longitude = unbox(longitude), minutes = unbox(minutes))))
+}
+
+#' Helper function to create a mile radius filter
+#' @param latitude Latitude of target
+#' @param longitude Longitude of target
+#' @param miles Size of radius in miles
+#' @keywords query
+#' @export
+#' @return filter structure
+#' @examples
+#' mile_radius_filter(latitude = 42.7, longitude = -120.38, miles = 5)
+mile_radius_filter = function(latitude, longitude, miles) {
+  return(
+    api_filter(
+      filter_variable = '',
+      filter_type = 'mile_radius',
+      filter_value = list(latitude = unbox(latitude), longitude = unbox(longitude), miles = unbox(miles))))
 }
