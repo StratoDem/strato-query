@@ -1,3 +1,4 @@
+library(jsonlite)
 
 #' This function structures api fields to query
 #' @param fields_list A list of fields to query
@@ -8,10 +9,10 @@
 #' api_fields(list('year', 'geoid2', list(population = 'state_population')))
 api_fields = function(fields_list = list()) {
   lapply(fields_list, function(el) {
-    if (class(el) == 'character') return(unbox(el))
+    if (class(el) == 'character') return(jsonlite::unbox(el))
     else if (class(el) == 'list') {
       r = list()
-      r [[names(el[1])]] = unbox(el[[1]])
+      r [[names(el[1])]] = jsonlite::unbox(el[[1]])
 
       return(r)
     }

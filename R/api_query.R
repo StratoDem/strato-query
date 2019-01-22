@@ -13,11 +13,11 @@ API_URL = 'https://api.stratodem.com/api'
 #' @examples
 #' submit_api_query(list(), 'my-api-token')
 submit_api_query = function(query, apiToken) {
-  json_request = list(token = unbox(apiToken), query = query)
+  json_request = list(token = jsonlite::unbox(apiToken), query = query)
 
   response = httr::POST(
     url = API_URL,
-    body = toJSON(json_request),
+    body = jsonlite::toJSON(json_request),
     encode = 'json',
     accept_json())
 

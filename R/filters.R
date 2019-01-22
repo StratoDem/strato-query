@@ -11,8 +11,8 @@ library(jsonlite)
 #' api_filter(filter_type = 'eq', filter_variable = 'year', filter_value = 2018)
 api_filter = function(filter_variable, filter_type, filter_value) {
   return(list(
-    filter_variable = unbox(filter_variable),
-    filter_type = unbox(filter_type),
+    filter_variable = jsonlite::unbox(filter_variable),
+    filter_type = jsonlite::unbox(filter_type),
     filter_value = filter_value
   ))
 }
@@ -50,7 +50,7 @@ nin_filter = function(filter_variable, filter_value) {
 #' @examples
 #' eq_filter(filter_variable = 'year', filter_value = 2018)
 eq_filter = function(filter_variable, filter_value) {
-  return(api_filter(filter_variable = filter_variable, filter_type = 'eq', filter_value = unbox(filter_value)))
+  return(api_filter(filter_variable = filter_variable, filter_type = 'eq', filter_value = jsonlite::unbox(filter_value)))
 }
 
 #' Helper function to create a "not equal to" filter
@@ -62,7 +62,7 @@ eq_filter = function(filter_variable, filter_value) {
 #' @examples
 #' ne_filter(filter_variable = 'year', filter_value = 2018)
 ne_filter = function(filter_variable, filter_value) {
-  return(api_filter(filter_variable = filter_variable, filter_type = 'ne', filter_value = unbox(filter_value)))
+  return(api_filter(filter_variable = filter_variable, filter_type = 'ne', filter_value = jsonlite::unbox(filter_value)))
 }
 
 #' Helper function to create a "greater than" filter
@@ -74,7 +74,7 @@ ne_filter = function(filter_variable, filter_value) {
 #' @examples
 #' gt_filter(filter_variable = 'year', filter_value = 2018)
 gt_filter = function(filter_variable, filter_value) {
-  return(api_filter(filter_variable = filter_variable, filter_type = 'gt', filter_value = unbox(filter_value)))
+  return(api_filter(filter_variable = filter_variable, filter_type = 'gt', filter_value = jsonlite::unbox(filter_value)))
 }
 
 #' Helper function to create a "greater than or equal to" filter
@@ -86,7 +86,7 @@ gt_filter = function(filter_variable, filter_value) {
 #' @examples
 #' ge_filter(filter_variable = 'year', filter_value = 2018)
 ge_filter = function(filter_variable, filter_value) {
-  return(api_filter(filter_variable = filter_variable, filter_type = 'ge', filter_value = unbox(filter_value)))
+  return(api_filter(filter_variable = filter_variable, filter_type = 'ge', filter_value = jsonlite::unbox(filter_value)))
 }
 
 #' Helper function to create a "less than" filter
@@ -98,7 +98,7 @@ ge_filter = function(filter_variable, filter_value) {
 #' @examples
 #' lt_filter(filter_variable = 'year', filter_value = 2018)
 lt_filter = function(filter_variable, filter_value) {
-  return(api_filter(filter_variable = filter_variable, filter_type = 'lt', filter_value = unbox(filter_value)))
+  return(api_filter(filter_variable = filter_variable, filter_type = 'lt', filter_value = jsonlite::unbox(filter_value)))
 }
 
 #' Helper function to create a "less than or equal to" filter
@@ -110,7 +110,7 @@ lt_filter = function(filter_variable, filter_value) {
 #' @examples
 #' le_filter(filter_variable = 'year', filter_value = 2018)
 le_filter = function(filter_variable, filter_value) {
-  return(api_filter(filter_variable = filter_variable, filter_type = 'le', filter_value = unbox(filter_value)))
+  return(api_filter(filter_variable = filter_variable, filter_type = 'le', filter_value = jsonlite::unbox(filter_value)))
 }
 
 #' Helper function to create a between filter
@@ -139,7 +139,10 @@ drivetime_filter = function(latitude, longitude, minutes) {
     api_filter(
       filter_variable = '',
       filter_type = 'drivetime',
-      filter_value = list(latitude = unbox(latitude), longitude = unbox(longitude), minutes = unbox(minutes))))
+      filter_value = list(
+        latitude = jsonlite::unbox(latitude),
+        longitude = jsonlite::unbox(longitude),
+        minutes = jsonlite::unbox(minutes))))
 }
 
 #' Helper function to create a mile radius filter
@@ -156,5 +159,8 @@ mile_radius_filter = function(latitude, longitude, miles) {
     api_filter(
       filter_variable = '',
       filter_type = 'mile_radius',
-      filter_value = list(latitude = unbox(latitude), longitude = unbox(longitude), miles = unbox(miles))))
+      filter_value = list(
+        latitude = jsonlite::unbox(latitude),
+        longitude = jsonlite::unbox(longitude),
+        miles = jsonlite::unbox(miles))))
 }

@@ -27,57 +27,57 @@ api_query_params = function(table, query_type = 'COUNT', data_fields, data_filte
                             order = list(), median_variable_name = NA, mean_variable_name = NA, join = NA, on = NA) {
   if (is.na(on) && is.na(join)) {
     query = list(
-      table = unbox(table),
-      query_type = unbox(query_type),
+      table = jsonlite::unbox(table),
+      query_type = jsonlite::unbox(query_type),
       data_fields = data_fields,
       data_filters = data_filters,
       aggregations = aggregations,
       groupby = groupby,
       order = order,
-      median_variable_name = unbox(median_variable_name),
-      mean_variable_name = unbox(mean_variable_name),
-      join = unbox(NA),
-      on = unbox(NA)
+      median_variable_name = jsonlite::unbox(median_variable_name),
+      mean_variable_name = jsonlite::unbox(mean_variable_name),
+      join = jsonlite::unbox(NA),
+      on = jsonlite::unbox(NA)
     )
   } else if (is.na(on) && !is.na(join)) {
     query = list(
-      table = unbox(table),
-      query_type = unbox(query_type),
+      table = jsonlite::unbox(table),
+      query_type = jsonlite::unbox(query_type),
       data_fields = data_fields,
       data_filters = data_filters,
       aggregations = aggregations,
       groupby = groupby,
       order = order,
-      median_variable_name = unbox(median_variable_name),
-      mean_variable_name = unbox(mean_variable_name),
+      median_variable_name = jsonlite::unbox(median_variable_name),
+      mean_variable_name = jsonlite::unbox(mean_variable_name),
       join = join,
-      on = unbox(NA)
+      on = jsonlite::unbox(NA)
     )
   } else if (!is.na(on) && is.na(join)) {
     query = list(
-      table = unbox(table),
-      query_type = unbox(query_type),
+      table = jsonlite::unbox(table),
+      query_type = jsonlite::unbox(query_type),
       data_fields = data_fields,
       data_filters = data_filters,
       aggregations = aggregations,
       groupby = groupby,
       order = order,
-      median_variable_name = unbox(median_variable_name),
-      mean_variable_name = unbox(mean_variable_name),
-      join = unbox(NA),
+      median_variable_name = jsonlite::unbox(median_variable_name),
+      mean_variable_name = jsonlite::unbox(mean_variable_name),
+      join = jsonlite::unbox(NA),
       on = on
     )
   } else {
     query = list(
-      table = unbox(table),
-      query_type = unbox(query_type),
+      table = jsonlite::unbox(table),
+      query_type = jsonlite::unbox(query_type),
       data_fields = data_fields,
       data_filters = data_filters,
       aggregations = aggregations,
       groupby = groupby,
       order = order,
-      median_variable_name = unbox(median_variable_name),
-      mean_variable_name = unbox(mean_variable_name),
+      median_variable_name = jsonlite::unbox(median_variable_name),
+      mean_variable_name = jsonlite::unbox(mean_variable_name),
       join = join,
       on = on
     )

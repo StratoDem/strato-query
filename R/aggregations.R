@@ -10,8 +10,8 @@ library(jsonlite)
 #' api_aggregation(aggregation_func = 'sum', variable_name = 'population')
 api_aggregation = function(aggregation_func, variable_name) {
   return(list(
-    aggregation_func = unbox(aggregation_func),
-    variable_name = unbox(variable_name)
+    aggregation_func = jsonlite::unbox(aggregation_func),
+    variable_name = jsonlite::unbox(variable_name)
   ))
 }
 
