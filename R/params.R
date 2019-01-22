@@ -7,6 +7,7 @@ library(jsonlite)
 #' @param data_filters List of filters for the query
 #' @param aggregations List of aggregations for the query
 #' @param groupby List of variables for GROUP BY
+#' @param order List of variables to ORDER
 #' @keywords query
 #' @export
 #' @return query parameters
@@ -14,7 +15,7 @@ library(jsonlite)
 #' # Returns 80+ population for Massachusetts and California from 2010 onward, sorted by year and state ID
 #' api_query_params(
 #'   table = 'populationforecast_state_annual_population_age',
-#'   data_fields = api_fields(fields_list = list('year', list(population = 'population_80_plus'))),
+#'   data_fields = api_fields(fields_list = list('year', 'geoid2', list(population = 'population_80_plus'))),
 #'   data_filters = list(
 #'     ge_filter(filter_variable = 'age_g', filter_value = 17),
 #'     in_filter(filter_variable = 'geoid2', filter_value = c(6, 25)),
@@ -23,18 +24,64 @@ library(jsonlite)
 #'   groupby = c('year', 'geoid2'),
 #'   order = c('year', 'geoid2'))
 api_query_params = function(table, query_type = 'COUNT', data_fields, data_filters, aggregations = list(), groupby = list(),
-                            order = list(), median_variable_name = NULL, mean_variable_name = NULL) {
-  query = list(
-    table = unbox(table),
-    query_type = unbox(query_type),
-    data_fields = data_fields,
-    data_filters = data_filters,
-    aggregations = aggregations,
-    groupby = groupby,
-    order = order,
-    median_variable_name = unbox(median_variable_name),
-    mean_variable_name = unbox(mean_variable_name)
-  )
+                            order = list(), median_variable_name = NA, mean_variable_name = NA, join = NA, on = NA) {
+  if (is.na(on) && is.na(join)) {
+    query = list(
+      table = unbox(table),
+      query_type = unbox(query_type),
+      data_fields = data_fields,
+      data_filters = data_filters,
+      aggregations = aggregations,
+      groupby = groupby,
+      order = order,
+      median_variable_name = unbox(median_variable_name),
+      mean_variable_name = unbox(mean_variable_name),
+      join = unbox(NA),
+      on = unbox(NA)
+    )
+  } else if (is.na(on) && !is.na(join)) {
+    query = list(
+      table = unbox(table),
+      query_type = unbox(query_type),
+      data_fields = data_fields,
+      data_filters = data_filters,
+      aggregations = aggregations,
+      groupby = groupby,
+      order = order,
+      median_variable_name = unbox(median_variable_name),
+      mean_variable_name = unbox(mean_variable_name),
+      join = join,
+      on = unbox(NA)
+    )
+  } else if (!is.na(on) && is.na(join)) {
+    query = list(
+      table = unbox(table),
+      query_type = unbox(query_type),
+      data_fields = data_fields,
+      data_filters = data_filters,
+      aggregations = aggregations,
+      groupby = groupby,
+      order = order,
+      median_variable_name = unbox(median_variable_name),
+      mean_variable_name = unbox(mean_variable_name),
+      join = unbox(NA),
+      on = on
+    )
+  } else {
+    query = list(
+      table = unbox(table),
+      query_type = unbox(query_type),
+      data_fields = data_fields,
+      data_filters = data_filters,
+      aggregations = aggregations,
+      groupby = groupby,
+      order = order,
+      median_variable_name = unbox(median_variable_name),
+      mean_variable_name = unbox(mean_variable_name),
+      join = join,
+      on = on
+    )
+  }
 
   return(query)
 }
@@ -60,7 +107,8 @@ api_query_params = function(table, query_type = 'COUNT', data_fields, data_filte
 #'   median_variable_name = 'income_g',
 #'   groupby = c('geoid5'),
 #'   order = c('geoid5'))
-median_query_params = function(table, data_fields, data_filters, median_variable_name, aggregations = list(), groupby = list(), order = list()) {
+median_query_params = function(table, data_fields, data_filters, median_variable_name, aggregations = list(),
+                               groupby = list(), order = list(), join = NA, on = NA) {
   return(api_query_params(
     table = table,
     query_type = 'MEDIAN',
@@ -69,7 +117,9 @@ median_query_params = function(table, data_fields, data_filters, median_variable
     aggregations = aggregations,
     groupby = groupby,
     order = order,
-    median_variable_name = median_variable_name
+    median_variable_name = median_variable_name,
+    join = join,
+    on = on
   ))
 }
 
@@ -93,7 +143,8 @@ median_query_params = function(table, data_fields, data_filters, median_variable
 #'   mean_variable_name = 'mean_household_income',
 #'   groupby = c('geoid2'),
 #'   order = c('geoid2'))
-mean_query_params = function(table, data_fields, data_filters, mean_variable_name, aggregations = list(), groupby = list()) {
+mean_query_params = function(table, data_fields, data_filters, mean_variable_name, aggregations = list(), groupby = list(),
+                             order = list(), join = NA, on = NA) {
   return(api_query_params(
     table = table,
     query_type = 'MEAN',
@@ -101,6 +152,9 @@ mean_query_params = function(table, data_fields, data_filters, mean_variable_nam
     data_filters = data_filters,
     aggregations = aggregations,
     groupby = groupby,
-    mean_variable_name = mean_variable_name
+    mean_variable_name = mean_variable_name,
+    order = order,
+    join = join,
+    on = on
   ))
 }

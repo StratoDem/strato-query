@@ -2,7 +2,16 @@
 tools to help create queries to StratoDem's API
 
 ## Installation and usage
-`$ pip install strato-query`
+Python:
+```
+$ pip install strato-query`
+```
+
+R:
+```
+library(devtools)
+devtools::install_github('StratoDem/strato-query')
+```
 
 ### Authentication
 `strato_query` looks for an `API_TOKEN` environment variable.
@@ -12,6 +21,7 @@ $ API_TOKEN=my-api-token-here python examples/examples.py
 ```
 
 ### Median household income for 80+ households across the US, by year
+Python:
 ```python
 from strato_query.base_API_query import *
 from strato_query.standard_filters import *
@@ -37,6 +47,28 @@ df = BaseAPIQuery.query_api_df(
 print('Median US household income 80+:')
 print(df.head())
 ```
+R:
+```R
+library(stRatoquery)
+
+
+# Finds median household income in the US for those 80+ from 2010 to 2013
+r = submit_api_query(
+  query = median_query_params(
+    table = 'incomeforecast_us_annual_income_group_age',
+    data_fields = api_fields(fields_list = list('year', 'geoid2', list(median_value = 'median_hhi'))),
+    data_filters = list(
+        ge_filter(filter_variable = 'age_g', filter_value = 17),
+        between_filter(filter_variable = 'year', filter_value = c(2010, 2013)),
+    groupby=c('year'),
+    median_variable_name='income_g',
+    aggregations=list()
+  ),
+  apiToken = 'my-api-token-here')
+
+print('Median US household income 80+:')
+print(head(df))
+```
 
 Output:
 ```
@@ -49,6 +81,7 @@ Median US household income 80+:
 ```
 
 ### Population density in the Boston MSA
+Python:
 ```python
 from strato_query.base_API_query import *
 from strato_query.standard_filters import *

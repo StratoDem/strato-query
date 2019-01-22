@@ -6,7 +6,8 @@
 \usage{
 api_query_params(table, query_type = "COUNT", data_fields, data_filters,
   aggregations = list(), groupby = list(), order = list(),
-  median_variable_name = NULL, mean_variable_name = NULL)
+  median_variable_name = NA, mean_variable_name = NA, join = NA,
+  on = NA)
 }
 \arguments{
 \item{table}{Table name}
@@ -20,6 +21,8 @@ api_query_params(table, query_type = "COUNT", data_fields, data_filters,
 \item{aggregations}{List of aggregations for the query}
 
 \item{groupby}{List of variables for GROUP BY}
+
+\item{order}{List of variables to ORDER}
 }
 \value{
 query parameters
@@ -31,7 +34,7 @@ This function structures an API query to submit to the StratoDem Analytics API
 # Returns 80+ population for Massachusetts and California from 2010 onward, sorted by year and state ID
 api_query_params(
   table = 'populationforecast_state_annual_population_age',
-  data_fields = api_fields(fields_list = list('year', list(population = 'population_80_plus'))),
+  data_fields = api_fields(fields_list = list('year', 'geoid2', list(population = 'population_80_plus'))),
   data_filters = list(
     ge_filter(filter_variable = 'age_g', filter_value = 17),
     in_filter(filter_variable = 'geoid2', filter_value = c(6, 25)),

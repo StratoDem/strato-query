@@ -5,7 +5,8 @@
 \title{This function structures an API query that gets the average value of the target "mean_variable_name" to submit to the StratoDem Analytics API}
 \usage{
 mean_query_params(table, data_fields, data_filters, mean_variable_name,
-  aggregations = list(), groupby = list())
+  aggregations = list(), groupby = list(), order = list(),
+  join = NA, on = NA)
 }
 \arguments{
 \item{table}{Table name}
