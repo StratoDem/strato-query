@@ -21,7 +21,7 @@ submit_api_query = function(query, apiToken) {
     encode = 'json',
     httr::accept_json())
 
-  cont <- content(response)
+  cont <- httr::content(response)
 
   if (!cont$success) stop(cont$message)
 
