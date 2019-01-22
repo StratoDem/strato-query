@@ -19,7 +19,7 @@ submit_api_query = function(query, apiToken) {
     url = API_URL,
     body = jsonlite::toJSON(json_request),
     encode = 'json',
-    accept_json())
+    httr::accept_json())
 
   cont <- content(response)
 
