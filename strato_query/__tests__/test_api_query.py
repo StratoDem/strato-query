@@ -16,6 +16,13 @@ from strato_query.standard_filters import *
 
 
 class TestAPIQuery(unittest.TestCase, BaseAPIQuery):
+    age_filter = NotInFilter(
+        var='age_g_bottom_coded',
+        val=[16, 17, 18]).to_dict()
+    year_filter = EqFilter(
+        var='year',
+        val=2015).to_dict()
+
     @classmethod
     def test_query_call(cls):
         age_filter = EqFilter(
@@ -28,7 +35,6 @@ class TestAPIQuery(unittest.TestCase, BaseAPIQuery):
 
         df = cls.submit_query(
             query_params=APIQueryParams(
-                query_type='COUNT',
                 data_fields=('year', 'population'),
                 table='populationforecast_us_annual_population_age',
                 data_filters=(age_filter, year_filter),
@@ -49,14 +55,12 @@ class TestAPIQuery(unittest.TestCase, BaseAPIQuery):
                 table='geocookbook_county_na_county_metro',
                 data_fields=('GEOID5',),
                 data_filters=(InFilter(var='cbsa', val=[14454]).to_dict(),),
-                query_type='COUNT',
                 aggregations=(),
                 groupby=(),
                 join=APIQueryParams(
                     table='geocookbook_county_na_county_name',
                     data_fields=('GEOID5', 'GEOID2', 'GEOID5_NAME'),
                     data_filters=(),
-                    query_type='COUNT',
                     aggregations=(),
                     groupby=(),
                     on=dict(left=('GEOID5',), right=('GEOID5',)),
@@ -64,7 +68,6 @@ class TestAPIQuery(unittest.TestCase, BaseAPIQuery):
                         table='geocookbook_state_na_state_name',
                         data_fields=('GEOID2', 'GEOID2_INIT'),
                         data_filters=(),
-                        query_type='COUNT',
                         aggregations=(),
                         groupby=(),
                         on=dict(left=('GEOID2',), right=('GEOID2',)),
@@ -87,7 +90,6 @@ class TestAPIQuery(unittest.TestCase, BaseAPIQuery):
 
         df = cls.submit_query(
             query_params=APIMedianQueryParams(
-                query_type='MEDIAN',
                 median_variable_name='income_g',
                 data_fields=('year', 'median_value'),
                 table='incomeforecast_county_annual_income_group',
@@ -103,23 +105,58 @@ class TestAPIQuery(unittest.TestCase, BaseAPIQuery):
 
     @classmethod
     def test_mean_query(cls):
-        age_filter = NotInFilter(
-            var='age_g_bottom_coded',
-            val=[16, 17, 18]).to_dict()
-        year_filter = EqFilter(
-            var='year',
-            val=2015).to_dict()
-
         df = cls.submit_query(
             query_params=APIMeanQueryParams(
-                query_type='MEAN',
-                mean_variable_name='net_worth_g',
-                data_fields=('year', 'age_g_bottom_coded', 'mean_value'),
                 table='networth_county_annual_net_worth_age_mean',
-                data_filters=(year_filter, age_filter),
+                data_fields=('year', 'age_g_bottom_coded', 'mean_value'),
+                data_filters=(cls.year_filter, cls.age_filter),
                 aggregations=(),
                 groupby=('year', 'age_g_bottom_coded'),
+                mean_variable_name='net_worth_g',
             )
         )
 
         assert df['YEAR'].unique() == 2015
+
+    @classmethod
+    def test_pretty_print(cls):
+        query_params = APIQueryParams(
+            table='geocookbook_county_na_county_metro',
+            data_fields=('GEOID5',),
+            data_filters=(InFilter(var='cbsa', val=[14454]).to_dict(),),
+            aggregations=(),
+            groupby=(),
+            join=APIQueryParams(
+                table='geocookbook_county_na_county_name',
+                data_fields=('GEOID5', 'GEOID2', 'GEOID5_NAME'),
+                data_filters=(),
+                aggregations=(),
+                groupby=(),
+                on=dict(left=('GEOID5',), right=('GEOID5',)),
+                join=APIQueryParams(
+                    table='geocookbook_state_na_state_name',
+                    data_fields=('GEOID2', 'GEOID2_INIT'),
+                    data_filters=(),
+                    aggregations=(),
+                    groupby=(),
+                    on=dict(left=('GEOID2',), right=('GEOID2',)),
+                )
+            )
+        )
+
+        string_form = query_params.pretty_print()
+        print(string_form)
+        assert isinstance(string_form, str)
+
+        median_query_params = APIMeanQueryParams(
+            mean_variable_name='net_worth_g',
+            data_fields=('year', 'age_g_bottom_coded', 'mean_value'),
+            table='networth_county_annual_net_worth_age_mean',
+            data_filters=(cls.year_filter, cls.age_filter),
+            aggregations=(),
+            groupby=('year', 'age_g_bottom_coded'),
+        )
+
+        string_form = median_query_params.pretty_print()
+        print(string_form)
+        assert isinstance(string_form, str)
