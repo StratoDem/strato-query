@@ -37,7 +37,7 @@ class APIQueryParams(abc.ABC):
                  groupby: Tuple[str, ...],
                  data_filters: Tuple[dict, ...],
                  aggregations: Tuple[dict, ...],
-                 query_type: str,
+                 query_type: Optional[str] = 'COUNT',
                  order: Optional[Tuple[str, ...]] = None,
                  on: Optional[dict] = None,
                  join: Optional['APIQueryParams'] = None):
@@ -115,6 +115,61 @@ class APIQueryParams(abc.ABC):
     def order(self) -> Union[None, Tuple[str, ...]]:
         return self._order
 
+    def pretty_print(self) -> str:
+        def pretty_print_recursive(query_params, spacer: Optional[str] = '    '):
+            if isinstance(query_params, APIQueryParams):
+                dict_form = query_params.to_api_struct()
+            elif isinstance(query_params, dict):
+                dict_form = query_params
+            else:
+                raise ValueError(query_params)
+
+            query_params_class = 'APIQueryParams'
+            if 'mean_variable_name' in dict_form:
+                query_params_class = 'APIMeanQueryParams'
+            elif 'median_variable_name' in dict_form:
+                query_params_class = 'APIMedianQueryParams'
+
+            string_form = '''{query_params_class}(
+{spacer}table='{table_name}',
+{spacer}data_fields={fields},
+{spacer}data_filters={filters},
+{spacer}query_type='{query_type}',
+{spacer}aggregations={aggregations},
+{spacer}groupby={groupby},{mean_value}{median_value}{order}{on}{join}
+{spacer})'''.format(
+                query_params_class=query_params_class,
+                table_name=dict_form['table'],
+                fields=dict_form['data_fields'],
+                filters=dict_form['data_filters'],
+                query_type=dict_form['query_type'],
+                aggregations=dict_form['aggregations'],
+                groupby=dict_form['groupby'],
+                mean_value='\n{spacer}mean_variable_name=\'{var}\','.format(
+                    spacer=spacer,
+                    var=dict_form['mean_variable_name']
+                ) if 'mean_variable_name' in dict_form else '',
+                median_value='\n{spacer}median_variable_name=\'{var}\','.format(
+                    spacer=spacer,
+                    var=dict_form['median_variable_name']
+                ) if 'median_variable_name' in dict_form else '',
+                order='\n{spacer}order={var},'.format(
+                    spacer=spacer,
+                    var=dict_form['order']) if 'order' in dict_form else '',
+                join='\n{spacer}join={var}'.format(
+                    spacer=spacer,
+                    var=pretty_print_recursive(
+                        query_params=dict_form['join'],
+                        spacer=spacer + '    ')
+                ) if 'join' in dict_form else '',
+                on='\n{spacer}on={var},'.format(
+                    spacer=spacer,
+                    var=dict_form['on']) if 'on' in dict_form else '',
+                spacer=spacer)
+
+            return string_form
+        return pretty_print_recursive(query_params=self)
+
 
 class APIMeanQueryParams(APIQueryParams):
     def __init__(self, mean_variable_name: str, **kwargs):
@@ -129,6 +184,10 @@ class APIMeanQueryParams(APIQueryParams):
         return_dict['mean_variable_name'] = self.mean_variable_name
 
         return return_dict
+
+    @property
+    def query_type(self) -> str:
+        return 'MEAN'
 
     @property
     def mean_variable_name(self) -> str:
@@ -148,6 +207,10 @@ class APIMedianQueryParams(APIQueryParams):
         return_dict['median_variable_name'] = self.median_variable_name
 
         return return_dict
+
+    @property
+    def query_type(self) -> str:
+        return 'MEDIAN'
 
     @property
     def median_variable_name(self) -> str:
