@@ -124,14 +124,12 @@ class TestAPIQuery(unittest.TestCase, BaseAPIQuery):
             table='geocookbook_county_na_county_metro',
             data_fields=('GEOID5',),
             data_filters=(InFilter(var='cbsa', val=[14454]).to_dict(),),
-            query_type='COUNT',
             aggregations=(),
             groupby=(),
             join=APIQueryParams(
                 table='geocookbook_county_na_county_name',
                 data_fields=('GEOID5', 'GEOID2', 'GEOID5_NAME'),
                 data_filters=(),
-                query_type='COUNT',
                 aggregations=(),
                 groupby=(),
                 on=dict(left=('GEOID5',), right=('GEOID5',)),
@@ -139,7 +137,6 @@ class TestAPIQuery(unittest.TestCase, BaseAPIQuery):
                     table='geocookbook_state_na_state_name',
                     data_fields=('GEOID2', 'GEOID2_INIT'),
                     data_filters=(),
-                    query_type='COUNT',
                     aggregations=(),
                     groupby=(),
                     on=dict(left=('GEOID2',), right=('GEOID2',)),
@@ -152,7 +149,6 @@ class TestAPIQuery(unittest.TestCase, BaseAPIQuery):
         assert isinstance(string_form, str)
 
         median_query_params = APIMeanQueryParams(
-            query_type='MEAN',
             mean_variable_name='net_worth_g',
             data_fields=('year', 'age_g_bottom_coded', 'mean_value'),
             table='networth_county_annual_net_worth_age_mean',
