@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.5.0] - 2019-01-25
+### Adds
+- Adds a pretty print method that can be called on the `APIQueryParams` class, and any class inheriting from the same. 
+It will return a string that mirrors the Python code, and can be copied and pasted directly into a Python script.
+- Adds default values for the `query_type`, allowing this value to be omitted when creating instances of the `APIQueryParams` classes
+
 ## [2.4.0] - 2019-01-09
 ### Adds
 - Adds example queries to demonstrate different ways of using `strato-query`
