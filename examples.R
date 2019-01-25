@@ -1,4 +1,4 @@
-library(stRatoQuery)
+library(stRatoquery)
 apiToken = 'my-api-token'
 
 # Median household income for all counties in California by year
@@ -19,6 +19,7 @@ df_ca_hhi = submit_api_query(
     aggregations = list()),
   apiToken = apiToken)
 head(df_ca_hhi)
+plot(df_ca_hhi$year, df_ca_hhi$median_hhi)
 
 # 80+ households with at least $250,000 in household net worth by census tract in Suffolk County, MA
 df_ma_80plus_nw = submit_api_query(

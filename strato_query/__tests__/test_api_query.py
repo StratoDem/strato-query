@@ -160,3 +160,46 @@ class TestAPIQuery(unittest.TestCase, BaseAPIQuery):
         string_form = median_query_params.pretty_print()
         print(string_form)
         assert isinstance(string_form, str)
+
+    def test_pretty_print_vba(self):
+        query_params = APIQueryParams(
+            table='geocookbook_county_na_county_metro',
+            data_fields=('GEOID5',),
+            data_filters=(InFilter(var='cbsa', val=[14454]).to_dict(),),
+            aggregations=(),
+            groupby=(),
+            order=('GEOID5',),
+            join=APIQueryParams(
+                table='geocookbook_county_na_county_name',
+                data_fields=('GEOID5', 'GEOID2', 'GEOID5_NAME'),
+                data_filters=(),
+                aggregations=(),
+                groupby=(),
+                on=dict(left=('GEOID5',), right=('GEOID5',)),
+                join=APIQueryParams(
+                    table='geocookbook_state_na_state_name',
+                    data_fields=('GEOID2', 'GEOID2_INIT'),
+                    data_filters=(),
+                    aggregations=(),
+                    groupby=(),
+                    on=dict(left=('GEOID2',), right=('GEOID2',)),
+                )
+            )
+        )
+
+        string_form = query_params.pretty_print_vba()
+        print(string_form)
+        assert isinstance(string_form, str)
+
+        median_query_params = APIMeanQueryParams(
+            mean_variable_name='net_worth_g',
+            data_fields=('year', 'age_g_bottom_coded', 'mean_value'),
+            table='networth_county_annual_net_worth_age_mean',
+            data_filters=(self.year_filter, self.age_filter),
+            aggregations=(),
+            groupby=('year', 'age_g_bottom_coded'),
+        )
+
+        string_form = median_query_params.pretty_print_vba()
+        print(string_form)
+        self.assertIsInstance(string_form, str)

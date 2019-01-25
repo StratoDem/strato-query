@@ -115,15 +115,20 @@ class APIQueryParams(abc.ABC):
     def order(self) -> Union[None, Tuple[str, ...]]:
         return self._order
 
+    @staticmethod
+    def _dict_form(query_params) -> dict:
+        if isinstance(query_params, APIQueryParams):
+            dict_form = query_params.to_api_struct()
+        elif isinstance(query_params, dict):
+            dict_form = query_params
+        else:
+            raise ValueError(query_params)
+
+        return dict_form
+
     def pretty_print(self) -> str:
         def pretty_print_recursive(query_params, spacer: Optional[str] = '    '):
-            if isinstance(query_params, APIQueryParams):
-                dict_form = query_params.to_api_struct()
-            elif isinstance(query_params, dict):
-                dict_form = query_params
-            else:
-                raise ValueError(query_params)
-
+            dict_form = self._dict_form(query_params)
             query_params_class = 'APIQueryParams'
             if 'mean_variable_name' in dict_form:
                 query_params_class = 'APIMeanQueryParams'
@@ -169,6 +174,136 @@ class APIQueryParams(abc.ABC):
 
             return string_form
         return pretty_print_recursive(query_params=self)
+
+    def pretty_print_vba(self) -> str:
+        def pretty_print_recursive(query_params, spacer: Optional[str] = '    ') -> str:
+            dict_form = self._dict_form(query_params)
+            query_params_func = 'apiQueryParameters'
+            if 'mean_variable_name' in dict_form:
+                query_params_func = 'meanQueryParameters'
+            if 'median_variable_name' in dict_form:
+                query_params_func = 'medianQueryParameters'
+
+            def _process_renamed_field(field: dict) -> str:
+                assert isinstance(field, dict)
+
+                original = list(field.keys())[0]
+                renamed = field[original]
+
+                renamed_val = '"{}"'.format(renamed) if isinstance(renamed, str) else renamed
+
+                return 'renameVariable(original:="{}", renamed:={})'.format(original, renamed_val)
+
+            def _process_filter(filt: dict) -> str:
+                assert isinstance(filt, dict)
+
+                filter_type = filt['filter_type']
+                if filter_type in {'mile_radius', 'drivetime'}:
+                    metric = 'miles' if filter_type == 'mile_radius' else 'minutes'
+                    func = {
+                        'mile_radius': 'mileRadiusFilter',
+                        'drivetime': 'drivetimeFilter'}
+                    return '{func}(latitude:={lat}, longitude:={lng}, {metric}:={val})'.format(
+                        func=func,
+                        lat=filt['filter_value']['latitude'],
+                        lng=filt['filter_value']['longitude'],
+                        metric=metric,
+                        val=filt['filter_value'][metric]
+                    )
+                else:
+                    func = {
+                        'eq': 'equalToFilter',
+                        'ne': 'notEqualToFilter',
+                        'gt': 'greaterThanFilter',
+                        'ge': 'greaterThanOrEqualToFilter',
+                        'lt': 'lessThanFilter',
+                        'le': 'lessThanOrEqualToFilter',
+                        'in': 'inFilter',
+                        'nin': 'notInFilter',
+                        'between': 'betweenFilter',
+                    }[filter_type]
+
+                    fv = filt['filter_value']
+                    if isinstance(fv, str):
+                        filter_value = '"{}"'.format(fv)
+                    elif isinstance(fv, (list, tuple)):
+                        filter_value = 'Array({})'.format(
+                            ','.join('"{}"'.format(v) if isinstance(v, str) else str(v)
+                                     for v in fv))
+                    else:
+                        filter_value = fv
+                    return '{func}(filterVariable:="{filter_variable}", ' \
+                           'filterValue:={filter_value})'.format(
+                            func=func,
+                            filter_variable=filt['filter_variable'],
+                            filter_value=filter_value)
+
+            def _process_aggregation(agg: dict) -> str:
+                assert isinstance(agg, dict)
+
+                aggregation_func = agg['aggregation_func']
+                variable_name = agg['variable_name']
+
+                return '{}Aggregation(variableName:="{}")'.format(aggregation_func, variable_name)
+
+            def _process_join_on(on: dict) -> str:
+                assert isinstance(on, dict)
+                left = on['left']
+                right = on['right']
+
+                return 'joinOnStructure(left:=Array({}), right:=Array({}))'.format(
+                    ','.join('"{}"'.format(f) for f in left),
+                    ','.join('"{}"'.format(f) for f in right))
+
+            return '''{query_params_func}( _
+{spacer}table:="{table_name}", _
+{spacer}dataFields:=Array({fields}), _
+{spacer}dataFilters:=Array({filters}), _
+{spacer}aggregations:=Array({aggregations}), _
+{spacer}groupby:=Array({groupby}){order}{median}{mean}{on}{join})'''.format(
+                query_params_func=query_params_func,
+                table_name=dict_form['table'],
+                fields=','.join(
+                    '"{}"'.format(f) if isinstance(f, str) else _process_renamed_field(f)
+                    for f in dict_form['data_fields']),
+                filters=', '.join(_process_filter(f) for f in dict_form['data_filters']),
+                aggregations=', '.join(_process_aggregation(agg)
+                                       for agg in dict_form['aggregations']),
+                groupby=','.join('"{}"'.format(f) for f in dict_form['groupby']),
+                order=', order:=Array({var})'.format(
+                    spacer=spacer,
+                    var=','.join('"{}"'.format(f) for f in dict_form['order']))
+                if 'order' in dict_form else '',
+                mean=', _\n{spacer}meanVariableName:="{var}"'.format(
+                    spacer=spacer,
+                    var=dict_form['mean_variable_name']
+                ) if 'mean_variable_name' in dict_form else '',
+                median=', _\n{spacer}medianVariableName:="{var}"'.format(
+                    spacer=spacer,
+                    var=dict_form['median_variable_name']
+                ) if 'median_variable_name' in dict_form else '',
+                join=', _\n{spacer}join:={var}'.format(
+                    spacer=spacer,
+                    var=pretty_print_recursive(
+                        query_params=dict_form['join'],
+                        spacer=spacer + '    ')) if 'join' in dict_form else '',
+                on=', _\n{spacer}joinOn:={joinOn}'.format(
+                    spacer=spacer,
+                    joinOn=_process_join_on(dict_form['on'])) if 'on' in dict_form else '',
+                spacer=spacer)
+        return pretty_print_recursive(query_params=self)
+
+    def pretty_print_r(self) -> str:
+        raise NotImplementedError
+        def pretty_print_recursive(query_params, spacer: Optional[str] = '  ') -> str:
+            dict_form = self._dict_form(query_params)
+            query_params_class = self._cls_name(dict_form=dict_form)
+
+            return '''
+            
+            '''.format(
+
+            )
 
 
 class APIMeanQueryParams(APIQueryParams):
