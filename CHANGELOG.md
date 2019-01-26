@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.5.2] - 2019-01-25
+### Adds
+- Adds a pretty print method that can be called on the `APIQueryParams` class, and any class inheriting from the same.
+It will return a string that mirrors R code, and can be copied and pasted directly into an R script.
+
 ## [2.5.1] - 2019-01-25
 ### Adds
 - Adds a pretty print method that can be called on the `APIQueryParams` class, and any class inheriting from the same.
