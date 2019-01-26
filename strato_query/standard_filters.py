@@ -106,3 +106,19 @@ class NotInFilter(BaseFilter):
         super().__init__(filter_type='nin',
                          filter_value=val,
                          filter_variable=var)
+
+
+class MileRadiusFilter(BaseFilter):
+    def __init__(self, latitude: float, longitude: float, miles: Union[int, float]):
+        super().__init__(
+            filter_type='mile_radius',
+            filter_variable='',
+            filter_value=dict(latitude=latitude, longitude=longitude, miles=miles))
+
+
+class DrivetimeFilter(BaseFilter):
+    def __init__(self, latitude: float, longitude: float, minutes: Union[int, float]):
+        super().__init__(
+            filter_type='drivetime',
+            filter_variable='',
+            filter_value=dict(latitude=latitude, longitude=longitude, minutes=minutes))

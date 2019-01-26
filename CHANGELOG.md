@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.5.6] - 2019-01-26
+### Adds
+- Adds `MileRadiusFilter` and `DrivetimeFilter` to `strato_query`
+- Updates `submit_api_query` to return `data.frame` with correct `numeric` types in R
+
 ## [2.5.5] - 2019-01-25
 ### Fixes
 - Adds spacing for comma-separated arguments

@@ -25,5 +25,5 @@ submit_api_query = function(query, apiToken) {
 
   if (!cont$success) stop(cont$message)
 
-  return(as.data.frame(do.call(rbind, cont$data)))
+  return(fromJSON(toJSON(cont$data, auto_unbox = TRUE)))
 }

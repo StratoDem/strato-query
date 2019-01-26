@@ -3,7 +3,15 @@ Tools to help query the StratoDem Analytics API for economic and geo-demographic
 
 [Back to main page](/)
 
-### Installation and usage
+## Table of contents
+- [Installation and usage](#installation-and-usage)
+- [Authentication](#authentication)
+- [Sample queries](#sample-queries)
+  - [Median household income for 80+ households across the US, by year](#median-household-income-for-80-households-across-the-us-by-year)
+  - [Population density in the Boston MSA](#population-density-in-the-boston-msa)
+  - [Population within five miles of latitude-longitude pair](#population-within-five-miles-of-latitude-longitude-pair)
+
+### [Installation and usage](#installation-and-usage)
 
 To install the `strato_query` Python package:
 #### Python:
@@ -11,18 +19,28 @@ To install the `strato_query` Python package:
 $ pip install strato-query
 ```
 
-### Authentication
+### [Authentication](#authentication)
 `strato_query` looks for an `API_TOKEN` environment variable.
 ```bash
 # Example passing a StratoDem Analytics API token to a Python file using the API
 $ API_TOKEN=my-api-token-here python examples/examples.py
 ```
 
+You can also create it at the start of a Python script:
+```python
+import os
+
+# Set API_TOKEN environment variable to 'my-api-token'
+os.environ['API_TOKEN'] = 'my-api-token'
+
+# API calls from this point on will now query the API with API_TOKEN
+```
+
 [How do I create a new API token or find an existing token? &rarr;](https://academy.stratodem.com/article/82-creating-and-managing-api-tokens)
 
-### Sample queries
+### [Sample queries](#sample-queries)
 
-#### Median household income for 80+ households across the US, by year
+#### [Median household income for 80+ households across the US, by year](#median-household-income-for-80-households-across-the-us-by-year)
 ```python
 from strato_query.base_API_query import *
 from strato_query.standard_filters import *
@@ -52,17 +70,17 @@ print(df.head())
 Output:
 ```
 Median US household income 80+:
-   MEDIAN_VALUE  YEAR
-0         27645  2010
-1         29269  2011
-2         30474  2012
-3         30712  2013
+   MEDIAN_INCOME  YEAR
+0          27645  2010
+1          29269  2011
+2          30474  2012
+3          30712  2013
 ```
 
-#### Population density in the Boston MSA
+#### [Population density in the Boston MSA](#population-density-in-the-boston-msa)
 ```python
-from strato_query.base_API_query import *
-from strato_query.standard_filters import *
+from strato_query.base_API_query import BaseAPIQuery, APIQueryParams
+from strato_query.standard_filters import EqFilter, LessThanFilter
 
 
 df = BaseAPIQuery.query_api_df(
@@ -81,7 +99,7 @@ df = BaseAPIQuery.query_api_df(
             query_type='AREA',
             table='geocookbook_metro_na_shapes_full',
             data_fields=('cbsa', 'area', 'name'),
-            data_filters=(),
+            data_filters=(EqFilter(var='cbsa', val=14454).to_dict(),),
             groupby=('cbsa', 'name'),
             aggregations=(),
             on=dict(left=('cbsa',), right=('cbsa',)),
@@ -102,50 +120,43 @@ Output:
 ```
 Population density in the Boston MSA up to 2015:
    YEAR        NAME  POP_PER_SQ_MI
-0  2000  Boston, MA    1139.046639
-1  2001  Boston, MA    1149.129937
-2  2002  Boston, MA    1153.094740
-3  2003  Boston, MA    1152.352351
-4  2004  Boston, MA    1149.932307
+0  2014  Boston, MA    1665.827530
+1  2013  Boston, MA    1651.187549
+2  2012  Boston, MA    1633.847778
+3  2011  Boston, MA    1617.340007
+4  2010  Boston, MA    1601.802067
 Results truncated
 ```
 
-#### Example use of query base class with API call and example filter
+### [Population within five miles of latitude-longitude pair](#population-within-five-miles-of-latitude-longitude-pair)
 ```python
-from strato_query.base_API_query import *
-from strato_query.standard_filters import *
+from strato_query.base_API_query import BaseAPIQuery, APIQueryParams
+from strato_query.standard_filters import MileRadiusFilter, BetweenFilter
 
+df = BaseAPIQuery.query_api_df(
+    query_params=APIQueryParams(
+        table='populationforecast_tract_annual_population',
+        data_fields=(('YEAR', {'population': 'population_within_5_miles'})),
+        data_filters=(
+            # Aggregate data within five miles of 40.7589542, -73.9937348
+            MileRadiusFilter(
+                latitude=40.75895, longitude=-73.9937, miles=5).to_dict(),
+            # Only get data for years between 2010 and 2020 (inclusive)
+            BetweenFilter(var='year', val=[2010, 2020]).to_dict()),
+        aggregations=({'variable_name': 'population', 'aggregation_func': 'sum'},),
+        groupby=('year',)))
 
-class ExampleAPIQuery(BaseAPIQuery):
-    @classmethod
-    def get_df_from_API_call(cls, **kwargs):
-        # This API call will return the population 65+ in 2018 within 5 miles of the lat/long pair
-        age_filter = GtrThanOrEqFilter(
-            var='age_g',
-            val=14).to_dict()
+print('Population within five miles of 40.7589542, -73.9937348')
+print(df.head())
+```
 
-        year_filter = EqFilter(
-            var='year',
-            val=2018).to_dict()
-
-        mile_radius_filter = dict(
-            filter_type='mile_radius',
-            filter_value=dict(
-                latitude=26.606484,
-                longitude=-81.851531,
-                miles=5),
-            filter_variable='')
-
-        df = cls.query_api_df(
-            query_params=APIQueryParams(
-                table='populationforecast_tract_annual_population_age',
-                data_fields=('POPULATION',),
-                data_filters=(age_filter, year_filter, mile_radius_filter),
-                query_type='COUNT',
-                aggregations=(),
-                groupby=()
-            )
-        )
-
-        return df
+Output:
+```
+Population within five miles of 40.7589542, -73.9937348
+   POPULATION_WITHIN_5_MILES  YEAR
+0               2.333544e+06  2010
+1               2.369469e+06  2011
+2               2.400245e+06  2012
+3               2.420539e+06  2013
+4               2.438206e+06  2014
 ```

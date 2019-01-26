@@ -43,7 +43,7 @@ df = submit_api_query(
     median_variable_name='income_g',
     aggregations=list()
   ),
-  apiToken = 'my-api-token-here')
+  apiToken = apiToken)
 
 print('Median US household income 80+:')
 print(head(df))
@@ -51,17 +51,19 @@ print(head(df))
 
 Output:
 ```
-Median US household income 80+:
-   MEDIAN_VALUE  YEAR
-0         27645  2010
-1         29269  2011
-2         30474  2012
-3         30712  2013
+[1] "Median US household income 80+:"
+  year median_hhi
+1 2010      27645
+2 2011      29269
+3 2012      30474
+4 2013      30712
 ```
 
 #### [Population density in the Boston MSA](#population-density-in-the-boston-msa)
 ```R
 library(stRatoquery)
+
+apiToken = 'my-api-token'
 
 df = submit_api_query(
   query = api_query_params(
@@ -71,7 +73,7 @@ df = submit_api_query(
         lt_filter(filter_variable = 'year', filter_value = 2015),
         eq_filter(filter_variable = 'cbsa', filter_value = 14454)
     ),
-    groupby=c('year'),
+    groupby=c('year', 'cbsa'),
     aggregations = list(sum_aggregation(variable_name = 'population')),
     join = api_query_params(
         table = 'geocookbook_metro_na_shapes_full',
@@ -83,19 +85,28 @@ df = submit_api_query(
         on = list(left = c('cbsa'), right = c('cbsa'))
     )
   ),
-  apiToken = 'my-api-token-here')
+  apiToken = apiToken)
+
+df$pop_per_sq_mi = df$population / df$area
+
+print('Population density in the Boston MSA up to 2015:')
+print(head(df))
+print('Results truncated')
 ```
 
 Output:
 ```
-Population density in the Boston MSA up to 2015:
-   YEAR        NAME  POP_PER_SQ_MI
-0  2000  Boston, MA    1139.046639
-1  2001  Boston, MA    1149.129937
-2  2002  Boston, MA    1153.094740
-3  2003  Boston, MA    1152.352351
-4  2004  Boston, MA    1149.932307
-Results truncated
+[1] "Population density in the Boston MSA up to 2015:"
+
+  year  cbsa population       name     area pop_per_sq_mi
+1 2014 14454    1970099 Boston, MA 1182.655      1665.828
+2 2013 14454    1952785 Boston, MA 1182.655      1651.188
+3 2012 14454    1932278 Boston, MA 1182.655      1633.848
+4 2011 14454    1912755 Boston, MA 1182.655      1617.340
+5 2010 14454    1894379 Boston, MA 1182.655      1601.802
+6 2009 14454    1875325 Boston, MA 1182.655      1585.691
+
+[1] "Results truncated"
 ```
 
 ### [Population within five miles of latitude-longitude pair](#population-within-five-miles-of-latitude-longitude-pair)
@@ -107,24 +118,27 @@ df = submit_api_query(
     table = 'populationforecast_tract_annual_population',
     data_fields = api_fields(fields_list = list('YEAR', list(population = 'population_within_5_miles'))),
     data_filters = list(
-      # Aggregate data within five miles of 40.7589542, -73.9937348
-      mile_radius_filter(latitude = 40.7589542, longitude = -73.9937348, miles = 5),
+      # Aggregate data within five miles of 40.7589, -73.9937
+      mile_radius_filter(latitude = 40.7589, longitude = -73.9937, miles = 5),
       # Only get data for years between 2010 and 2020 (inclusive)
       between_filter(filter_variable = 'year', filter_value = c(2010, 2020))),
     aggregations = list(sum_aggregation(variable_name = 'population')),
     groupby = c('year')),
-  apiToken=apiToken)
+  apiToken = apiToken)
 
-head(df)
+print('Population within five miles of 40.7589542, -73.9937348')
+print(head(df))
 ```
 
 Output:
 ```
+[1] "Population within five miles of 40.7589542, -73.9937348"
+
   year population_within_5_miles
-1 2010                   2333013
-2 2011                   2368923
-3 2012                   2399682
-4 2013                   2419962
-5 2014                   2437614
-6 2015                   2456257
+1 2010                   2331875
+2 2011                   2367830
+3 2012                   2398631
+4 2013                   2418956
+5 2014                   2436646
+6 2015                   2455316
 ```
