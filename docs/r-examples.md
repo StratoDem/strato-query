@@ -4,11 +4,14 @@ Tools to help query the StratoDem Analytics API for economic and geo-demographic
 [Back to main page](/strato-query)
 
 ## Table of contents
-- [Installation and usage](#Installation-and-usage)
-- [Authentication](#Authentication)
-- [Sample queries](#Sample-queries)
+- [Installation and usage](#installation-and-usage)
+- [Authentication](#authentication)
+- [Sample queries](#sample-queries)
+  - [Median household income for 80+ households across the US, by year](#api-example-median-hhi)
+  - [Population density in the Boston MSA](#api-example-population-density)
+  - [Population within five miles of latitude-longitude pair](#api-example-mile-radius-filter)
 
-### [Installation and usage](#Installation-and-usage)
+### [Installation and usage](#installation-and-usage)
 
 To install the `stRatoquery` R package:
 ```R
@@ -16,14 +19,14 @@ library(devtools)
 devtools::install_github('StratoDem/strato-query')
 ```
 
-### [Authentication](#Authentication)
+### [Authentication](#authentication)
 `stRatoquery::submit_api_query` requires an `apiToken` argument.
 
 [How do I create a new API token or find an existing token? &rarr;](https://academy.stratodem.com/article/82-creating-and-managing-api-tokens)
 
-### [Sample queries](#Sample-queries)
+### [Sample queries](#sample-queries)
 
-#### Median household income for 80+ households across the US, by year
+#### [Median household income for 80+ households across the US, by year](#api-example-median-hhi)
 ```R
 library(stRatoquery)
 
@@ -56,7 +59,7 @@ Median US household income 80+:
 3         30712  2013
 ```
 
-#### Population density in the Boston MSA
+#### [Population density in the Boston MSA](#api-example-population-density)
 ```R
 library(stRatoquery)
 
@@ -95,7 +98,7 @@ Population density in the Boston MSA up to 2015:
 Results truncated
 ```
 
-### Population within five miles of latitude-longitude pair
+### [Population within five miles of latitude-longitude pair](#api-example-mile-radius-filter)
 ```R
 library(stRatoquery)
 
