@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.5.5] - 2019-01-25
+### Fixes
+- Adds spacing for comma-separated arguments
+
 ## [2.5.4] - 2019-01-25
 ### Fixes
 - Bug fixes in `pretty_print_r` and `pretty_print_vba` for `query_type`

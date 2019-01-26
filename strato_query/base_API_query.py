@@ -228,8 +228,8 @@ class APIQueryParams(abc.ABC):
                         filter_value = '"{}"'.format(fv)
                     elif isinstance(fv, (list, tuple)):
                         filter_value = 'Array({})'.format(
-                            ','.join('"{}"'.format(v) if isinstance(v, str) else str(v)
-                                     for v in fv))
+                            ', '.join('"{}"'.format(v) if isinstance(v, str) else str(v)
+                                      for v in fv))
                     else:
                         filter_value = fv
                     return '{func}(filterVariable:="{filter_variable}", ' \
@@ -252,8 +252,8 @@ class APIQueryParams(abc.ABC):
                 right = on['right']
 
                 return 'joinOnStructure(left:=Array({}), right:=Array({}))'.format(
-                    ','.join('"{}"'.format(f) for f in left),
-                    ','.join('"{}"'.format(f) for f in right))
+                    ', '.join('"{}"'.format(f) for f in left),
+                    ', '.join('"{}"'.format(f) for f in right))
 
             return '''{query_params_func}( _
 {spacer}table:="{table_name}", _
@@ -263,16 +263,16 @@ class APIQueryParams(abc.ABC):
 {spacer}groupby:=Array({groupby}){order}{median}{mean}{on}{join}{query_type})'''.format(
                 query_params_func=query_params_func,
                 table_name=dict_form['table'],
-                fields=','.join(
+                fields=', '.join(
                     '"{}"'.format(f) if isinstance(f, str) else _process_renamed_field(f)
                     for f in dict_form['data_fields']),
                 filters=', '.join(_process_filter(f) for f in dict_form['data_filters']),
                 aggregations=', '.join(_process_aggregation(agg)
                                        for agg in dict_form['aggregations']),
-                groupby=','.join('"{}"'.format(f) for f in dict_form['groupby']),
+                groupby=', '.join('"{}"'.format(f) for f in dict_form['groupby']),
                 order=', order:=Array({var})'.format(
                     spacer=spacer,
-                    var=','.join('"{}"'.format(f) for f in dict_form['order']))
+                    var=', '.join('"{}"'.format(f) for f in dict_form['order']))
                 if 'order' in dict_form else '',
                 mean=', _\n{spacer}meanVariableName:="{var}"'.format(
                     spacer=spacer,
@@ -349,8 +349,8 @@ class APIQueryParams(abc.ABC):
                         filter_value = '"{}"'.format(fv)
                     elif isinstance(fv, (list, tuple)):
                         filter_value = 'c({})'.format(
-                            ','.join('"{}"'.format(v) if isinstance(v, str) else str(v)
-                                     for v in fv))
+                            ', '.join('"{}"'.format(v) if isinstance(v, str) else str(v)
+                                      for v in fv))
                     else:
                         filter_value = fv
                     return '{func}(filter_variable = "{filter_variable}", ' \

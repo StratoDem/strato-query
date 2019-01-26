@@ -13,7 +13,7 @@ from setuptools import setup
 
 setup(
     name='strato_query',
-    version='2.5.4',
+    version='2.5.5',
     author='Michael Clawar, Raaid Arshad, Eric Linden',
     author_email='tech@stratodem.com',
     packages=[
