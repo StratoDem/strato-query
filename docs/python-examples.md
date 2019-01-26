@@ -1,3 +1,6 @@
+## `strato_query`
+Tools to help query the StratoDem Analytics API for economic and geo-demographic data in Python
+
 ### Installation and usage
 
 To install the `strato_query` Python package:

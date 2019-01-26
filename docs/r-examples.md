@@ -1,4 +1,5 @@
-##
+## `stRatoquery`
+Tools to help query the StratoDem Analytics API for economic and geo-demographic data in R
 
 ### Installation and usage
 
@@ -18,7 +19,6 @@ devtools::install_github('StratoDem/strato-query')
 #### Median household income for 80+ households across the US, by year
 ```R
 library(stRatoquery)
-
 
 # Finds median household income in the US for those 80+ from 2010 to 2013
 df = submit_api_query(
