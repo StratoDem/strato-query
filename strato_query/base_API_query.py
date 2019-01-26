@@ -290,9 +290,9 @@ class APIQueryParams(abc.ABC):
                 on=', _\n{spacer}joinOn:={joinOn}'.format(
                     spacer=spacer,
                     joinOn=_process_join_on(dict_form['on'])) if 'on' in dict_form else '',
-                query_type=',\n{spacer}queryType:="{query_type}"'.format(
+                query_type=', _\n{spacer}queryType:="{query_type}"'.format(
                     spacer=spacer, query_type=dict_form['query_type'])
-                if 'query_type' in dict_form else '',
+                if 'query_type' in dict_form and query_params_func == 'apiQueryParameters' else '',
                 spacer=spacer)
         return pretty_print_recursive(query_params=self)
 
@@ -389,7 +389,7 @@ class APIQueryParams(abc.ABC):
                     spacer=spacer,
                     var=dict_form['mean_variable_name']
                 ) if 'mean_variable_name' in dict_form else '',
-                median_value=',\n{spacer}median_variable_name = \'{var}\','.format(
+                median_value=',\n{spacer}median_variable_name = \'{var}\''.format(
                     spacer=spacer,
                     var=dict_form['median_variable_name']
                 ) if 'median_variable_name' in dict_form else '',
@@ -406,7 +406,7 @@ class APIQueryParams(abc.ABC):
                 if 'on' in dict_form else '',
                 query_type=',\n{spacer}query_type = "{query_type}"'.format(
                     spacer=spacer, query_type=dict_form['query_type'])
-                if 'query_type' in dict_form else '',
+                if 'query_type' in dict_form and query_params_func == 'api_query_params' else '',
                 spacer=spacer)
 
             return string_form
