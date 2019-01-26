@@ -1,7 +1,7 @@
 ## `stRatoquery`
 Tools to help query the StratoDem Analytics API for economic and geo-demographic data in R
 
-[Back to main page](/strato-query)
+[Back to main page](/)
 
 ## Table of contents
 - [Installation and usage](#installation-and-usage)

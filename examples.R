@@ -1,5 +1,5 @@
 library(stRatoquery)
-apiToken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJ1c2VyX2lkIjoxLCJvcmdhbml6YXRpb25faWQiOjEsInZhbGlkX2ZvciI6MzE1MzYwMDAsImV4cCI6MTU3OTg5NjA3Nn0.fKoo5B2L0w37ONhTD6L4umxzCd2DWcXIW8sc-R85xJdbzxIHKgaSWrCfoFkw6f7X2qz7RBgsBhb7MQ3gwie8PA'
+apiToken = 'my-api-token'
 
 # Median household income for all counties in California by year
 df_ca_hhi = submit_api_query(
@@ -91,7 +91,7 @@ df = submit_api_query(
     table = 'populationforecast_tract_annual_population',
     data_fields = api_fields(fields_list = list('YEAR', list(population = 'population_within_5_miles'))),
     data_filters = list(
-      mile_radius_filter(latitude = 42, longitude = -107.3, miles = 5),
+      mile_radius_filter(latitude = 40.7589542, longitude = -73.9937348, miles = 5),
       between_filter(filter_variable = 'year', filter_value = c(2010, 2020))),
     aggregations = list(sum_aggregation(variable_name = 'population')),
     groupby = c('year')),
