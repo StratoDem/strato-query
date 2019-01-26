@@ -87,13 +87,18 @@ submit_api_query(api_query_params(
   query_type = "COUNT"), apiToken = apiToken)
 
 df = submit_api_query(
-  api_query_params(
-    table = 'populationforecast_tract_annual_population',
-    data_fields = api_fields(fields_list = list('YEAR', list(population = 'population_within_5_miles'))),
+  query = median_query_params(
+    table = 'incomeforecast_us_annual_income_group_age',
+    data_fields = api_fields(fields_list = list('year', 'geoid2', list(median_value = 'median_hhi'))),
     data_filters = list(
-      mile_radius_filter(latitude = 40.7589542, longitude = -73.9937348, miles = 5),
-      between_filter(filter_variable = 'year', filter_value = c(2010, 2020))),
-    aggregations = list(sum_aggregation(variable_name = 'population')),
-    groupby = c('year')),
-  apiToken=apiToken)
-head(df)
+      ge_filter(filter_variable = 'age_g', filter_value = 17),
+      between_filter(filter_variable = 'year', filter_value = c(2010, 2013))
+    ),
+    groupby=c('year'),
+    median_variable_name='income_g',
+    aggregations=list()
+  ),
+  apiToken = apiToken)
+
+print('Median US household income 80+:')
+print(head(df))
