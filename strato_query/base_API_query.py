@@ -260,7 +260,7 @@ class APIQueryParams(abc.ABC):
 {spacer}dataFields:=Array({fields}), _
 {spacer}dataFilters:=Array({filters}), _
 {spacer}aggregations:=Array({aggregations}), _
-{spacer}groupby:=Array({groupby}){order}{median}{mean}{on}{join})'''.format(
+{spacer}groupby:=Array({groupby}){order}{median}{mean}{on}{join}{query_type})'''.format(
                 query_params_func=query_params_func,
                 table_name=dict_form['table'],
                 fields=','.join(
@@ -290,6 +290,9 @@ class APIQueryParams(abc.ABC):
                 on=', _\n{spacer}joinOn:={joinOn}'.format(
                     spacer=spacer,
                     joinOn=_process_join_on(dict_form['on'])) if 'on' in dict_form else '',
+                query_type=',\n{spacer}queryType:="{query_type}"'.format(
+                    spacer=spacer, query_type=dict_form['query_type'])
+                if 'query_type' in dict_form else '',
                 spacer=spacer)
         return pretty_print_recursive(query_params=self)
 
@@ -308,7 +311,7 @@ class APIQueryParams(abc.ABC):
                 elif isinstance(field, dict):
                     k = list(field.keys())[0]
                     v = field[k]
-                    return "list({} = '{}')".format(k, v)
+                    return "list('{}' = '{}')".format(k, v)
                 else:
                     raise TypeError(field)
 
@@ -362,24 +365,25 @@ class APIQueryParams(abc.ABC):
                 aggregation_func = agg['aggregation_func']
                 variable_name = agg['variable_name']
 
-                return '{}_aggregation(variableName = "{}")'.format(aggregation_func, variable_name)
+                return '{}_aggregation(variable_name = "{}")'.format(
+                    aggregation_func, variable_name)
 
             string_form = '''{query_params_func}(
 {spacer}table = '{table_name}',
 {spacer}data_fields = api_fields(fields_list = list({fields})),
 {spacer}data_filters = list({filters}),
 {spacer}aggregations = list({aggregations}),
-{spacer}groupby = c({groupby}){mean_value}{median_value}{order}{on}{join})'''.format(
+{spacer}groupby = c({groupby}){mean_value}{median_value}{order}{on}{join}{query_type})'''.format(
                 query_params_func=query_params_func,
                 table_name=dict_form['table'],
-                fields=','.join(_process_field(f) for f in dict_form['data_fields']),
-                filters=','.join(_process_filter(f) for f in dict_form['data_filters']),
+                fields=', '.join(_process_field(f) for f in dict_form['data_fields']),
+                filters=', '.join(_process_filter(f) for f in dict_form['data_filters']),
                 aggregations=', '.join(_process_aggregation(agg)
                                        for agg in dict_form['aggregations']),
-                groupby=','.join('"{}"'.format(f) for f in dict_form['groupby']),
+                groupby=', '.join('"{}"'.format(f) for f in dict_form['groupby']),
                 order=',\n{spacer}order = c({var})'.format(
                     spacer=spacer,
-                    var=','.join('"{}"'.format(f) for f in dict_form['order']))
+                    var=', '.join('"{}"'.format(f) for f in dict_form['order']))
                 if 'order' in dict_form else '',
                 mean_value=',\n{spacer}mean_variable_name = \'{var}\''.format(
                     spacer=spacer,
@@ -397,9 +401,12 @@ class APIQueryParams(abc.ABC):
                 ) if 'join' in dict_form else '',
                 on=',\n{spacer}on = list(left = c({left}), right = c({right}))'.format(
                     spacer=spacer,
-                    left=','.join("'{}'".format(f) for f in dict_form['on']['left']),
-                    right=','.join("'{}'".format(f) for f in dict_form['on']['right']))
+                    left=', '.join("'{}'".format(f) for f in dict_form['on']['left']),
+                    right=', '.join("'{}'".format(f) for f in dict_form['on']['right']))
                 if 'on' in dict_form else '',
+                query_type=',\n{spacer}query_type = "{query_type}"'.format(
+                    spacer=spacer, query_type=dict_form['query_type'])
+                if 'query_type' in dict_form else '',
                 spacer=spacer)
 
             return string_form

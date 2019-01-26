@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.5.4] - 2019-01-25
+### Fixes
+- Bug fixes in `pretty_print_r` and `pretty_print_vba` for `query_type`
+
 ## [2.5.3] - 2019-01-25
 ### Fixes
 - Fixes argument name in `pretty_print` method

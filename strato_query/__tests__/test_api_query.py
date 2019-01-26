@@ -206,27 +206,33 @@ class TestAPIQuery(unittest.TestCase, BaseAPIQuery):
 
     def test_pretty_print_r(self):
         query_params = APIQueryParams(
-            table='geocookbook_county_na_county_metro',
-            data_fields=('GEOID5',),
-            data_filters=(InFilter(var='cbsa', val=[14454]).to_dict(),),
-            aggregations=(),
-            groupby=(),
-            order=('GEOID5',),
+            table='populationforecast_county_annual_population_age_race_ext',
+            data_fields=({'custom:GEOID': 1}, 'YEAR', {'population': 'units'}),
+            data_filters=({'filter_type': 'in', 'filter_value': [1, 2, 3, 4, 5, 6, 7],
+                           'filter_variable': 'RACE_HISP'},
+                          {'filter_type': 'in', 'filter_value': [25025],
+                           'filter_variable': 'GEOID5'},
+                          {'filter_type': 'between', 'filter_value': [5, 18],
+                           'filter_variable': 'AGE_G'}, {'filter_type': 'in',
+                                                         'filter_value': [25025, 25027, 36001,
+                                                                          20173, 6037, 25021, 6059,
+                                                                          6075, 25023, 48453,
+                                                                          44001],
+                                                         'filter_variable': 'GEOID5'},
+                          {'filter_type': 'in', 'filter_value': [2019, 2024, 2025],
+                           'filter_variable': 'YEAR'}),
+            query_type='COUNT',
+            aggregations=({'aggregation_func': 'sum', 'variable_name': 'population'},),
+            groupby=('YEAR', 'GEOID'),
             join=APIQueryParams(
-                table='geocookbook_county_na_county_name',
-                data_fields=('GEOID5', 'GEOID2', 'GEOID5_NAME'),
-                data_filters=(),
+                table='geocookbook_county_na_shapes_full',
+                data_fields=({'custom:GEOID': 1}, 'area'),
+                data_filters=(
+                {'filter_type': 'in', 'filter_value': [25025], 'filter_variable': 'GEOID5'},),
+                query_type='AREA',
                 aggregations=(),
-                groupby=(),
-                on=dict(left=('GEOID5',), right=('GEOID5',)),
-                join=APIQueryParams(
-                    table='geocookbook_state_na_state_name',
-                    data_fields=('GEOID2', 'GEOID2_INIT'),
-                    data_filters=(),
-                    aggregations=(),
-                    groupby=(),
-                    on=dict(left=('GEOID2',), right=('GEOID2',)),
-                )
+                groupby=('GEOID',),
+                on={'left': ('GEOID',), 'right': ('GEOID',)},
             )
         )
 
