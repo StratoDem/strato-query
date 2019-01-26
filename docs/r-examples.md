@@ -7,9 +7,9 @@ Tools to help query the StratoDem Analytics API for economic and geo-demographic
 - [Installation and usage](#installation-and-usage)
 - [Authentication](#authentication)
 - [Sample queries](#sample-queries)
-  - [Median household income for 80+ households across the US, by year](#api-example-median-hhi)
-  - [Population density in the Boston MSA](#api-example-population-density)
-  - [Population within five miles of latitude-longitude pair](#api-example-mile-radius-filter)
+  - [Median household income for 80+ households across the US, by year](#median-household-income-for-80-households-across-the-us-by-year)
+  - [Population density in the Boston MSA](#population-density-in-the-boston-msa)
+  - [Population within five miles of latitude-longitude pair](#population-within-five-miles-of-latitude-longitude-pair)
 
 ### [Installation and usage](#installation-and-usage)
 
@@ -26,7 +26,7 @@ devtools::install_github('StratoDem/strato-query')
 
 ### [Sample queries](#sample-queries)
 
-#### [Median household income for 80+ households across the US, by year](#api-example-median-hhi)
+#### [Median household income for 80+ households across the US, by year](#median-household-income-for-80-households-across-the-us-by-year)
 ```R
 library(stRatoquery)
 
@@ -59,7 +59,7 @@ Median US household income 80+:
 3         30712  2013
 ```
 
-#### [Population density in the Boston MSA](#api-example-population-density)
+#### [Population density in the Boston MSA](#population-density-in-the-boston-msa)
 ```R
 library(stRatoquery)
 
@@ -98,7 +98,7 @@ Population density in the Boston MSA up to 2015:
 Results truncated
 ```
 
-### [Population within five miles of latitude-longitude pair](#api-example-mile-radius-filter)
+### [Population within five miles of latitude-longitude pair](#population-within-five-miles-of-latitude-longitude-pair)
 ```R
 library(stRatoquery)
 

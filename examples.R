@@ -1,5 +1,5 @@
 library(stRatoquery)
-apiToken = 'my-api-token'
+apiToken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJ1c2VyX2lkIjoxLCJvcmdhbml6YXRpb25faWQiOjEsInZhbGlkX2ZvciI6MzE1MzYwMDAsImV4cCI6MTU3OTg5NjA3Nn0.fKoo5B2L0w37ONhTD6L4umxzCd2DWcXIW8sc-R85xJdbzxIHKgaSWrCfoFkw6f7X2qz7RBgsBhb7MQ3gwie8PA'
 
 # Median household income for all counties in California by year
 df_ca_hhi = submit_api_query(
@@ -69,3 +69,31 @@ df_senior_population = submit_api_query(
     )),
   apiToken = apiToken)
 head(df_senior_population)
+
+submit_api_query(api_query_params(
+  table = 'populationforecast_county_annual_population_age_race_ext',
+  data_fields = api_fields(fields_list = list(list('custom:GEOID' = '1'), 'YEAR', list('population' = 'units'))),
+  data_filters = list(in_filter(filter_variable = "RACE_HISP", filter_value = c(1,2,3,4,5,6,7)), in_filter(filter_variable = "GEOID5", filter_value = c(25025)), between_filter(filter_variable = "AGE_G", filter_value = c(5,18)), in_filter(filter_variable = "GEOID5", filter_value = c(25025,25027,36001,20173,6037,25021,6059,6075,25023,48453,44001)), in_filter(filter_variable = "YEAR", filter_value = c(2019,2024,2025))),
+  aggregations = list(sum_aggregation(variable_name = "population")),
+  groupby = c("YEAR", "GEOID"),
+  join = api_query_params(
+    table = 'geocookbook_county_na_shapes_full',
+    data_fields = api_fields(fields_list = list(list('custom:GEOID' = '1'), 'area')),
+    data_filters = list(in_filter(filter_variable = "GEOID5", filter_value = c(25025))),
+    aggregations = list(),
+    groupby = c("GEOID"),
+    on = list(left = c('GEOID'), right = c('GEOID')),
+    query_type = "AREA"),
+  query_type = "COUNT"), apiToken = apiToken)
+
+df = submit_api_query(
+  api_query_params(
+    table = 'populationforecast_tract_annual_population',
+    data_fields = api_fields(fields_list = list('YEAR', list(population = 'population_within_5_miles'))),
+    data_filters = list(
+      mile_radius_filter(latitude = 42, longitude = -107.3, miles = 5),
+      between_filter(filter_variable = 'year', filter_value = c(2010, 2020))),
+    aggregations = list(sum_aggregation(variable_name = 'population')),
+    groupby = c('year')),
+  apiToken=apiToken)
+head(df)
