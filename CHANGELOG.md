@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.5.3] - 2019-01-25
+### Fixes
+- Fixes argument name in `pretty_print` method
+
 ## [2.5.2] - 2019-01-25
 ### Adds
 - Adds a pretty print method that can be called on the `APIQueryParams` class, and any class inheriting from the same.

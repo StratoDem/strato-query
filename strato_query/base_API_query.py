@@ -129,13 +129,13 @@ class APIQueryParams(abc.ABC):
     def pretty_print(self) -> str:
         def pretty_print_recursive(query_params, spacer: Optional[str] = '    '):
             dict_form = self._dict_form(query_params)
-            query_params_func = 'APIQueryParams'
+            query_params_class = 'APIQueryParams'
             if 'mean_variable_name' in dict_form:
-                query_params_func = 'APIMeanQueryParams'
+                query_params_class = 'APIMeanQueryParams'
             elif 'median_variable_name' in dict_form:
-                query_params_func = 'APIMedianQueryParams'
+                query_params_class = 'APIMedianQueryParams'
 
-            string_form = '''{query_params_func}(
+            string_form = '''{query_params_class}(
 {spacer}table='{table_name}',
 {spacer}data_fields={fields},
 {spacer}data_filters={filters},
@@ -143,7 +143,7 @@ class APIQueryParams(abc.ABC):
 {spacer}aggregations={aggregations},
 {spacer}groupby={groupby},{mean_value}{median_value}{order}{on}{join}
 {spacer})'''.format(
-                query_params_class=query_params_func,
+                query_params_class=query_params_class,
                 table_name=dict_form['table'],
                 fields=dict_form['data_fields'],
                 filters=dict_form['data_filters'],
