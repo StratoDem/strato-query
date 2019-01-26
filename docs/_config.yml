@@ -2,6 +2,8 @@ theme: jekyll-theme-slate
 include:
   - README.md
   - r-examples.md
+  - python-examples.md
+  - vba-examples.md
 plugins:
   - jekyll-relative-links
 relative_links:
