@@ -3,7 +3,12 @@ Tools to help query the StratoDem Analytics API for economic and geo-demographic
 
 [Back to main page](/strato-query)
 
-### Installation and usage
+## Table of contents
+- [Installation and usage](#Installation-and-usage)
+- [Authentication](#Authentication)
+- [Sample queries](#Sample-queries)
+
+### [Installation and usage](#Installation-and-usage)
 
 To install the `stRatoquery` R package:
 ```R
@@ -11,12 +16,12 @@ library(devtools)
 devtools::install_github('StratoDem/strato-query')
 ```
 
-### Authentication
+### [Authentication](#Authentication)
 `stRatoquery::submit_api_query` requires an `apiToken` argument.
 
 [How do I create a new API token or find an existing token? &rarr;](https://academy.stratodem.com/article/82-creating-and-managing-api-tokens)
 
-### Sample queries
+### [Sample queries](#Sample-queries)
 
 #### Median household income for 80+ households across the US, by year
 ```R
@@ -88,4 +93,35 @@ Population density in the Boston MSA up to 2015:
 3  2003  Boston, MA    1152.352351
 4  2004  Boston, MA    1149.932307
 Results truncated
+```
+
+### Population within five miles of latitude-longitude pair
+```R
+library(stRatoquery)
+
+df = submit_api_query(
+  api_query_params(
+    table = 'populationforecast_tract_annual_population',
+    data_fields = api_fields(fields_list = list('YEAR', list(population = 'population_within_5_miles'))),
+    data_filters = list(
+      # Aggregate data within five miles of 40.7589542, -73.9937348
+      mile_radius_filter(latitude = 40.7589542, longitude = -73.9937348, miles = 5),
+      # Only get data for years between 2010 and 2020 (inclusive)
+      between_filter(filter_variable = 'year', filter_value = c(2010, 2020))),
+    aggregations = list(sum_aggregation(variable_name = 'population')),
+    groupby = c('year')),
+  apiToken=apiToken)
+
+head(df)
+```
+
+Output:
+```
+  year population_within_5_miles
+1 2010                   2333013
+2 2011                   2368923
+3 2012                   2399682
+4 2013                   2419962
+5 2014                   2437614
+6 2015                   2456257
 ```
