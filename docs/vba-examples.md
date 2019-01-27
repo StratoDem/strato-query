@@ -1,4 +1,4 @@
-## `stRatoquery`
+## StratoDem Analytics for Excel in VBA
 Tools to help query the StratoDem Analytics API for economic and geo-demographic data using VBA in Excel
 
 [Back to main page](/)
@@ -16,7 +16,7 @@ Download the sample Excel file with a macro that hits the StratoDem Analtyics AP
 to query data around a latitude-longitude pair ([download here](https://github.com/StratoDem/strato-query/raw/master/StratoDem_API_Template.xlsm)).
 
 ### [Authentication](#authentication)
-The VBA function `submitAPIQuery` looks for a StratoDem Analytics API token in `Configuration!B5`. Place a valid token in that cell to authenticate queries.
+The VBA function `submitAPIQuery` looks for a StratoDem Analytics API token in `Configuration!B5`. Place a valid token in that cell to authenticate queries. Then click the **RUN QUERIES** button to run the example queries for the three latitude-longitude pairs and three mile radius definitions specified.
 
 [How do I create a new API token or find an existing token? &rarr;](https://academy.stratodem.com/article/82-creating-and-managing-api-tokens)
 
@@ -44,6 +44,7 @@ Call writeToSheet(results:=submitAPIQuery(medianHHIQuery), sheetName:="US_median
 ```
 
 Output:
+
 <img src="assets/images/us_median_hhi_80plus.png" alt="80+ median household income in Excel from the StratoDem Analytics API" />
 
 ### [Population within five miles of latitude-longitude pair](#population-within-five-miles-of-latitude-longitude-pair)
@@ -65,4 +66,5 @@ Call writeToSheet(results:=submitAPIQuery(populationQuery), sheetName:="Populati
 ```
 
 Output:
+
 <img src="assets/images/population_within_five_miles_excel.png" alt="Population within five miles of Times Square in Excel from the StratoDem Analytics API" />
