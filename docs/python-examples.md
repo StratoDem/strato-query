@@ -14,7 +14,6 @@ Tools to help query the StratoDem Analytics API for economic and geo-demographic
 ### [Installation and usage](#installation-and-usage)
 
 To install the `strato_query` Python package:
-#### Python:
 ```
 $ pip install strato-query
 ```
@@ -42,8 +41,8 @@ os.environ['API_TOKEN'] = 'my-api-token'
 
 #### [Median household income for 80+ households across the US, by year](#median-household-income-for-80-households-across-the-us-by-year)
 ```python
-from strato_query.base_API_query import *
-from strato_query.standard_filters import *
+from strato_query.base_API_query import BaseAPIQuery, APIMedianQueryParams
+from strato_query.standard_filters import GtrThanOrEqFilter, BetweenFilter
 
 
 # Finds median household income in the US for those 80+ from 2010 to 2013

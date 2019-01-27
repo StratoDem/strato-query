@@ -12,7 +12,7 @@ Tools to help query the StratoDem Analytics API for economic and geo-demographic
 
 ### [Installation and usage](#installation-and-usage)
 
-Download the sample Excel file with a macro that hits the StratoDem Analtyics API
+Download the sample Excel file with a macro that hits the StratoDem Analytics API
 to query data around a latitude-longitude pair ([download here](https://github.com/StratoDem/strato-query/raw/master/StratoDem_API_Template.xlsm)).
 
 ### [Authentication](#authentication)
