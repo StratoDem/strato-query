@@ -34,7 +34,7 @@ library(stRatoquery)
 df = submit_api_query(
   query = median_query_params(
     table = 'incomeforecast_us_annual_income_group_age',
-    data_fields = api_fields(fields_list = list('year', 'geoid2', list(median_value = 'median_hhi'))),
+    data_fields = api_fields(fields_list = list('year', list(median_value = 'median_hhi'))),
     data_filters = list(
         ge_filter(filter_variable = 'age_g', filter_value = 17),
         between_filter(filter_variable = 'year', filter_value = c(2010, 2013))
