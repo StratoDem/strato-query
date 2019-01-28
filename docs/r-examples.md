@@ -155,4 +155,4 @@ To generate the code in R, just:
 4. Switch to the **R** tab and copy the generated API query/queries into your favorite R editor
 
 #### Which metros have the most households with adults 65 to 79 with a net worth of at least $500,000 in 2019?
-<img src="assets/images/R_sample_query.gif" alt="Using Blaise ML to create a sample query in R" />
+<img src="assets/images/R_example_query.gif" alt="Using Blaise ML to create a sample query in R" />
