@@ -9,7 +9,7 @@ Tools to help query the StratoDem Analytics API for economic and geo-demographic
 - [Sample queries](#sample-queries)
   - [Median household income for 80+ households across the US, by year](#median-household-income-for-80-households-across-the-us-by-year)
   - [Population within five miles of latitude-longitude pair](#population-within-five-miles-of-latitude-longitude-pair)
-- [Creating queries with Portfolio](#portfolio-query)
+- [Using Blaise ML to generate queries](#using-blaise-ml-to-generate-queries)
 
 ### [Installation and usage](#installation-and-usage)
 
@@ -70,6 +70,15 @@ Output:
 
 <img src="assets/images/population_within_five_miles_excel.png" alt="Population within five miles of Times Square in Excel from the StratoDem Analytics API" />
 
-### [Creating queries with Portfolio](#portfolio-query)
+## [Using Blaise ML to generate queries](#using-blaise-ml-to-generate-queries)
+Blaise ML by StratoDem Analytics is embedded in all StratoDem Analytics applications. One feature that Blaise ML supports is
+generating the code for API queries from a natural language question in the [Portfolio application on clients.stratodem.com](https://clients.stratodem.com/dash/?id=marketscorecard).
+
+To generate the code in VBA, just:
+1. Type in the question to the text bar at the top of the application
+2. Click **Adjust the question** to open the query adjustment drawer
+3. Click **View API query** above the question in the drawer
+4. Switch to the **VBA** tab and copy the generated API query/queries into your favorite R editor
+
 #### Find the estimated household count by metro for adults ages 80+ and net worth of at least $100,000 in 2020  
-<img src="assets/images/VBA_sample_query.gif" alt="Using Portfolio to create a sample query in VBA" />
+<img src="assets/images/VBA_sample_query.gif" alt="Using Blaise ML to create a sample query in VBA" />

@@ -10,7 +10,7 @@ Tools to help query the StratoDem Analytics API for economic and geo-demographic
   - [Median household income for 80+ households across the US, by year](#median-household-income-for-80-households-across-the-us-by-year)
   - [Population density in the Boston MSA](#population-density-in-the-boston-msa)
   - [Population within five miles of latitude-longitude pair](#population-within-five-miles-of-latitude-longitude-pair)
-- [Creating queries with Portfolio](#portfolio-query)
+- [Using Blaise ML to generate queries](#using-blaise-ml-to-generate-queries)
 
 ### [Installation and usage](#installation-and-usage)
 
@@ -161,6 +161,15 @@ Population within five miles of 40.7589542, -73.9937348
 4               2.438206e+06  2014
 ```
 
-### [Creating queries with Portfolio](#portfolio-query)
-#### Find the alpha values for each metro
-<img src="assets/images/Python_sample_query.gif" alt="Using Portfolio to create a sample query in Python" />
+## [Using Blaise ML to generate queries](#using-blaise-ml-to-generate-queries)
+Blaise ML by StratoDem Analytics is embedded in all StratoDem Analytics applications. One feature that Blaise ML supports is
+generating the code for API queries from a natural language question in the [Portfolio application on clients.stratodem.com](https://clients.stratodem.com/dash/?id=marketscorecard).
+
+To generate the code in Python, just:
+1. Type in the question to the text bar at the top of the application
+2. Click **Adjust the question** to open the query adjustment drawer
+3. Click **View API query** above the question in the drawer
+4. Switch to the **Python** tab and copy the generated API query/queries into your favorite R editor
+
+#### Find the markets estimated to have the most adults 80+ in 2020
+<img src="assets/images/Python_sample_query.gif" alt="Using Blaise ML to create a sample query in Python" />

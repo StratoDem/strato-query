@@ -154,6 +154,5 @@ To generate the code in R, just:
 3. Click **View API query** above the question in the drawer
 4. Switch to the **R** tab and copy the generated API query/queries into your favorite R editor
 
-<img src="assets/images/PortfolioInsightsToRQuery.gif" alt="Blaise ML by StratoDem Analytics generates API queries using natural language processing" />
-#### Find the number of households with adults 80+ who have $30,000 or more in retirement income in 2018
-<img src="assets/images/R_sample_query.gif" alt="Using Portfolio to create a sample query in R" />
+#### Which metros have the most households with adults 65 to 79 with a net worth of at least $500,000 in 2019?
+<img src="assets/images/R_sample_query.gif" alt="Using Blaise ML to create a sample query in R" />
