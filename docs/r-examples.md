@@ -144,7 +144,7 @@ Output:
 6 2015                   2455316
 ```
 
-## Using Blaise ML to generate queries
+## [Using Blaise ML to generate queries](#using-blaise-ml-to-generate-queries)
 Blaise ML by StratoDem Analytics is embedded in all StratoDem Analytics applications. One feature that Blaise ML supports is
 generating the code for API queries from a natural language question in the [Portfolio application on clients.stratodem.com](https://clients.stratodem.com/dash/?id=marketscorecard).
 
