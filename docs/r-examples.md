@@ -10,6 +10,7 @@ Tools to help query the StratoDem Analytics API for economic and geo-demographic
   - [Median household income for 80+ households across the US, by year](#median-household-income-for-80-households-across-the-us-by-year)
   - [Population density in the Boston MSA](#population-density-in-the-boston-msa)
   - [Population within five miles of latitude-longitude pair](#population-within-five-miles-of-latitude-longitude-pair)
+- [Creating queries with Portfolio](#portfolio-query)
 
 ### [Installation and usage](#installation-and-usage)
 
@@ -142,3 +143,7 @@ Output:
 5 2014                   2436646
 6 2015                   2455316
 ```
+
+### [Creating queries with Portfolio](#portfolio-query)
+#### Find the number of households with adults 80+ who have $30,000 or more in retirement income in 2018
+<img src="assets/images/R_sample_query.gif" alt="Using Portfolio to create a sample query in R" />

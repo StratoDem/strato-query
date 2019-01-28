@@ -10,6 +10,7 @@ Tools to help query the StratoDem Analytics API for economic and geo-demographic
   - [Median household income for 80+ households across the US, by year](#median-household-income-for-80-households-across-the-us-by-year)
   - [Population density in the Boston MSA](#population-density-in-the-boston-msa)
   - [Population within five miles of latitude-longitude pair](#population-within-five-miles-of-latitude-longitude-pair)
+- [Creating queries with Portfolio](#portfolio-query)
 
 ### [Installation and usage](#installation-and-usage)
 
@@ -398,3 +399,7 @@ Response body:
   "message": "Query executed"
 }
 ```
+
+### [Creating queries with Portfolio](#portfolio-query)
+#### Find the median home values by metro for adults 60+ in the year 2018
+<img src="assets/images/JSON_sample_query.gif" alt="Using Portfolio to create a sample query in JSON" />

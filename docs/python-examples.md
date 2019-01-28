@@ -10,6 +10,7 @@ Tools to help query the StratoDem Analytics API for economic and geo-demographic
   - [Median household income for 80+ households across the US, by year](#median-household-income-for-80-households-across-the-us-by-year)
   - [Population density in the Boston MSA](#population-density-in-the-boston-msa)
   - [Population within five miles of latitude-longitude pair](#population-within-five-miles-of-latitude-longitude-pair)
+- [Creating queries with Portfolio](#portfolio-query)
 
 ### [Installation and usage](#installation-and-usage)
 
@@ -159,3 +160,7 @@ Population within five miles of 40.7589542, -73.9937348
 3               2.420539e+06  2013
 4               2.438206e+06  2014
 ```
+
+### [Creating queries with Portfolio](#portfolio-query)
+#### Find the alpha values for each metro
+<img src="assets/images/Python_sample_query.gif" alt="Using Portfolio to create a sample query in Python" />

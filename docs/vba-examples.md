@@ -9,6 +9,7 @@ Tools to help query the StratoDem Analytics API for economic and geo-demographic
 - [Sample queries](#sample-queries)
   - [Median household income for 80+ households across the US, by year](#median-household-income-for-80-households-across-the-us-by-year)
   - [Population within five miles of latitude-longitude pair](#population-within-five-miles-of-latitude-longitude-pair)
+- [Creating queries with Portfolio](#portfolio-query)
 
 ### [Installation and usage](#installation-and-usage)
 
@@ -68,3 +69,7 @@ Call writeToSheet(results:=submitAPIQuery(populationQuery), sheetName:="Populati
 Output:
 
 <img src="assets/images/population_within_five_miles_excel.png" alt="Population within five miles of Times Square in Excel from the StratoDem Analytics API" />
+
+### [Creating queries with Portfolio](#portfolio-query)
+#### Find the estimated household count by metro for adults ages 80+ and net worth of at least $100,000 in 2020  
+<img src="assets/images/VBA_sample_query.gif" alt="Using Portfolio to create a sample query in VBA" />
