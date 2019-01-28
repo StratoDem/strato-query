@@ -81,4 +81,4 @@ To generate the code in VBA, just:
 4. Switch to the **VBA** tab and copy the generated API query/queries into your favorite R editor
 
 #### Find the estimated household count by metro for adults ages 80+ and net worth of at least $100,000 in 2020  
-<img src="assets/images/VBA_sample_query.gif" alt="Using Blaise ML to create a sample query in VBA" />
+<img src="assets/images/VBA_example_query.gif" alt="Using Blaise ML to create a sample query in VBA" />

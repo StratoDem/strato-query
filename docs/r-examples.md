@@ -157,4 +157,4 @@ To generate the code in R, just:
 <img src="assets/images/PortfolioInsightsToRQuery.gif" alt="Blaise ML by StratoDem Analytics generates API queries using natural language processing" />
 
 #### Which metros have the most households with adults 65 to 79 with a net worth of at least $500,000 in 2019?
-<img src="assets/images/R_sample_query.gif" alt="Using Blaise ML to create a sample query in R" />
+<img src="assets/images/R_example_query.gif" alt="Using Blaise ML to create a sample query in R" />

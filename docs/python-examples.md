@@ -172,4 +172,4 @@ To generate the code in Python, just:
 4. Switch to the **Python** tab and copy the generated API query/queries into your favorite R editor
 
 #### Find the markets estimated to have the most adults 80+ in 2020
-<img src="assets/images/Python_sample_query.gif" alt="Using Blaise ML to create a sample query in Python" />
+<img src="assets/images/Python_example_query.gif" alt="Using Blaise ML to create a sample query in Python" />

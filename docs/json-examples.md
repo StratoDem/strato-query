@@ -411,4 +411,4 @@ To generate the code in JSON, just:
 4. Switch to the **JSON** tab and copy the generated API query/queries into your favorite R editor
 
 #### Find the metros with the most adults 80+ with income of at least $100,000 in the year 2018?
-<img src="assets/images/JSON_sample_query.gif" alt="Using Blaise ML to create a sample query in JSON" />
+<img src="assets/images/JSON_example_query.gif" alt="Using Blaise ML to create a sample query in JSON" />
