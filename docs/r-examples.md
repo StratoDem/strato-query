@@ -10,6 +10,7 @@ Tools to help query the StratoDem Analytics API for economic and geo-demographic
   - [Median household income for 80+ households across the US, by year](#median-household-income-for-80-households-across-the-us-by-year)
   - [Population density in the Boston MSA](#population-density-in-the-boston-msa)
   - [Population within five miles of latitude-longitude pair](#population-within-five-miles-of-latitude-longitude-pair)
+- [Using Blaise ML to generate queries](#using-blaise-ml-to-generate-queries)
 
 ### [Installation and usage](#installation-and-usage)
 
@@ -142,3 +143,15 @@ Output:
 5 2014                   2436646
 6 2015                   2455316
 ```
+
+## Using Blaise ML to generate queries
+Blaise ML by StratoDem Analytics is embedded in all StratoDem Analytics applications. One feature that Blaise ML supports is
+generating the code for API queries from a natural language question in the [Portfolio application on clients.stratodem.com](https://clients.stratodem.com/dash/?id=marketscorecard).
+
+To generate the code in R, just:
+1. Type in the question to the text bar at the top of the application
+2. Click **Adjust the question** to open the query adjustment drawer
+3. Click **View API query** above the question in the drawer
+4. Switch to the **R** tab and copy the generated API query/queries into your favorite R editor
+
+<img src="assets/images/PortfolioInsightsToRQuery.gif" alt="Blaise ML by StratoDem Analytics generates API queries using natural language processing" />
