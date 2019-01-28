@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.6.0] - 2019-01-28
+### Adds
+- Adds examples to the docs showing how to use Blaise ML to generate API queries for each supported language
+
 ## [2.5.6] - 2019-01-26
 ### Adds
 - Adds `MileRadiusFilter` and `DrivetimeFilter` to `strato_query`
