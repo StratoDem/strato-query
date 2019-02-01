@@ -26,7 +26,7 @@ __all__ = [
     'APIQueryParams', 'BaseAPIQuery', 'APIMeanQueryParams', 'APIMedianQueryParams',
 ]
 
-API_TOKEN = os.environ.get('API_TOKEN', sdc.debug_token)
+API_TOKEN = os.environ.get('API_TOKEN')
 T_DF = pandas.DataFrame
 
 
