@@ -17,8 +17,6 @@ import requests
 
 import pandas
 
-import config as sdc
-
 from strato_query.core import constants as cc
 
 
