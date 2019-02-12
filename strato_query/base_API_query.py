@@ -200,7 +200,7 @@ class APIQueryParams(abc.ABC):
                     metric = 'miles' if filter_type == 'mile_radius' else 'minutes'
                     func = {
                         'mile_radius': 'mileRadiusFilter',
-                        'drivetime': 'drivetimeFilter'}
+                        'drivetime': 'drivetimeFilter'}[filter_type]
                     return '{func}(latitude:={lat}, longitude:={lng}, {metric}:={val})'.format(
                         func=func,
                         lat=filt['filter_value']['latitude'],

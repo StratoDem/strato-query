@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.6.3] - 2019-02-12
+### Fixes
+- Fixes `APIQueryParams.pretty_print_vba` for mile radius and drivetime filters
+
 ## [2.6.2] - 2019-02-01
 ### Fixes
 - Fixes a bug caused by users running the code without a debug token. The debug token has been removed and the code will rely on the actual API token
