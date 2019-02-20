@@ -108,23 +108,35 @@ Tools to help query the StratoDem Analytics API for economic and geo-demographic
 22. From the Portfolio app, copy the first query section into that new
     VBA function
 25. Edit:
-    1. The year filter to be the year passed in as an argument
-    2. Add one more filter: 
-        
-        `equalToFilter(filterVariable:=”cbsa”, filterValue:=cbsaCode)`
-        
-        This makes sure we’re only getting data for the target metro area
+    1. The **year filter** to be the `year` passed in as an argument to
+       the function: 
+       ```vba
+       inFilter(filterValue:="year", filterValue:=year)
+       ```
+    2. Add one more filter to restrict the data to the metro ID number
+       passed in to the function:
+        ```vba
+        equalToFilter(filterVariable:=”cbsa”, filterValue:=cbsaCode)
+        ```
+        This makes sure we’re only getting data for the target metro
+        area.
 26. To have the function return a value, we need to add one final line to the end of the function:
  
-    `querySeniorMedianHouseholdIncomeMetro = dataResults("data")(1)("median_val")` 
+    ```vba
+    querySeniorMedianHouseholdIncomeMetro = dataResults("data")(1)("median_val")
+    ```
     
-    where `median_val` is whatever the metric name returned is
+    Again, make sure that, if you use a different query, `"median_val"`
+    is whatever the target metric is named in the query object (for
+    example, it might be `"households"` instead.
 27. Add one more line of code to the `writeLocationData` below where we wrote our previous new query calls for mile-radius-defined market areas:
  
-    `Worksheets("Output").Cells(firstLocationRowNumber + 3, 13).Value = querySeniorMedianHouseholdIncomeMetro(cbsaCode, 2019)`
+    ```vba
+    Worksheets("Output").Cells(firstLocationRowNumber + 3, 13).Value = querySeniorMedianHouseholdIncomeMetro(cbsaCode, 2019)
+    ```
 
-28. Run the query!
-
+25. Click the **RUN QUERY** button in the `Configuration` sheet to query
+    the data from the StratoDem Analytics API!
 
 ### [Sample queries](#sample-queries)
 
