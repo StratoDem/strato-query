@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.6.4] - 2019-02-20
+### Changes
+- Changes the VBA docs to give a more detailed account of how to use and update queries
+
 ## [2.6.3] - 2019-02-12
 ### Fixes
 - Fixes `APIQueryParams.pretty_print_vba` for mile radius and drivetime filters
