@@ -26,11 +26,11 @@ Tools to help query the StratoDem Analytics API for economic and geo-demographic
 <img src="assets/images/Excel_API_template.png" alt="StratoDem Analytics API token in Excel" />
 
 #### [Editting the template to add a new query](#adding-a-query)
-1. Download API template (here → add link)
+1. Download API template ([download here](https://github.com/StratoDem/strato-query/raw/master/StratoDem_API_Template.xlsm))
 2. Get an API token and place in the correct cell
 3. Enable Developer tab in Excel (we’ll come back here in a bit)
 4. Open Portfolio
-5. Load in a custom portfolio defined with mile radius markets (here’s how to do that → )
+5. Load in a custom portfolio defined with mile radius markets ([here’s how to do that →](https://academy.stratodem.com/article/43-loading-a-previously-defined-portfolio))
 6. Ask Blaise “Which markets have the highest median household income for 80+ households in 2019?”
 7. Open “Adjust the question” drawer to open the options drawer
 8. Click “View API query”
@@ -77,7 +77,7 @@ Tools to help query the StratoDem Analytics API for economic and geo-demographic
     `querySeniorMedianHouseholdIncomeMetro = dataResults("data")(1)("median_val")` 
     
     where `median_val` is whatever the metric name returned is
-27. Add one more line of code to the “writeLocationData” below where we wrote our previous new query calls for mile-radius-defined market areas:
+27. Add one more line of code to the `writeLocationData` below where we wrote our previous new query calls for mile-radius-defined market areas:
  
     `Worksheets("Output").Cells(firstLocationRowNumber + 3, 13).Value = querySeniorMedianHouseholdIncomeMetro(cbsaCode, 2019)`
 
