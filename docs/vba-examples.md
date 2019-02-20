@@ -25,46 +25,88 @@ Tools to help query the StratoDem Analytics API for economic and geo-demographic
 
 <img src="assets/images/Excel_API_template.png" alt="StratoDem Analytics API token in Excel" />
 
-#### [Editting the template to add a new query](#adding-a-query)
+#### [Editing the template to add a new query](#adding-a-query)
 1. Download API template ([download here](https://github.com/StratoDem/strato-query/raw/master/StratoDem_API_Template.xlsm))
-2. Get an API token and place in the correct cell
-3. Enable Developer tab in Excel (we’ll come back here in a bit)
-4. Open Portfolio
-5. Load in a custom portfolio defined with mile radius markets ([here’s how to do that →](https://academy.stratodem.com/article/43-loading-a-previously-defined-portfolio))
-6. Ask Blaise “Which markets have the highest median household income for 80+ households in 2019?”
-7. Open “Adjust the question” drawer to open the options drawer
-8. Click “View API query”
-9. Click on the Excel VBA tab
-10. The code here includes the query objects necessary to replicate the query for each market definition in the entire portfolio. We’re only going to use one of them for now.
-11. Open Visual Basic editor
-12. We’re going to modify the `writeLocationData` function to add a column for median household income for 80+ households in 2019
-13. Create a new function (ours will be called `querySeniorMedianHouseholdIncome`)
-14. From the Portfolio app, copy the first query section into that new function
-15. Edit:
-    1. The year filter to be the year passed in as an argument
-    2. The mile radius filter to use `latitude`, `longitude`, and `mileRadius` passed in as arguments
-16. To have the function return a value, we need to add one final line to the end of the function:
- 
-    `querySeniorMedianHouseholdIncome = dataResults("data")(1)("median_val")` 
-    
-    where `median_val` is whatever the metric name returned is
-17. Add a code block to the `writeLocationData` that calls our new querySeniorMedianHouseholdIncome function and writes the data (make sure to use a new column index number)
-    ```VBA
-    ' Write senior median household income (age 80+)
-    Worksheets("Output").Cells(firstLocationRowNumber, 13).Value = querySeniorMedianHouseholdIncome(latitude, longitude, radius1, 2019)
-    Worksheets("Output").Cells(firstLocationRowNumber + 1, 13).Value = querySeniorMedianHouseholdIncome(latitude, longitude, radius2, 2019)
-    Worksheets("Output").Cells(firstLocationRowNumber + 2, 13).Value = querySeniorMedianHouseholdIncome(latitude, longitude, radius3, 2019)
+2. Get an API token and place in the correct cell, `Configuration!B5` in
+   the template ([How do I get an API token?](https://academy.stratodem.com/article/82-creating-and-managing-api-tokens)). 
+3. Enable Developer tab in Excel. We'll come back here in a few steps
+   ([How do I enable the Developer
+   tab?](https://support.office.com/en-us/article/show-the-developer-tab-e1192344-5e56-4d45-931b-e5fd9bea2d45))
+4. Open
+   [StratoDem Portfolio](https://clients.stratodem.com/dash?id=marketscorecard).
+5. Load in a custom portfolio defined with mile radius markets
+   ([How do I load in a portfolio?](https://academy.stratodem.com/article/43-loading-a-previously-defined-portfolio))
+6. Ask Blaise: “Which markets have the highest median household income
+   for 80+ households in 2019?”
+   ([How do I ask Blaise a question?](https://academy.stratodem.com/article/53-ask-a-question))
+7. Click **Adjust the question** to open the options drawer
+   ([How do I adjust a query in StratoDem Portfolio?](https://academy.stratodem.com/article/54-adjust-the-question)).
+8. Click the **View API query** button.
+9. Click on the **Excel VBA** tab in the popup window. The code here
+   includes the query objects necessary to replicate the query for each
+   market definition in the entire portfolio. We’re only going to use
+   one of them for now.
+10. **In your Excel file**, open the Visual Basic editor from the
+    Developer tab in the top ribbon. We’re going to modify the
+    `writeLocationData` VBA function to add a column for median
+    household income for households age 80+ in 2019.
+11. Create a new function (ours will be called
+    `querySeniorMedianHouseholdIncome`) like this: 
+    ```vba
+    Function querySeniorMedianHouseholdIncome(latitude As Double, longitude As Double, mileRadius As Integer, year As Integer) As Double
+        ' Query median household income for households age 80+
+        ' for a market defined by latitude, longitude and mileRadius
+        
+    End Function
     ```
-18. Add a column name writer to `writeColumnMetadata`:
+12. From the Portfolio app, copy the first query section into that new
+    function below the comments.
+13. Edit two of the filters to be sure we're requesting the right data:
+    1. The **year filter** to be the `year` passed in as an argument to
+       the function: 
+       ```vba
+       inFilter(filterValue:="year", filterValue:=year)
+       ```
+    2. The mile radius filter to use `latitude`, `longitude`, and
+       `mileRadius` passed in as arguments to the function:
+       ```vba
+       mileRadiusFilter(latitude:=latitude, longitude:=longitude, miles:=mileRadius)
+       ```
+    The query will now ask for data to be restricted to the
+    mile-radius-defined market area in the `year` we pass to the
+    function.
+14. To have the function return a value, we need to add one final line
+    to the end of the function:
+    ```vba
+    querySeniorMedianHouseholdIncome = dataResults("data")(1)("median_val")
+    ```
+    Make sure that, if you use a different query, `"median_val"` is
+    whatever the target metric is named in the query object (for
+    example, it might be `"households"` instead.
+15.  Add a code block to the `writeLocationData` function that calls our
+     new `querySeniorMedianHouseholdIncome` function and writes the data
+     (make sure to use a new column index number) 
+     ```vba 
+     ' Write senior median household income (age 80+)
+     Worksheets("Output").Cells(firstLocationRowNumber, 13).Value = querySeniorMedianHouseholdIncome(latitude, longitude, radius1, 2019) 
+     Worksheets("Output").Cells(firstLocationRowNumber + 1, 13).Value = querySeniorMedianHouseholdIncome(latitude, longitude, radius2, 2019) 
+     Worksheets("Output").Cells(firstLocationRowNumber + 2, 13).Value = querySeniorMedianHouseholdIncome(latitude, longitude, radius3, 2019)
+     ```
 
-    `Worksheets("Output").Cells(1, 13).Value = "Median household income 80+ households (2019)"  ' M1`
-    
-19. Now we need to add one more row for the associated metro.
-20. Change the geographic coverage level in Portfolio to “Metro”
-21. Open up the View API query dialog again and we’ll copy the code from the Excel VBA tab again
-22. Open up the Visual Basic Editor
+16. Update the `writeColumnMetadata` function to add a new column name:
+    ```vba
+    Worksheets("Output").Cells(1, 13).Value = "Median household income 80+ households (2019)" ' M1
+    ```
+
+17. Now we need to add one more row for the associated metropolitan
+    area. In StratoDem Portfolio, change the geographic coverage level
+    in Portfolio to **Metro**
+18. Open up the **View API** dialog again and we’ll copy the new code
+    from the **Excel VBA** tab once more.
+19. Back in Excel, open up the Visual Basic editor
 23. Create a new function (we’ll call it `querySeniorMedianHouseholdIncomeMetro`) that we’ll use to get the metro data
-24. From the Portfolio app, copy the first query section into that new VBA Function
+22. From the Portfolio app, copy the first query section into that new
+    VBA function
 25. Edit:
     1. The year filter to be the year passed in as an argument
     2. Add one more filter: 
