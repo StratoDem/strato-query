@@ -7,7 +7,7 @@ geo-demographic data using VBA in Excel
 ## Table of contents
 - [Installation and usage](#installation-and-usage)
   - [Running the template the first time](#first-run)
-  - [Editting the template to add a new query](#adding-a-query)
+  - [Editing the template to add a new query](#adding-a-query)
 - [Sample queries](#sample-queries)
   - [Median household income for 80+ households across the US, by year](#median-household-income-for-80-households-across-the-us-by-year)
   - [Population within five miles of latitude-longitude pair](#population-within-five-miles-of-latitude-longitude-pair)
