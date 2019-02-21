@@ -16,11 +16,16 @@ geo-demographic data using VBA in Excel
 ### [Installation and usage](#installation-and-usage)
 
 #### [Running the template the first time](#running-the-template-the-first-time)
+
 1. Download API template ([download here](https://github.com/StratoDem/strato-query/raw/master/StratoDem_API_Template.xlsm))
+
 2. Get an API token and place in the correct cell (`Configuration!B5`)
+
 3. Select one to three buffers
+
 4. Enter locations in the bottom section
-5. Click RUN QUERIES
+
+5. Click **RUN QUERIES**
 
 [How do I create a new API token or find an existing token? &rarr;](https://academy.stratodem.com/article/82-creating-and-managing-api-tokens)
 
@@ -28,6 +33,7 @@ geo-demographic data using VBA in Excel
 
 #### [Editing the template to add a new query](#editing-the-template-to-add-a-new-query)
 1. Request an API Excel template from the StratoDem Analytics team.
+
 2. Get an API token and place in the correct cell, `B5` in the
    `Configuration` sheet of the Excel template
    ([How do I get an API token?](https://academy.stratodem.com/article/82-creating-and-managing-api-tokens)).
@@ -37,16 +43,22 @@ geo-demographic data using VBA in Excel
 3. Enable the Developer tab in Excel. We'll come back here in a few
    steps
    ([How do I enable the Developer tab?](https://support.office.com/en-us/article/show-the-developer-tab-e1192344-5e56-4d45-931b-e5fd9bea2d45))
+
 4. In a web browser, open
    [StratoDem Portfolio](https://clients.stratodem.com/dash?id=marketscorecard).
+
 5. Load in a custom portfolio defined with mile radius markets
    ([How do I load in a portfolio?](https://academy.stratodem.com/article/43-loading-a-previously-defined-portfolio))
+
 6. Ask Blaise: “Which markets have the highest median household income
    for 80+ households in 2019?”
    ([How do I ask Blaise a question?](https://academy.stratodem.com/article/53-ask-a-question))
+   
 7. Click **Adjust the question** to open the options drawer
+
    ([How do I adjust a query in StratoDem Portfolio?](https://academy.stratodem.com/article/54-adjust-the-question)).
 8. Click the **View API query** button.
+
 9. Click on the **Excel VBA** tab in the popup window. The code here
    includes the query objects necessary to replicate the query for each
    market definition in the entire portfolio. We’re only going to use
@@ -89,6 +101,7 @@ geo-demographic data using VBA in Excel
     The query will now ask for data to be restricted to the
     mile-radius-defined market area in the `year` we pass to the
     function.
+   
 14. To have the function return a value, we need to add one final line
     to the end of the function:
     ```vba
@@ -100,26 +113,29 @@ geo-demographic data using VBA in Excel
     
     <img src="assets/images/AddReturnStatementVBAQuery.gif" alt="Add return statement for senior median household income query" />
 
-15.  Add a code block to the `writeLocationData` function that calls our
-     new `querySeniorMedianHouseholdIncome` function and writes the data
-     (make sure to use a new column index number) 
+15. Add a code block to the `writeLocationData` function that calls our 
+    new `querySeniorMedianHouseholdIncome` function and writes the data
+    (make sure to use a new column index number)
      ```vba 
      ' Write senior median household income (age 80+)
      Worksheets("Output").Cells(firstLocationRowNumber, 9).Value = querySeniorMedianHouseholdIncome(latitude, longitude, radius1, 2019) 
      Worksheets("Output").Cells(firstLocationRowNumber + 1, 9).Value = querySeniorMedianHouseholdIncome(latitude, longitude, radius2, 2019) 
      Worksheets("Output").Cells(firstLocationRowNumber + 2, 9).Value = querySeniorMedianHouseholdIncome(latitude, longitude, radius3, 2019)
      ```
-
+     
+    <img src="assets/images/AddWriteCallsToVBA.gif" alt="Add write statement for senior median household income query"/>
+    
 16. Update the `writeColumnMetadata` function to add a new column name:
     ```vba
     Worksheets("Output").Cells(1, 9).Value = "Median household income 80+ households (2019)" ' I1
     ```
     
-    <img src="assets/images/AddWriteCallsToVBA.gif" alt="Add write statement for senior median household income query"/>
+    <img src="assets/images/WriteColumnMetadata.gif" alt="Add another column to the header"/>
 
 17. Now we need to add one more row for the associated metropolitan
     area. In StratoDem Portfolio, change the geographic coverage level
     in Portfolio to **Metro**
+
 18. Open up the **View API** dialog again and we’ll copy the new code
     from the **Excel VBA** tab once more. The code here includes the
     query object necessary to replicate the query for all metros.
@@ -127,6 +143,7 @@ geo-demographic data using VBA in Excel
     <img src="assets/images/CopyAPIQueryMetro.gif" alt="Copy StratoDem Analytics API metro-level query from Blaise ML to Excel VBA code" />
 
 19. Back in Excel, open up the Visual Basic editor
+
 20. Create a new function that we'll use to get the metro data (ours
     will be called `querySeniorMedianHouseholdIncomeMetro`) like this:
     
@@ -151,6 +168,7 @@ geo-demographic data using VBA in Excel
        ```vba
        inFilter(filterValue:="year", filterValue:=year)
        ```
+       
     2. Add one more filter to restrict the data to the metro ID number
        passed in to the function:
         ```vba
@@ -158,6 +176,7 @@ geo-demographic data using VBA in Excel
         ```
         This makes sure we’re only getting data for the target metro
         area.
+        
 23. To have the function return a value, we need to add one final line to
     the end of the function:
  
