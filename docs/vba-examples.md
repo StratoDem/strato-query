@@ -15,7 +15,7 @@ geo-demographic data using VBA in Excel
 
 ### [Installation and usage](#installation-and-usage)
 
-#### [Running the template the first time](#first-run)
+#### [Running the template the first time](#running-the-template-the-first-time)
 1. Download API template ([download here](https://github.com/StratoDem/strato-query/raw/master/StratoDem_API_Template.xlsm))
 2. Get an API token and place in the correct cell (`Configuration!B5`)
 3. Select one to three buffers
@@ -26,7 +26,7 @@ geo-demographic data using VBA in Excel
 
 <img src="assets/images/Excel_API_template.png" alt="StratoDem Analytics API token in Excel" />
 
-#### [Editing the template to add a new query](#adding-a-query)
+#### [Editing the template to add a new query](#editing-the-template-to-add-a-new-query)
 1. Request an API Excel template from the StratoDem Analytics team.
 2. Get an API token and place in the correct cell, `B5` in the
    `Configuration` sheet of the Excel template
