@@ -26,13 +26,14 @@ Tools to help query the StratoDem Analytics API for economic and geo-demographic
 <img src="assets/images/Excel_API_template.png" alt="StratoDem Analytics API token in Excel" />
 
 #### [Editing the template to add a new query](#adding-a-query)
-1. Download API template ([download here](https://github.com/StratoDem/strato-query/raw/master/StratoDem_API_Template.xlsm))
-2. Get an API token and place in the correct cell, `Configuration!B5` in
-   the template ([How do I get an API token?](https://academy.stratodem.com/article/82-creating-and-managing-api-tokens)). 
-3. Enable Developer tab in Excel. We'll come back here in a few steps
-   ([How do I enable the Developer
-   tab?](https://support.office.com/en-us/article/show-the-developer-tab-e1192344-5e56-4d45-931b-e5fd9bea2d45))
-4. Open
+1. Request an API Excel template from the StratoDem Analytics team.
+2. Get an API token and place in the correct cell, `B5` in the
+   `Configuration` sheet of the Excel template
+   ([How do I get an API token?](https://academy.stratodem.com/article/82-creating-and-managing-api-tokens)).
+3. Enable the Developer tab in Excel. We'll come back here in a few
+   steps
+   ([How do I enable the Developer tab?](https://support.office.com/en-us/article/show-the-developer-tab-e1192344-5e56-4d45-931b-e5fd9bea2d45))
+4. In a web browser, open
    [StratoDem Portfolio](https://clients.stratodem.com/dash?id=marketscorecard).
 5. Load in a custom portfolio defined with mile radius markets
    ([How do I load in a portfolio?](https://academy.stratodem.com/article/43-loading-a-previously-defined-portfolio))
@@ -82,7 +83,10 @@ Tools to help query the StratoDem Analytics API for economic and geo-demographic
     ```
     Make sure that, if you use a different query, `"median_val"` is
     whatever the target metric is named in the query object (for
-    example, it might be `"households"` instead.
+    example, it might be `"households"` instead. 
+    
+    <img src="assets/images/AddReturnStatementVBAQuery.gif" alt="Add return statement for senior median household income query" />
+
 15.  Add a code block to the `writeLocationData` function that calls our
      new `querySeniorMedianHouseholdIncome` function and writes the data
      (make sure to use a new column index number) 
@@ -129,6 +133,9 @@ Tools to help query the StratoDem Analytics API for economic and geo-demographic
     Again, make sure that, if you use a different query, `"median_val"`
     is whatever the target metric is named in the query object (for
     example, it might be `"households"` instead.
+    
+    <img src="assets/images/AddReturnStatementMetroVBAQuery.gif" alt="Add return statement for metro-level senior median household income query" />
+
 27. Add one more line of code to the `writeLocationData` below where we wrote our previous new query calls for mile-radius-defined market areas:
  
     ```vba
@@ -183,7 +190,10 @@ Call writeToSheet(results:=submitAPIQuery(populationQuery), sheetName:="Populati
 
 Output:
 
-<img src="assets/images/population_within_five_miles_excel.png" alt="Population within five miles of Times Square in Excel from the StratoDem Analytics API" />
+<img 
+src="assets/images/population_within_five_miles_excel.png"
+alt="Population within five miles of Times Square in Excel from the
+StratoDem Analytics API" />
 
 ## [Using Blaise ML to generate queries](#using-blaise-ml-to-generate-queries)
 Blaise ML by StratoDem Analytics is embedded in all StratoDem Analytics applications. One feature that Blaise ML supports is
