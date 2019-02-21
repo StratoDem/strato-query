@@ -1,5 +1,6 @@
-## StratoDem Analytics for Excel in VBA
-Tools to help query the StratoDem Analytics API for economic and geo-demographic data using VBA in Excel
+## StratoDem Analytics API for VBA in Excel
+Tools to help query the StratoDem Analytics API for economic and
+geo-demographic data using VBA in Excel
 
 [Back to main page](/)
 
@@ -30,6 +31,9 @@ Tools to help query the StratoDem Analytics API for economic and geo-demographic
 2. Get an API token and place in the correct cell, `B5` in the
    `Configuration` sheet of the Excel template
    ([How do I get an API token?](https://academy.stratodem.com/article/82-creating-and-managing-api-tokens)).
+   
+   <img src="assets/images/CreateAPIToken.gif" alt="Create StratoDem Analytics API token" />
+
 3. Enable the Developer tab in Excel. We'll come back here in a few
    steps
    ([How do I enable the Developer tab?](https://support.office.com/en-us/article/show-the-developer-tab-e1192344-5e56-4d45-931b-e5fd9bea2d45))
@@ -47,6 +51,9 @@ Tools to help query the StratoDem Analytics API for economic and geo-demographic
    includes the query objects necessary to replicate the query for each
    market definition in the entire portfolio. We’re only going to use
    one of them for now.
+   
+   <img src="assets/images/CopyAPIQuery.gif" alt="Create StratoDem Analytics API query code in VBA for Excel" />
+
 10. **In your Excel file**, open the Visual Basic editor from the
     Developer tab in the top ribbon. We’re going to modify the
     `writeLocationData` VBA function to add a column for median
@@ -62,6 +69,9 @@ Tools to help query the StratoDem Analytics API for economic and geo-demographic
     ```
 12. From the Portfolio app, copy the first query section into that new
     function below the comments.
+    
+    <img src="assets/images/CopyQueryFromBlaise.gif" alt="Copy StratoDem Analytics API query from Blaise ML to Excel VBA code" />
+
 13. Edit two of the filters to be sure we're requesting the right data:
     1. The **year filter** to be the `year` passed in as an argument to
        the function: 
@@ -108,12 +118,21 @@ Tools to help query the StratoDem Analytics API for economic and geo-demographic
     area. In StratoDem Portfolio, change the geographic coverage level
     in Portfolio to **Metro**
 18. Open up the **View API** dialog again and we’ll copy the new code
-    from the **Excel VBA** tab once more.
+    from the **Excel VBA** tab once more. The code here includes the
+    query object necessary to replicate the query for all metros.
+    
+    <img src="assets/images/CopyAPIQueryMetro.gif" alt="Copy StratoDem Analytics API metro-level query from Blaise ML to Excel VBA code" />
+
 19. Back in Excel, open up the Visual Basic editor
-23. Create a new function (we’ll call it `querySeniorMedianHouseholdIncomeMetro`) that we’ll use to get the metro data
-22. From the Portfolio app, copy the first query section into that new
+20. Create a new function (we’ll call it 
+    `querySeniorMedianHouseholdIncomeMetro`) that we’ll use to get the
+    metro data
+21. From the Portfolio app, copy the first query section into that new
     VBA function
-25. Edit:
+    
+    <img src="assets/images/CopyQueryFromBlaiseMetro.gif" alt="Copy StratoDem Analytics API metro-level query from Blaise ML to Excel VBA code" />
+
+22. Edit:
     1. The **year filter** to be the `year` passed in as an argument to
        the function: 
        ```vba
@@ -126,7 +145,8 @@ Tools to help query the StratoDem Analytics API for economic and geo-demographic
         ```
         This makes sure we’re only getting data for the target metro
         area.
-26. To have the function return a value, we need to add one final line to the end of the function:
+23. To have the function return a value, we need to add one final line to
+    the end of the function:
  
     ```vba
     querySeniorMedianHouseholdIncomeMetro = dataResults("data")(1)("median_val")
@@ -138,7 +158,9 @@ Tools to help query the StratoDem Analytics API for economic and geo-demographic
     
     <img src="assets/images/AddReturnStatementMetroVBAQuery.gif" alt="Add return statement for metro-level senior median household income query" />
 
-27. Add one more line of code to the `writeLocationData` below where we wrote our previous new query calls for mile-radius-defined market areas:
+24. Add one more line of code to the `writeLocationData` below where we 
+    wrote our previous new query calls for mile-radius-defined market
+    areas:
  
     ```vba
     Worksheets("Output").Cells(firstLocationRowNumber + 3, 9).Value = querySeniorMedianHouseholdIncomeMetro(cbsaCode, 2019)
