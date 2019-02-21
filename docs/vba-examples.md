@@ -67,6 +67,9 @@ geo-demographic data using VBA in Excel
         
     End Function
     ```
+    
+    <img src="assets/images/CreateFunctionStubVBA.gif" alt="Create function definition for senior household income" />
+
 12. From the Portfolio app, copy the first query section into that new
     function below the comments.
     
@@ -124,9 +127,19 @@ geo-demographic data using VBA in Excel
     <img src="assets/images/CopyAPIQueryMetro.gif" alt="Copy StratoDem Analytics API metro-level query from Blaise ML to Excel VBA code" />
 
 19. Back in Excel, open up the Visual Basic editor
-20. Create a new function (we’ll call it 
-    `querySeniorMedianHouseholdIncomeMetro`) that we’ll use to get the
-    metro data
+20. Create a new function that we'll use to get the metro data (ours
+    will be called `querySeniorMedianHouseholdIncomeMetro`) like this:
+    
+    ```vba
+    Function querySeniorMedianHouseholdIncomeMetro(cbsaCode As Long, year As Integer) As Double
+        ' Query median household income for households age 80+
+        ' for a metro
+        
+    End Function
+    ```
+    
+    <img src="assets/images/CreateFunctionStubMetroVBA.gif" alt="Create metro-level function definition for senior household income" />
+
 21. From the Portfolio app, copy the first query section into that new
     VBA function
     
@@ -170,6 +183,8 @@ geo-demographic data using VBA in Excel
 
 25. Click the **RUN QUERY** button in the `Configuration` sheet to query
     the data from the StratoDem Analytics API!
+    
+    <img src="assets/images/RunQuery.gif" alt="Run Excel VBA API query through StratoDem Analytics" />
 
 ### [Sample queries](#sample-queries)
 
