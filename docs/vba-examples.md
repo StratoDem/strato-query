@@ -92,15 +92,17 @@ Tools to help query the StratoDem Analytics API for economic and geo-demographic
      (make sure to use a new column index number) 
      ```vba 
      ' Write senior median household income (age 80+)
-     Worksheets("Output").Cells(firstLocationRowNumber, 13).Value = querySeniorMedianHouseholdIncome(latitude, longitude, radius1, 2019) 
-     Worksheets("Output").Cells(firstLocationRowNumber + 1, 13).Value = querySeniorMedianHouseholdIncome(latitude, longitude, radius2, 2019) 
-     Worksheets("Output").Cells(firstLocationRowNumber + 2, 13).Value = querySeniorMedianHouseholdIncome(latitude, longitude, radius3, 2019)
+     Worksheets("Output").Cells(firstLocationRowNumber, 9).Value = querySeniorMedianHouseholdIncome(latitude, longitude, radius1, 2019) 
+     Worksheets("Output").Cells(firstLocationRowNumber + 1, 9).Value = querySeniorMedianHouseholdIncome(latitude, longitude, radius2, 2019) 
+     Worksheets("Output").Cells(firstLocationRowNumber + 2, 9).Value = querySeniorMedianHouseholdIncome(latitude, longitude, radius3, 2019)
      ```
 
 16. Update the `writeColumnMetadata` function to add a new column name:
     ```vba
-    Worksheets("Output").Cells(1, 13).Value = "Median household income 80+ households (2019)" ' M1
+    Worksheets("Output").Cells(1, 9).Value = "Median household income 80+ households (2019)" ' I1
     ```
+    
+    <img src="assets/images/AddWriteCallsToVBA.gif" alt="Add write statement for senior median household income query"/>
 
 17. Now we need to add one more row for the associated metropolitan
     area. In StratoDem Portfolio, change the geographic coverage level
@@ -139,8 +141,10 @@ Tools to help query the StratoDem Analytics API for economic and geo-demographic
 27. Add one more line of code to the `writeLocationData` below where we wrote our previous new query calls for mile-radius-defined market areas:
  
     ```vba
-    Worksheets("Output").Cells(firstLocationRowNumber + 3, 13).Value = querySeniorMedianHouseholdIncomeMetro(cbsaCode, 2019)
+    Worksheets("Output").Cells(firstLocationRowNumber + 3, 9).Value = querySeniorMedianHouseholdIncomeMetro(cbsaCode, 2019)
     ```
+    
+    <img src="assets/images/AddWriteCallsMetroToVBA.gif" alt="Add write statement for metro-level senior median household income query"/>
 
 25. Click the **RUN QUERY** button in the `Configuration` sheet to query
     the data from the StratoDem Analytics API!
