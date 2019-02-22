@@ -35,16 +35,28 @@ pre.highlight {
     color: #eee;
   }
 
-  .s1 {
+  .s1, .s {
     color: #F168A2;
   }
 
-  .m {
+  .m, .mi {
     color: #4DD9E2;
   }
 
   .nf {
     color: #9CB0D2;
+  }
+
+  .kn, .k {
+    color: #fff;
+  }
+
+  .nn {
+    color: #ccc;
+  }
+
+  .c {
+    color: #aaa;
   }
 }
 
