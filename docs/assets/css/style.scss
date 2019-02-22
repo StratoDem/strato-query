@@ -28,6 +28,28 @@ pre code {
   background-color: #444444;
 }
 
+pre.highlight {
+  background-color: #444;
+
+  .o {
+    color: #eee;
+  }
+
+  .s1 {
+    color: #F168A2;
+  }
+
+  .m {
+    color: #4DD9E2;
+  }
+
+  .nf {
+    color: #9CB0D2;
+  }
+}
+
+
+
 ul {
   li {
     margin-bottom: 14px;
