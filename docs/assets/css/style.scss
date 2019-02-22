@@ -5,7 +5,36 @@
 
 @import url('https://fonts.googleapis.com/css?family=Lato');
 
-p {
+p, h1, h2, h3, h4, h5, h6 {
   font-family: "Lato", sans-serif;
+}
+
+p {
   line-height: 1.6;
+}
+
+pre {
+  margin: 21px 0;
+}
+
+pre code {
+  color: white;
+  background-color: #444444;
+}
+
+ul {
+  li {
+    margin-bottom: 14px;
+  }
+}
+
+.inner {
+  max-width: 800px;
+}
+
+#main_content {
+  background-color: #fff;
+  margin: 42px auto;
+  box-shadow: 1px 3px 5px #aaa;
+  padding: 21px 42px;
 }
