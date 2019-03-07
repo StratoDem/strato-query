@@ -19,12 +19,14 @@ import pandas
 
 from strato_query.core import constants as cc
 
-
 __all__ = [
     'APIQueryParams', 'BaseAPIQuery', 'APIMeanQueryParams', 'APIMedianQueryParams',
 ]
 
 API_TOKEN = os.environ.get('API_TOKEN')
+if API_TOKEN is None:
+    raise ValueError('No API token provided via API_TOKEN environment variable')
+
 T_DF = pandas.DataFrame
 
 
@@ -171,6 +173,7 @@ class APIQueryParams(abc.ABC):
                 spacer=spacer)
 
             return string_form
+
         return pretty_print_recursive(query_params=self)
 
     def pretty_print_vba(self) -> str:
@@ -232,9 +235,9 @@ class APIQueryParams(abc.ABC):
                         filter_value = fv
                     return '{func}(filterVariable:="{filter_variable}", ' \
                            'filterValue:={filter_value})'.format(
-                            func=func,
-                            filter_variable=filt['filter_variable'],
-                            filter_value=filter_value)
+                        func=func,
+                        filter_variable=filt['filter_variable'],
+                        filter_value=filter_value)
 
             def _process_aggregation(agg: dict) -> str:
                 assert isinstance(agg, dict)
@@ -292,6 +295,7 @@ class APIQueryParams(abc.ABC):
                     spacer=spacer, query_type=dict_form['query_type'])
                 if 'query_type' in dict_form and query_params_func == 'apiQueryParameters' else '',
                 spacer=spacer)
+
         return pretty_print_recursive(query_params=self)
 
     def pretty_print_r(self) -> str:
@@ -353,9 +357,9 @@ class APIQueryParams(abc.ABC):
                         filter_value = fv
                     return '{func}(filter_variable = "{filter_variable}", ' \
                            'filter_value = {filter_value})'.format(
-                            func=func,
-                            filter_variable=filt['filter_variable'],
-                            filter_value=filter_value)
+                        func=func,
+                        filter_variable=filt['filter_variable'],
+                        filter_value=filter_value)
 
             def _process_aggregation(agg: dict) -> str:
                 assert isinstance(agg, dict)
@@ -408,6 +412,7 @@ class APIQueryParams(abc.ABC):
                 spacer=spacer)
 
             return string_form
+
         return pretty_print_recursive(query_params=self)
 
 
@@ -457,6 +462,29 @@ class APIMedianQueryParams(APIQueryParams):
         return self._median_variable_name
 
 
+class APIGeoJSONQueryParams(APIQueryParams):
+    def __init__(self, properties: Tuple[Union[str, dict], ...], **kwargs):
+        assert isinstance(properties, tuple)
+
+        super().__init__(**kwargs)
+
+        self._properties = properties
+
+    def to_api_struct(self):
+        return_dict = super().to_api_struct()
+        return_dict['properties'] = self.properties
+
+        return return_dict
+
+    @property
+    def query_type(self) -> str:
+        return 'GEOJSON'
+
+    @property
+    def properties(self) -> Tuple[Union[str, dict], ...]:
+        return self._properties
+
+
 class BaseAPIQuery:
     @classmethod
     def submit_query(cls, query_params: Optional[APIQueryParams] = None,
@@ -466,13 +494,32 @@ class BaseAPIQuery:
                                                   APIQueryParams)
         assert queries_params is None or isinstance(queries_params,
                                                     APIQueryParams)
-        assert not(query_params is None and queries_params is None)
-        assert not(query_params is not None and queries_params is not None)
+        assert not (query_params is None and queries_params is None)
+        assert not (query_params is not None and queries_params is not None)
 
         if query_params is not None:
             return cls.query_api_df(query_params=query_params, headers=headers)
         elif queries_params is not None:
             return cls.query_api_multiple(queries=queries_params, headers=headers)
+
+    @staticmethod
+    def query_api_json(query_params: APIQueryParams,
+                       headers: Optional[Dict[str, str]] = None) -> dict:
+        r = requests.post(
+            url=cc.API_URL,
+            json=dict(
+                token=API_TOKEN,
+                query=query_params.to_api_struct()),
+            headers=headers)
+
+        assert r.status_code == 200, (r.status_code,
+                                      r.content,
+                                      query_params.to_api_struct())
+
+        json_data = r.json()
+        assert json_data['success'], json_data
+
+        return json_data['data'][0]
 
     @staticmethod
     def query_api_df(query_params: APIQueryParams,
@@ -521,20 +568,28 @@ class BaseAPIQuery:
 
 
 if __name__ == '__main__':
-    print(BaseAPIQuery.submit_query(
-        query_params=APIQueryParams(
-            query_type='COUNT',
-            data_fields=('year', 'population'),
-            table='populationforecast_us_annual_population_age',
-            data_filters=(
-                dict(filter_type='eq',
-                     filter_variable='age_g',
-                     filter_value=18),
-                dict(filter_type='between',
-                     filter_variable='year',
-                     filter_value=[2013, 2018])
-            ),
-            aggregations=(dict(aggregation_func='sum',
-                               variable_name='population'),),
-            groupby=('year',),
-        )))
+    import json
+
+    print(
+        json.dumps(
+            BaseAPIQuery.query_api_json(
+                query_params=APIGeoJSONQueryParams(
+                    data_fields=('geoid2', 'geometry'),
+                    table='geocookbook_state_na_shapes_simplified',
+                    properties=('geoid2', 'population'),
+                    data_filters=(
+                        {'filter_type': 'eq', 'filter_variable': 'geoid2', 'filter_value': 25},
+                    ),
+                    aggregations=(),
+                    groupby=(),
+                    join=APIQueryParams(
+                        table='populationforecast_state_annual_population',
+                        data_fields=({'geoid2': 'geoid2_pop'}, 'population'),
+                        aggregations=(),
+                        data_filters=(
+                            {'filter_type': 'eq', 'filter_variable': 'year', 'filter_value': 2019},
+                        ),
+                        groupby=(),
+                        on=dict(left=['geoid2'], right=['geoid2_pop'])
+                    ),
+                ))))
