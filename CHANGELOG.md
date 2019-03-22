@@ -2,6 +2,35 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.8.0] - 2019-03-22
+### Fixes
+- Includes `APIGeoJSONQueryParams` in `__all__` for `base_API_query.py`
+
+### Adds
+- Adds `APIGeocoderQueryParams`, which, when called form
+  `BaseAPIQuery.query_api_df`, returns a `DataFrame` with the geographic
+  information associated with a latitude-longitude pair.
+  
+  Example: 
+  ```python 
+  from strato_query.base_API_query import BaseAPIQuery, APIGeocoderQueryParams
+
+  BaseAPIQuery.query_api_df(
+    query_params=APIGeocoderQueryParams(
+        data_fields=('geoid11', 'geoid5',),
+        table='geocookbook_tract_na_shapes_full',
+        data_filters=(),
+        groupby=(),
+        aggregations=(),
+        latitude=42.983899,
+        longitude=-99.306204))
+  ```
+  
+  ```
+         GEOID11  GEOID5
+  0  31103975400   31103
+  ```
+
 ## [2.7.0] - 2019-03-07
 ### Adds
 - Adds `APIGeoJSONQueryParams`, which, when called from
@@ -10,6 +39,8 @@ All notable changes to this project will be documented in this file. This projec
   `Feature`.
   
   ```python
+  from strato_query.base_API_query import BaseAPIQuery, APIGeoJSONQueryParams, APIQueryParams
+
   BaseAPIQuery.query_api_json(
     query_params=APIGeoJSONQueryParams(
         data_fields=('geoid2', 'geometry'),
