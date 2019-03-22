@@ -21,6 +21,7 @@ from strato_query.core import constants as cc
 
 __all__ = [
     'APIQueryParams', 'BaseAPIQuery', 'APIMeanQueryParams', 'APIMedianQueryParams',
+    'APIGeoJSONQueryParams', 'APIGeocoderQueryParams',
 ]
 
 API_TOKEN = os.environ.get('API_TOKEN')
@@ -485,6 +486,36 @@ class APIGeoJSONQueryParams(APIQueryParams):
         return self._properties
 
 
+class APIGeocoderQueryParams(APIQueryParams):
+    def __init__(self, latitude: Union[int, float], longitude: Union[int, float], **kwargs):
+        assert isinstance(latitude, (int, float))
+        assert isinstance(longitude, (int, float))
+
+        super().__init__(**kwargs)
+
+        self._latitude = latitude
+        self._longitude = longitude
+
+    def to_api_struct(self):
+        return_dict = super().to_api_struct()
+        return_dict['latitude'] = self.latitude
+        return_dict['longitude'] = self.longitude
+
+        return return_dict
+
+    @property
+    def query_type(self) -> str:
+        return 'GEOCODER'
+
+    @property
+    def latitude(self) -> Union[float, int]:
+        return self._latitude
+
+    @property
+    def longitude(self) -> Union[float, int]:
+        return self._longitude
+
+
 class BaseAPIQuery:
     @classmethod
     def submit_query(cls, query_params: Optional[APIQueryParams] = None,
@@ -571,25 +602,12 @@ if __name__ == '__main__':
     import json
 
     print(
-        json.dumps(
-            BaseAPIQuery.query_api_json(
-                query_params=APIGeoJSONQueryParams(
-                    data_fields=('geoid2', 'geometry'),
-                    table='geocookbook_state_na_shapes_simplified',
-                    properties=('geoid2', 'population'),
-                    data_filters=(
-                        {'filter_type': 'eq', 'filter_variable': 'geoid2', 'filter_value': 25},
-                    ),
-                    aggregations=(),
-                    groupby=(),
-                    join=APIQueryParams(
-                        table='populationforecast_state_annual_population',
-                        data_fields=({'geoid2': 'geoid2_pop'}, 'population'),
-                        aggregations=(),
-                        data_filters=(
-                            {'filter_type': 'eq', 'filter_variable': 'year', 'filter_value': 2019},
-                        ),
-                        groupby=(),
-                        on=dict(left=['geoid2'], right=['geoid2_pop'])
-                    ),
-                ))))
+        BaseAPIQuery.query_api_df(
+            query_params=APIGeocoderQueryParams(
+                data_fields=('geoid11', 'geoid5',),
+                table='geocookbook_tract_na_shapes_full',
+                data_filters=(),
+                groupby=(),
+                aggregations=(),
+                latitude=42.983899,
+                longitude=-99.306204)))
