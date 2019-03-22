@@ -3,6 +3,9 @@
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [2.8.0] - 2019-03-22
+### Fixes
+- Includes `APIGeoJSONQueryParams` in `__all__` for `base_API_query.py`
+
 ### Adds
 - Adds `APIGeocoderQueryParams`, which, when called form
   `BaseAPIQuery.query_api_df`, returns a `DataFrame` with the geographic
