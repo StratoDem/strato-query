@@ -236,9 +236,9 @@ class APIQueryParams(abc.ABC):
                         filter_value = fv
                     return '{func}(filterVariable:="{filter_variable}", ' \
                            'filterValue:={filter_value})'.format(
-                        func=func,
-                        filter_variable=filt['filter_variable'],
-                        filter_value=filter_value)
+                            func=func,
+                            filter_variable=filt['filter_variable'],
+                            filter_value=filter_value)
 
             def _process_aggregation(agg: dict) -> str:
                 assert isinstance(agg, dict)
@@ -358,9 +358,9 @@ class APIQueryParams(abc.ABC):
                         filter_value = fv
                     return '{func}(filter_variable = "{filter_variable}", ' \
                            'filter_value = {filter_value})'.format(
-                        func=func,
-                        filter_variable=filt['filter_variable'],
-                        filter_value=filter_value)
+                            func=func,
+                            filter_variable=filt['filter_variable'],
+                            filter_value=filter_value)
 
             def _process_aggregation(agg: dict) -> str:
                 assert isinstance(agg, dict)
