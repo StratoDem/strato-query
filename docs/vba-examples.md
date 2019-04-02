@@ -17,7 +17,7 @@ geo-demographic data using VBA in Excel
 
 #### [Running the template the first time](#running-the-template-the-first-time)
 
-1. Download API template ([download here](https://github.com/StratoDem/strato-query/raw/master/StratoDem_API_Template.xlsm))
+1. Download API template ([download here](https://github.com/StratoDem/strato-query/raw/master/StratoDem_API_Template_v20190401.xlsm))
 
 2. Get an API token and place in the correct cell (`Configuration!B5`)
 
