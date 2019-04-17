@@ -583,6 +583,7 @@ class BaseAPIQuery:
     def submit_query(cls,
                      query_params: Optional[APIQueryParams] = None,
                      queries_params: Optional[Dict[str, APIQueryParams]] = None,
+                     timeout: Optional[float] = 1.0,
                      headers: Optional[Dict[str, str]] = None) -> Union[T_DF, Dict[str, T_DF]]:
         """
         Determines the proper method to use and passes values along for request submission
@@ -593,6 +594,8 @@ class BaseAPIQuery:
             A single query params object to submit as part of the request
         queries_params: Optional[Dict[str, APIQueryParams]] = None
             A list of dicts, with query params as the values, to be submitted together
+        timeout: Optional[float]=1.0
+            The time allowed before a request times out, where 1 second is 1.0
         headers: Optional[Dict[str, str]] = None
             Optional request headers
         Returns
@@ -605,12 +608,13 @@ class BaseAPIQuery:
         assert not (query_params is not None and queries_params is not None)
 
         if query_params is not None:
-            return cls.query_api_df(query_params=query_params, headers=headers)
+            return cls.query_api_df(query_params=query_params, headers=headers, timeout=timeout)
         elif queries_params is not None:
-            return cls.query_api_multiple(queries=queries_params, headers=headers)
+            return cls.query_api_multiple(queries=queries_params, headers=headers, timeout=timeout)
 
     @staticmethod
     def query_api_json(query_params: APIQueryParams,
+                       timeout: Optional[float] = 1.0,
                        headers: Optional[Dict[str, str]] = None) -> dict:
         """
         Submits the query params and returns the resulting data
@@ -618,6 +622,8 @@ class BaseAPIQuery:
         ----------
         query_params: APIQueryParams
             The query params to be used in the POST request
+        timeout: Optional[float]=1.0
+            The time allowed before a request times out, where 1 second is 1.0
         headers: Optional[Dict[str, str]] = None
             Optional request headers
 
@@ -627,12 +633,14 @@ class BaseAPIQuery:
         """
         json_data = _submit_post_request(
             json_dict=dict(token=API_TOKEN, query=query_params.to_api_struct()),
-            headers=headers)
+            headers=headers,
+            timeout=timeout)
 
         return json_data['data'][0]
 
     @staticmethod
     def query_api_df(query_params: APIQueryParams,
+                     timeout: Optional[float] = 1.0,
                      headers: Optional[Dict[str, str]] = None) -> pandas.DataFrame:
         """
         Submits the query params and returns the resulting data
@@ -641,6 +649,8 @@ class BaseAPIQuery:
         ----------
         query_params: APIQueryParams
             The query params to be used in the POST request
+        timeout: Optional[float]=1.0
+            The time allowed before a request times out, where 1 second is 1.0
         headers: Optional[Dict[str, str]] = None
             Optional request headers
 
@@ -650,7 +660,8 @@ class BaseAPIQuery:
         """
         json_data = _submit_post_request(
             json_dict=dict(token=API_TOKEN, query=query_params.to_api_struct()),
-            headers=headers)
+            headers=headers,
+            timeout=timeout)
 
         df_ = pandas.DataFrame(json_data['data'])
         df_.columns = [c.upper() for c in df_.columns]
@@ -659,6 +670,7 @@ class BaseAPIQuery:
 
     @staticmethod
     def query_api_multiple(queries: Dict[str, APIQueryParams],
+                           timeout: Optional[float]=1.0,
                            headers: Optional[Dict[str, str]] = None) -> Dict[str, pandas.DataFrame]:
         """
         Submits the query params and returns the resulting data
@@ -667,6 +679,8 @@ class BaseAPIQuery:
         ----------
         queries: Dict[str, APIQueryParams]
             The query params to be used in the POST request
+        timeout: Optional[float]=1.0
+            The time allowed before a request times out, where 1 second is 1.0
         headers: Optional[Dict[str, str]] = None
             Optional request headers
 
@@ -678,7 +692,8 @@ class BaseAPIQuery:
             json_dict=dict(
                 token=API_TOKEN,
                 queries={k: v.to_api_struct() for k, v in queries.items()}),
-            headers=headers)
+            headers=headers,
+            timeout=timeout)
 
         df_dict = {}
         for k, v in json_data['data'].items():
@@ -689,13 +704,16 @@ class BaseAPIQuery:
         return df_dict
 
 
-def _submit_post_request(json_dict: dict, headers: Optional[Dict[str, str]] = None) -> dict:
+def _submit_post_request(json_dict: dict,
+                         timeout: float,
+                         headers: Optional[Dict[str, str]] = None) -> dict:
     """
     Submits the POST request and retries on connection errors, waiting longer between each retry
 
     Parameters
     ----------
     json_dict: dict
+    timeout: float
     headers: Optional[Dict[str, str]] = None
 
     Returns
@@ -704,7 +722,7 @@ def _submit_post_request(json_dict: dict, headers: Optional[Dict[str, str]] = No
     """
     for retry_num in range(cc.MAX_RETRIES):
         try:
-            r = requests.post(url=cc.API_URL, json=json_dict, headers=headers)
+            r = requests.post(url=cc.API_URL, json=json_dict, headers=headers, timeout=timeout)
 
             assert r.status_code == 200, (r.status_code, r.content, json_dict)
 
@@ -712,7 +730,7 @@ def _submit_post_request(json_dict: dict, headers: Optional[Dict[str, str]] = No
             assert json_data['success'], json_data
 
             return json_data
-        except requests.exceptions.ConnectionError as e:
+        except (requests.exceptions.ConnectionError, requests.Timeout) as e:
             if retry_num == cc.MAX_RETRIES - 1:
                 raise e
             else:
