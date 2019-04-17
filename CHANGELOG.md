@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.9.0] - 2019-04-17
+### Adds
+- Adds automatic retries for the POST request if there is a connection issue
+- Adds an optional, adjustable `timeout` param to exposed methods
+
+### Related issues:
+- [#39](https://github.com/StratoDem/strato-query/issues/39)
+
 ## [2.8.0] - 2019-03-22
 ### Fixes
 - Includes `APIGeoJSONQueryParams` in `__all__` for `base_API_query.py`
