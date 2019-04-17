@@ -734,7 +734,7 @@ def _submit_post_request(json_dict: dict,
             if retry_num == cc.MAX_RETRIES - 1:
                 raise e
             else:
-                time.sleep(0.1 * (1 + retry_num))
+                time.sleep(0.5 * (1 + retry_num))
 
 
 if __name__ == '__main__':
