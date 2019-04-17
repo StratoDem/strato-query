@@ -598,7 +598,7 @@ def _submit_post_request(json_dict: dict, headers: Optional[Dict[str, str]] = No
 
 if __name__ == '__main__':
     print(
-        BaseAPIQuery.query_api_df(
+        BaseAPIQuery.submit_query(
             query_params=APIGeocoderQueryParams(
                 data_fields=('geoid11', 'geoid5',),
                 table='geocookbook_tract_na_shapes_full',
