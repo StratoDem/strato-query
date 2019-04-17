@@ -242,7 +242,7 @@ class TestAPIQuery(unittest.TestCase, BaseAPIQuery):
                 table='geocookbook_county_na_shapes_full',
                 data_fields=({'custom:GEOID': 1}, 'area'),
                 data_filters=(
-                {'filter_type': 'in', 'filter_value': [25025], 'filter_variable': 'GEOID5'},),
+                    {'filter_type': 'in', 'filter_value': [25025], 'filter_variable': 'GEOID5'},),
                 query_type='AREA',
                 aggregations=(),
                 groupby=('GEOID',),
