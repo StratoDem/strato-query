@@ -542,38 +542,18 @@ class BaseAPIQuery:
     @staticmethod
     def query_api_json(query_params: APIQueryParams,
                        headers: Optional[Dict[str, str]] = None) -> dict:
-        r = requests.post(
-            url=cc.API_URL,
-            json=dict(
-                token=API_TOKEN,
-                query=query_params.to_api_struct()),
+        json_data = _submit_post_request(
+            json_dict=dict(token=API_TOKEN, query=query_params.to_api_struct()),
             headers=headers)
-
-        assert r.status_code == 200, (r.status_code,
-                                      r.content,
-                                      query_params.to_api_struct())
-
-        json_data = r.json()
-        assert json_data['success'], json_data
 
         return json_data['data'][0]
 
     @staticmethod
     def query_api_df(query_params: APIQueryParams,
                      headers: Optional[Dict[str, str]] = None) -> pandas.DataFrame:
-        r = requests.post(
-            url=cc.API_URL,
-            json=dict(
-                token=API_TOKEN,
-                query=query_params.to_api_struct()),
+        json_data = _submit_post_request(
+            json_dict=dict(token=API_TOKEN, query=query_params.to_api_struct()),
             headers=headers)
-
-        assert r.status_code == 200, (r.status_code,
-                                      r.content,
-                                      query_params.to_api_struct())
-
-        json_data = r.json()
-        assert json_data['success'], json_data
 
         df_ = pandas.DataFrame(json_data['data'])
         df_.columns = [c.upper() for c in df_.columns]
@@ -583,17 +563,11 @@ class BaseAPIQuery:
     @staticmethod
     def query_api_multiple(queries: Dict[str, APIQueryParams],
                            headers: Optional[Dict[str, str]] = None) -> Dict[str, pandas.DataFrame]:
-        r = requests.post(
-            url=cc.API_URL,
-            json=dict(
+        json_data = _submit_post_request(
+            json_dict=dict(
                 token=API_TOKEN,
                 queries={k: v.to_api_struct() for k, v in queries.items()}),
             headers=headers)
-
-        assert r.status_code == 200, (r.status_code, r.content, queries)
-
-        json_data = r.json()
-        assert json_data['success'], json_data
 
         df_dict = {}
         for k, v in json_data['data'].items():
