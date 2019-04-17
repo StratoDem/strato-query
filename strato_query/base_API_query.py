@@ -11,7 +11,9 @@ December 26, 2018
 
 import abc
 import os
-from typing import Tuple, Dict, Optional, Union, List
+import time
+
+from typing import Tuple, Dict, Optional, Union
 
 import requests
 
@@ -600,6 +602,24 @@ class BaseAPIQuery:
             df_dict[k] = df_
 
         return df_dict
+
+
+def _submit_post_request(json_dict: dict, headers: Optional[Dict[str, str]] = None):
+    for retry_num in range(cc.MAX_RETRIES):
+        try:
+            r = requests.post(url=cc.API_URL, json=json_dict, headers=headers)
+
+            assert r.status_code == 200, (r.status_code, r.content, json_dict)
+
+            json_data = r.json()
+            assert json_data['success'], json_data
+
+            return json_data
+        except requests.exceptions.ConnectionError as e:
+            if retry_num == cc.MAX_RETRIES - 1:
+                raise e
+            else:
+                time.sleep(0.1 * (1 + retry_num))
 
 
 if __name__ == '__main__':
