@@ -10,3 +10,5 @@ December 26, 2018
 """
 
 API_URL = 'https://api.stratodem.com/api'
+
+MAX_RETRIES = 3
