@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file. This projec
 ### Adds
 - Adds automatic retries for the POST request if there is a connection issue
 - Adds an optional, adjustable `timeout` param to exposed methods
+- Adds docstrings to class methods
 
 ### Related issues:
 - [#39](https://github.com/StratoDem/strato-query/issues/39)
