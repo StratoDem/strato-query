@@ -20,8 +20,12 @@ import pandas
 from strato_query.core import constants as cc
 
 __all__ = [
-    'APIQueryParams', 'BaseAPIQuery', 'APIMeanQueryParams', 'APIMedianQueryParams',
-    'APIGeoJSONQueryParams', 'APIGeocoderQueryParams',
+    'APIQueryParams',
+    'BaseAPIQuery',
+    'APIMeanQueryParams',
+    'APIMedianQueryParams',
+    'APIGeoJSONQueryParams',
+    'APIGeocoderQueryParams',
 ]
 
 API_TOKEN = os.environ.get('API_TOKEN')
@@ -599,8 +603,6 @@ class BaseAPIQuery:
 
 
 if __name__ == '__main__':
-    import json
-
     print(
         BaseAPIQuery.query_api_df(
             query_params=APIGeocoderQueryParams(
