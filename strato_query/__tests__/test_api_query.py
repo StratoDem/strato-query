@@ -23,8 +23,9 @@ class TestAPIQuery(unittest.TestCase, BaseAPIQuery):
         var='year',
         val=2015).to_dict()
 
-    @classmethod
-    def test_query_call(cls):
+    def test_query_call(self):
+        import requests
+
         age_filter = EqFilter(
             var='age_g',
             val=18).to_dict()
@@ -33,7 +34,7 @@ class TestAPIQuery(unittest.TestCase, BaseAPIQuery):
             var='year',
             val=[2013, 2018]).to_dict()
 
-        df = cls.submit_query(
+        df = self.submit_query(
             query_params=APIQueryParams(
                 data_fields=('year', 'population'),
                 table='populationforecast_us_annual_population_age',
@@ -41,12 +42,25 @@ class TestAPIQuery(unittest.TestCase, BaseAPIQuery):
                 aggregations=(dict(aggregation_func='sum',
                                    variable_name='population'),),
                 groupby=('year',),
-            )
+            ),
         )
 
         df_sorted = df.sort_values(by='YEAR', ascending=True)
         assert all(x == y for x, y in zip(
             df_sorted['YEAR'].values, [x for x in range(2013, 2019)]))
+
+        with self.assertRaises(requests.exceptions.ConnectionError):
+            df = self.submit_query(
+                query_params=APIQueryParams(
+                    data_fields=('year', 'population'),
+                    table='populationforecast_us_annual_population_age',
+                    data_filters=(age_filter, year_filter),
+                    aggregations=(dict(aggregation_func='sum',
+                                       variable_name='population'),),
+                    groupby=('year',),
+                ),
+                timeout=0.000001
+            )
 
     @classmethod
     def test_multi_join(cls):
