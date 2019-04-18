@@ -731,7 +731,7 @@ def _submit_post_request(json_dict: dict,
 
             return json_data
         except (requests.exceptions.ConnectionError, requests.Timeout) as e:
-            if retry_num == cc.MAX_RETRIES - 1:
+            if retry_num >= cc.MAX_RETRIES:
                 raise e
             else:
                 time.sleep(0.5 * (1 + retry_num))
