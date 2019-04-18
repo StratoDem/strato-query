@@ -11,7 +11,9 @@ December 26, 2018
 
 import abc
 import os
-from typing import Tuple, Dict, Optional, Union, List
+import time
+
+from typing import Tuple, Dict, Optional, Union
 
 import requests
 
@@ -20,8 +22,12 @@ import pandas
 from strato_query.core import constants as cc
 
 __all__ = [
-    'APIQueryParams', 'BaseAPIQuery', 'APIMeanQueryParams', 'APIMedianQueryParams',
-    'APIGeoJSONQueryParams', 'APIGeocoderQueryParams',
+    'APIQueryParams',
+    'BaseAPIQuery',
+    'APIMeanQueryParams',
+    'APIMedianQueryParams',
+    'APIGeoJSONQueryParams',
+    'APIGeocoderQueryParams',
 ]
 
 API_TOKEN = os.environ.get('API_TOKEN')
@@ -62,6 +68,13 @@ class APIQueryParams(abc.ABC):
         self._order = order
 
     def to_api_struct(self) -> dict:
+        """
+        Converts the query params into a form that the API can work with
+
+        Returns
+        -------
+        The query params as a dict
+        """
         return_dict = dict(
             query_type=self.query_type,
             data_fields=self.data_fields,
@@ -128,6 +141,13 @@ class APIQueryParams(abc.ABC):
         return dict_form
 
     def pretty_print(self) -> str:
+        """
+        Converts the query params into a human-readable string representing the Python code
+
+        Returns
+        -------
+        The query params as a string
+        """
         def pretty_print_recursive(query_params, spacer: Optional[str] = '    '):
             dict_form = self._dict_form(query_params)
             query_params_class = 'APIQueryParams'
@@ -178,6 +198,13 @@ class APIQueryParams(abc.ABC):
         return pretty_print_recursive(query_params=self)
 
     def pretty_print_vba(self) -> str:
+        """
+        Converts the query params into a human-readable string representing the VBA code
+
+        Returns
+        -------
+        The query params as a string
+        """
         def pretty_print_recursive(query_params, spacer: Optional[str] = '    ') -> str:
             dict_form = self._dict_form(query_params)
             query_params_func = 'apiQueryParameters'
@@ -300,6 +327,13 @@ class APIQueryParams(abc.ABC):
         return pretty_print_recursive(query_params=self)
 
     def pretty_print_r(self) -> str:
+        """
+        Converts the query params into a human-readable string representing the R code
+
+        Returns
+        -------
+        The query params as a string
+        """
         def pretty_print_recursive(query_params, spacer: Optional[str] = '  ') -> str:
             dict_form = self._dict_form(query_params)
             query_params_func = 'api_query_params'
@@ -426,6 +460,13 @@ class APIMeanQueryParams(APIQueryParams):
         super().__init__(**kwargs)
 
     def to_api_struct(self):
+        """
+        Converts the query params into a form that the API can work with
+
+        Returns
+        -------
+        The query params as a dict
+        """
         return_dict = super().to_api_struct()
         return_dict['mean_variable_name'] = self.mean_variable_name
 
@@ -449,6 +490,13 @@ class APIMedianQueryParams(APIQueryParams):
         super().__init__(**kwargs)
 
     def to_api_struct(self):
+        """
+        Converts the query params into a form that the API can work with
+
+        Returns
+        -------
+        The query params as a dict
+        """
         return_dict = super().to_api_struct()
         return_dict['median_variable_name'] = self.median_variable_name
 
@@ -472,6 +520,13 @@ class APIGeoJSONQueryParams(APIQueryParams):
         self._properties = properties
 
     def to_api_struct(self):
+        """
+        Converts the query params into a form that the API can work with
+
+        Returns
+        -------
+        The query params as a dict
+        """
         return_dict = super().to_api_struct()
         return_dict['properties'] = self.properties
 
@@ -497,6 +552,13 @@ class APIGeocoderQueryParams(APIQueryParams):
         self._longitude = longitude
 
     def to_api_struct(self):
+        """
+        Converts the query params into a form that the API can work with
+
+        Returns
+        -------
+        The query params as a dict
+        """
         return_dict = super().to_api_struct()
         return_dict['latitude'] = self.latitude
         return_dict['longitude'] = self.longitude
@@ -518,56 +580,88 @@ class APIGeocoderQueryParams(APIQueryParams):
 
 class BaseAPIQuery:
     @classmethod
-    def submit_query(cls, query_params: Optional[APIQueryParams] = None,
+    def submit_query(cls,
+                     query_params: Optional[APIQueryParams] = None,
                      queries_params: Optional[Dict[str, APIQueryParams]] = None,
+                     timeout: Optional[float] = 1.0,
                      headers: Optional[Dict[str, str]] = None) -> Union[T_DF, Dict[str, T_DF]]:
-        assert query_params is None or isinstance(query_params,
-                                                  APIQueryParams)
-        assert queries_params is None or isinstance(queries_params,
-                                                    APIQueryParams)
+        """
+        Determines the proper method to use and passes values along for request submission
+
+        Parameters
+        ----------
+        query_params: Optional[APIQueryParams] = None
+            A single query params object to submit as part of the request
+        queries_params: Optional[Dict[str, APIQueryParams]] = None
+            A list of dicts, with query params as the values, to be submitted together
+        timeout: Optional[float]=1.0
+            The time allowed before a request times out, where 1 second is 1.0
+        headers: Optional[Dict[str, str]] = None
+            Optional request headers
+        Returns
+        -------
+        The result from the request, either a pandas dataframe or a dict with dataframes as values
+        """
+        assert query_params is None or isinstance(query_params, APIQueryParams)
+        assert queries_params is None or isinstance(queries_params, APIQueryParams)
         assert not (query_params is None and queries_params is None)
         assert not (query_params is not None and queries_params is not None)
 
         if query_params is not None:
-            return cls.query_api_df(query_params=query_params, headers=headers)
+            return cls.query_api_df(query_params=query_params, headers=headers, timeout=timeout)
         elif queries_params is not None:
-            return cls.query_api_multiple(queries=queries_params, headers=headers)
+            return cls.query_api_multiple(queries=queries_params, headers=headers, timeout=timeout)
 
     @staticmethod
     def query_api_json(query_params: APIQueryParams,
+                       timeout: Optional[float] = 1.0,
                        headers: Optional[Dict[str, str]] = None) -> dict:
-        r = requests.post(
-            url=cc.API_URL,
-            json=dict(
-                token=API_TOKEN,
-                query=query_params.to_api_struct()),
-            headers=headers)
+        """
+        Submits the query params and returns the resulting data
+        Parameters
+        ----------
+        query_params: APIQueryParams
+            The query params to be used in the POST request
+        timeout: Optional[float]=1.0
+            The time allowed before a request times out, where 1 second is 1.0
+        headers: Optional[Dict[str, str]] = None
+            Optional request headers
 
-        assert r.status_code == 200, (r.status_code,
-                                      r.content,
-                                      query_params.to_api_struct())
-
-        json_data = r.json()
-        assert json_data['success'], json_data
+        Returns
+        -------
+        A dict containing the query result
+        """
+        json_data = _submit_post_request(
+            json_dict=dict(token=API_TOKEN, query=query_params.to_api_struct()),
+            headers=headers,
+            timeout=timeout)
 
         return json_data['data'][0]
 
     @staticmethod
     def query_api_df(query_params: APIQueryParams,
+                     timeout: Optional[float] = 1.0,
                      headers: Optional[Dict[str, str]] = None) -> pandas.DataFrame:
-        r = requests.post(
-            url=cc.API_URL,
-            json=dict(
-                token=API_TOKEN,
-                query=query_params.to_api_struct()),
-            headers=headers)
+        """
+        Submits the query params and returns the resulting data
 
-        assert r.status_code == 200, (r.status_code,
-                                      r.content,
-                                      query_params.to_api_struct())
+        Parameters
+        ----------
+        query_params: APIQueryParams
+            The query params to be used in the POST request
+        timeout: Optional[float]=1.0
+            The time allowed before a request times out, where 1 second is 1.0
+        headers: Optional[Dict[str, str]] = None
+            Optional request headers
 
-        json_data = r.json()
-        assert json_data['success'], json_data
+        Returns
+        -------
+        A pandas dataframe containing the query result
+        """
+        json_data = _submit_post_request(
+            json_dict=dict(token=API_TOKEN, query=query_params.to_api_struct()),
+            headers=headers,
+            timeout=timeout)
 
         df_ = pandas.DataFrame(json_data['data'])
         df_.columns = [c.upper() for c in df_.columns]
@@ -576,18 +670,30 @@ class BaseAPIQuery:
 
     @staticmethod
     def query_api_multiple(queries: Dict[str, APIQueryParams],
+                           timeout: Optional[float]=1.0,
                            headers: Optional[Dict[str, str]] = None) -> Dict[str, pandas.DataFrame]:
-        r = requests.post(
-            url=cc.API_URL,
-            json=dict(
+        """
+        Submits the query params and returns the resulting data
+
+        Parameters
+        ----------
+        queries: Dict[str, APIQueryParams]
+            The query params to be used in the POST request
+        timeout: Optional[float]=1.0
+            The time allowed before a request times out, where 1 second is 1.0
+        headers: Optional[Dict[str, str]] = None
+            Optional request headers
+
+        Returns
+        -------
+        A dict with pandas dataframes as the values for each of the query params in the input dict
+        """
+        json_data = _submit_post_request(
+            json_dict=dict(
                 token=API_TOKEN,
                 queries={k: v.to_api_struct() for k, v in queries.items()}),
-            headers=headers)
-
-        assert r.status_code == 200, (r.status_code, r.content, queries)
-
-        json_data = r.json()
-        assert json_data['success'], json_data
+            headers=headers,
+            timeout=timeout)
 
         df_dict = {}
         for k, v in json_data['data'].items():
@@ -598,11 +704,42 @@ class BaseAPIQuery:
         return df_dict
 
 
-if __name__ == '__main__':
-    import json
+def _submit_post_request(json_dict: dict,
+                         timeout: float,
+                         headers: Optional[Dict[str, str]] = None) -> dict:
+    """
+    Submits the POST request and retries on connection errors, waiting longer between each retry
 
+    Parameters
+    ----------
+    json_dict: dict
+    timeout: float
+    headers: Optional[Dict[str, str]] = None
+
+    Returns
+    -------
+    The JSON result from the query in dict form
+    """
+    for retry_num in range(cc.MAX_RETRIES):
+        try:
+            r = requests.post(url=cc.API_URL, json=json_dict, headers=headers, timeout=timeout)
+
+            assert r.status_code == 200, (r.status_code, r.content, json_dict)
+
+            json_data = r.json()
+            assert json_data['success'], json_data
+
+            return json_data
+        except (requests.exceptions.ConnectionError, requests.Timeout) as e:
+            if retry_num >= cc.MAX_RETRIES:
+                raise e
+            else:
+                time.sleep(0.5 * (1 + retry_num))
+
+
+if __name__ == '__main__':
     print(
-        BaseAPIQuery.query_api_df(
+        BaseAPIQuery.submit_query(
             query_params=APIGeocoderQueryParams(
                 data_fields=('geoid11', 'geoid5',),
                 table='geocookbook_tract_na_shapes_full',
