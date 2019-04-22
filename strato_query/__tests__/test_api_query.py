@@ -301,7 +301,22 @@ class TestAPIQuery(unittest.TestCase, BaseAPIQuery):
 
     @classmethod
     def test_filter_query(cls):
-        pass
+        df = cls.submit_query(
+            query_params=APIFilterQueryParams(
+                data_fields=(),
+                data_filters=(GtrThanOrEqFilter(var='population', val=1).to_dict(),),
+                table='',
+                inner_query=APIQueryParams(
+                    table='populationforecast_us_annual_population',
+                    data_fields=({'custom:joiner': 1}, 'population'),
+                    data_filters=(cls.year_filter,),
+                    aggregations=(),
+                    groupby=(),
+                ),
+                aggregations=(),
+                groupby=()))
+
+        assert len(df) == 1
 
     @classmethod
     def test_filter_pretty_print(cls):
