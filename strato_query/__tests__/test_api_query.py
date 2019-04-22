@@ -286,7 +286,7 @@ class TestAPIQuery(unittest.TestCase, BaseAPIQuery):
                     groupby=(),
                     join=APIQueryParams(
                         table='populationforecast_us_annual_population',
-                        data_fields=({'custom: joiner_b': 1}, {'population': 'past_pop'}),
+                        data_fields=({'custom:joiner_b': 1}, {'population': 'past_pop'}),
                         data_filters=(EqFilter(var='year', val=2018).to_dict(),),
                         aggregations=(),
                         groupby=(),
@@ -296,7 +296,8 @@ class TestAPIQuery(unittest.TestCase, BaseAPIQuery):
                 aggregations=(),
                 groupby=()))
 
-        assert df['pop_diff'].iloc[0] == df['current_pop'].sub(df['past_pop']).iloc[0]
+        diff = df['CURRENT_POP'].sub(df['PAST_POP']).iloc[0].round(3)
+        assert df['POP_DIFF'].iloc[0].round(3) == diff
 
     @classmethod
     def test_filter_query(cls):
