@@ -618,7 +618,7 @@ class APICalculationQueryParams(APIQueryParams):
 
         def pretty_print_recursive(query_params, spacer: Optional[str] = '    '):
             dict_form = self._dict_form(query_params)
-            if dict_form['data_fields'] is not None:
+            if dict_form['data_fields'] != ():
                 query_params_class = 'APICalculationQueryParams'
             else:
                 query_params_class = 'APIFilterQueryParams'
@@ -681,7 +681,7 @@ class APICalculationQueryParams(APIQueryParams):
 
         def pretty_print_recursive(query_params, spacer: Optional[str] = '    ') -> str:
             dict_form = self._dict_form(query_params)
-            if dict_form['data_fields'] is not None:
+            if dict_form['data_fields'] != ():
                 query_params_func = 'calculationQueryParams'
             else:
                 query_params_func = 'filterQueryParams'
@@ -819,7 +819,7 @@ class APICalculationQueryParams(APIQueryParams):
 
         def pretty_print_recursive(query_params, spacer: Optional[str] = '  ') -> str:
             dict_form = self._dict_form(query_params)
-            if dict_form['data_fields'] is not None:
+            if dict_form['data_fields'] != ():
                 query_params_func = 'calculation_query_params'
             else:
                 query_params_func = 'filter_query_params'
