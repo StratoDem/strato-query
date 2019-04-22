@@ -750,16 +750,24 @@ class APICalculationQueryParams(APIQueryParams):
                 return '{}Aggregation(variableName:="{}")'.format(aggregation_func,
                                                                   variable_name)
 
+            def _process_join_on(on: dict) -> str:
+                assert isinstance(on, dict)
+                left = on['left']
+                right = on['right']
+
+                return 'joinOnStructure(left:=Array({}), right:=Array({}))'.format(
+                    ', '.join('"{}"'.format(f) for f in left),
+                    ', '.join('"{}"'.format(f) for f in right))
+
             return '''{query_params_func}( _
-{spacer}inner_query:={inner_query}, _
+{spacer}table:="{table_name}", _
 {spacer}dataFields:=Array({fields}), _
 {spacer}dataFilters:=Array({filters}), _
 {spacer}aggregations:=Array({aggregations}), _
-{spacer}groupby:=Array({groupby}){order}{join}{query_type})'''.format(
+{spacer}groupby:=Array({groupby}){order}{inner_query}{median}{mean}{on}{join}{query_type})
+'''.format(
                 query_params_func=query_params_func,
-                inner_query=pretty_print_recursive(
-                    query_params=dict_form['inner_query'],
-                    spacer=spacer + '    '),
+                table_name=dict_form['table'],
                 fields=', '.join(
                     '"{}"'.format(f) if isinstance(f, str) else _process_renamed_field(f)
                     for f in dict_form['data_fields']),
@@ -771,11 +779,28 @@ class APICalculationQueryParams(APIQueryParams):
                     spacer=spacer,
                     var=', '.join('"{}"'.format(f) for f in dict_form['order']))
                 if 'order' in dict_form else '',
+                mean=', _\n{spacer}meanVariableName:="{var}"'.format(
+                    spacer=spacer,
+                    var=dict_form['mean_variable_name']
+                ) if 'mean_variable_name' in dict_form else '',
+                median=', _\n{spacer}medianVariableName:="{var}"'.format(
+                    spacer=spacer,
+                    var=dict_form['median_variable_name']
+                ) if 'median_variable_name' in dict_form else '',
+                inner_query=', _\n{spacer}join:={var}'.format(
+                    spacer=spacer,
+                    var=pretty_print_recursive(
+                        query_params=dict_form['inner_query'],
+                        spacer=spacer + '    ')
+                ) if 'inner_query' in dict_form else '',
                 join=', _\n{spacer}join:={var}'.format(
                     spacer=spacer,
                     var=pretty_print_recursive(
                         query_params=dict_form['join'],
                         spacer=spacer + '    ')) if 'join' in dict_form else '',
+                on=', _\n{spacer}joinOn:={joinOn}'.format(
+                    spacer=spacer,
+                    joinOn=_process_join_on(dict_form['on'])) if 'on' in dict_form else '',
                 query_type=', _\n{spacer}queryType:="{query_type}"'.format(
                     spacer=spacer, query_type=dict_form['query_type'])
                 if 'query_type' in dict_form and query_params_func == 'apiQueryParameters' else '',
@@ -849,9 +874,9 @@ class APICalculationQueryParams(APIQueryParams):
                         filter_value = fv
                     return '{func}(filter_variable = "{filter_variable}", ' \
                            'filter_value = {filter_value})'.format(
-                        func=func,
-                        filter_variable=filt['filter_variable'],
-                        filter_value=filter_value)
+                            func=func,
+                            filter_variable=filt['filter_variable'],
+                            filter_value=filter_value)
 
             def _process_aggregation(agg: dict) -> str:
                 assert isinstance(agg, dict)
@@ -863,15 +888,14 @@ class APICalculationQueryParams(APIQueryParams):
                     aggregation_func, variable_name)
 
             string_form = '''{query_params_func}(
-{spacer}inner_query = {inner_query},
+{spacer}table = '{table_name}',
 {spacer}data_fields = api_fields(fields_list = list({fields})),
 {spacer}data_filters = list({filters}),
 {spacer}aggregations = list({aggregations}),
-{spacer}groupby = c({groupby}){order}{join}{query_type})'''.format(
+{spacer}groupby = c({groupby}){mean_value}{median_value}{order}{on}{inner_query}{join}{query_type})
+'''.format(
                 query_params_func=query_params_func,
-                inner_query=pretty_print_recursive(
-                    query_params=dict_form['inner_query'],
-                    spacer=spacer + '    '),
+                table_name=dict_form['table'],
                 fields=', '.join(_process_field(f) for f in dict_form['data_fields']),
                 filters=', '.join(_process_filter(f) for f in dict_form['data_filters']),
                 aggregations=', '.join(_process_aggregation(agg)
@@ -881,12 +905,31 @@ class APICalculationQueryParams(APIQueryParams):
                     spacer=spacer,
                     var=', '.join('"{}"'.format(f) for f in dict_form['order']))
                 if 'order' in dict_form else '',
+                mean_value=',\n{spacer}mean_variable_name = \'{var}\''.format(
+                    spacer=spacer,
+                    var=dict_form['mean_variable_name']
+                ) if 'mean_variable_name' in dict_form else '',
+                median_value=',\n{spacer}median_variable_name = \'{var}\''.format(
+                    spacer=spacer,
+                    var=dict_form['median_variable_name']
+                ) if 'median_variable_name' in dict_form else '',
+                inner_query=',\n{spacer}join = {var}'.format(
+                    spacer=spacer,
+                    var=pretty_print_recursive(
+                        query_params=dict_form['inner_query'],
+                        spacer=spacer + '    ')
+                ) if 'inner_query' in dict_form else '',
                 join=',\n{spacer}join = {var}'.format(
                     spacer=spacer,
                     var=pretty_print_recursive(
                         query_params=dict_form['join'],
                         spacer=spacer + '    ')
                 ) if 'join' in dict_form else '',
+                on=',\n{spacer}on = list(left = c({left}), right = c({right}))'.format(
+                    spacer=spacer,
+                    left=', '.join("'{}'".format(f) for f in dict_form['on']['left']),
+                    right=', '.join("'{}'".format(f) for f in dict_form['on']['right']))
+                if 'on' in dict_form else '',
                 query_type=',\n{spacer}query_type = "{query_type}"'.format(
                     spacer=spacer, query_type=dict_form['query_type'])
                 if 'query_type' in dict_form and query_params_func == 'api_query_params' else '',
