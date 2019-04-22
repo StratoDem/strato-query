@@ -607,6 +607,280 @@ class APICalculationQueryParams(APIQueryParams):
     def inner_query(self) -> 'APIQueryParams':
         return self._inner_query
 
+    def pretty_print(self) -> str:
+        """
+        Converts the query params into a human-readable string representing the Python code
+
+        Returns
+        -------
+        The query params as a string
+        """
+
+        def pretty_print_recursive(query_params, spacer: Optional[str] = '    '):
+            dict_form = self._dict_form(query_params)
+            if dict_form['data_fields'] is not None:
+                query_params_class = 'APICalculationQueryParams'
+            else:
+                query_params_class = 'APIFilterQueryParams'
+
+            string_form = '''{query_params_class}(
+{spacer}query_type='{query_type}',
+{spacer}data_fields={fields},
+{spacer}data_filters={filters},
+{spacer}inner_query={inner_query},
+{spacer}aggregations={aggregations},
+{spacer}groupby={groupby},{order}{join}
+{spacer})'''.format(
+                query_params_class=query_params_class,
+                inner_query=pretty_print_recursive(
+                    query_params=dict_form['inner_query'],
+                    spacer=spacer + '    '),
+                fields=dict_form['data_fields'],
+                filters=dict_form['data_filters'],
+                query_type=dict_form['query_type'],
+                aggregations=dict_form['aggregations'],
+                groupby=dict_form['groupby'],
+                order='\n{spacer}order={var},'.format(
+                    spacer=spacer,
+                    var=dict_form['order']) if 'order' in dict_form else '',
+                join='\n{spacer}join={var}'.format(
+                    spacer=spacer,
+                    var=pretty_print_recursive(
+                        query_params=dict_form['join'],
+                        spacer=spacer + '    ')
+                ) if 'join' in dict_form else '',
+                spacer=spacer)
+
+            return string_form
+
+        return pretty_print_recursive(query_params=self)
+
+    def pretty_print_vba(self) -> str:
+        """
+        Converts the query params into a human-readable string representing the VBA code
+
+        Returns
+        -------
+        The query params as a string
+        """
+
+        def pretty_print_recursive(query_params, spacer: Optional[str] = '    ') -> str:
+            dict_form = self._dict_form(query_params)
+            if dict_form['data_fields'] is not None:
+                query_params_func = 'calculationQueryParams'
+            else:
+                query_params_func = 'filterQueryParams'
+
+            def _process_renamed_field(field: dict) -> str:
+                assert isinstance(field, dict)
+
+                original = list(field.keys())[0]
+                renamed = field[original]
+
+                renamed_val = '"{}"'.format(renamed) if isinstance(renamed, str) else renamed
+
+                return 'renameVariable(original:="{}", renamed:={})'.format(original,
+                                                                            renamed_val)
+
+            def _process_filter(filt: dict) -> str:
+                assert isinstance(filt, dict)
+
+                filter_type = filt['filter_type']
+                if filter_type in {'mile_radius', 'drivetime'}:
+                    metric = 'miles' if filter_type == 'mile_radius' else 'minutes'
+                    func = {
+                        'mile_radius': 'mileRadiusFilter',
+                        'drivetime': 'drivetimeFilter'}[filter_type]
+                    return '{func}(latitude:={lat}, longitude:={lng}, {metric}:={val})'.format(
+                        func=func,
+                        lat=filt['filter_value']['latitude'],
+                        lng=filt['filter_value']['longitude'],
+                        metric=metric,
+                        val=filt['filter_value'][metric]
+                    )
+                else:
+                    func = {
+                        'eq': 'equalToFilter',
+                        'ne': 'notEqualToFilter',
+                        'gt': 'greaterThanFilter',
+                        'ge': 'greaterThanOrEqualToFilter',
+                        'lt': 'lessThanFilter',
+                        'le': 'lessThanOrEqualToFilter',
+                        'in': 'inFilter',
+                        'nin': 'notInFilter',
+                        'between': 'betweenFilter',
+                    }[filter_type]
+
+                    fv = filt['filter_value']
+                    if isinstance(fv, str):
+                        filter_value = '"{}"'.format(fv)
+                    elif isinstance(fv, (list, tuple)):
+                        filter_value = 'Array({})'.format(
+                            ', '.join('"{}"'.format(v) if isinstance(v, str) else str(v)
+                                      for v in fv))
+                    else:
+                        filter_value = fv
+                    return '{func}(filterVariable:="{filter_variable}", ' \
+                           'filterValue:={filter_value})'.format(
+                            func=func,
+                            filter_variable=filt['filter_variable'],
+                            filter_value=filter_value)
+
+            def _process_aggregation(agg: dict) -> str:
+                assert isinstance(agg, dict)
+
+                aggregation_func = agg['aggregation_func']
+                variable_name = agg['variable_name']
+
+                return '{}Aggregation(variableName:="{}")'.format(aggregation_func,
+                                                                  variable_name)
+
+            return '''{query_params_func}( _
+{spacer}inner_query:={inner_query}, _
+{spacer}dataFields:=Array({fields}), _
+{spacer}dataFilters:=Array({filters}), _
+{spacer}aggregations:=Array({aggregations}), _
+{spacer}groupby:=Array({groupby}){order}{join}{query_type})'''.format(
+                query_params_func=query_params_func,
+                inner_query=pretty_print_recursive(
+                    query_params=dict_form['inner_query'],
+                    spacer=spacer + '    '),
+                fields=', '.join(
+                    '"{}"'.format(f) if isinstance(f, str) else _process_renamed_field(f)
+                    for f in dict_form['data_fields']),
+                filters=', '.join(_process_filter(f) for f in dict_form['data_filters']),
+                aggregations=', '.join(_process_aggregation(agg)
+                                       for agg in dict_form['aggregations']),
+                groupby=', '.join('"{}"'.format(f) for f in dict_form['groupby']),
+                order=', order:=Array({var})'.format(
+                    spacer=spacer,
+                    var=', '.join('"{}"'.format(f) for f in dict_form['order']))
+                if 'order' in dict_form else '',
+                join=', _\n{spacer}join:={var}'.format(
+                    spacer=spacer,
+                    var=pretty_print_recursive(
+                        query_params=dict_form['join'],
+                        spacer=spacer + '    ')) if 'join' in dict_form else '',
+                query_type=', _\n{spacer}queryType:="{query_type}"'.format(
+                    spacer=spacer, query_type=dict_form['query_type'])
+                if 'query_type' in dict_form and query_params_func == 'apiQueryParameters' else '',
+                spacer=spacer)
+
+        return pretty_print_recursive(query_params=self)
+
+    def pretty_print_r(self) -> str:
+        """
+        Converts the query params into a human-readable string representing the R code
+
+        Returns
+        -------
+        The query params as a string
+        """
+
+        def pretty_print_recursive(query_params, spacer: Optional[str] = '  ') -> str:
+            dict_form = self._dict_form(query_params)
+            if dict_form['data_fields'] is not None:
+                query_params_func = 'calculation_query_params'
+            else:
+                query_params_func = 'filter_query_params'
+
+            def _process_field(field: Union[str, dict]) -> str:
+                if isinstance(field, str):
+                    return "'{field}'".format(field=field)
+                elif isinstance(field, dict):
+                    k = list(field.keys())[0]
+                    v = field[k]
+                    return "list('{}' = '{}')".format(k, v)
+                else:
+                    raise TypeError(field)
+
+            def _process_filter(filt: dict) -> str:
+                assert isinstance(filt, dict)
+
+                filter_type = filt['filter_type']
+                if filter_type in {'mile_radius', 'drivetime'}:
+                    metric = 'miles' if filter_type == 'mile_radius' else 'minutes'
+                    func = {
+                        'mile_radius': 'mile_radius_filter',
+                        'drivetime': 'drivetime_filter'}
+                    return '{func}(latitude = {lat}, longitude = {lng}, {metric} = {val})'.format(
+                        func=func,
+                        lat=filt['filter_value']['latitude'],
+                        lng=filt['filter_value']['longitude'],
+                        metric=metric,
+                        val=filt['filter_value'][metric]
+                    )
+                else:
+                    func = {
+                        'eq': 'eq_filter',
+                        'ne': 'ne_filter',
+                        'gt': 'gt_filter',
+                        'ge': 'ge_filter',
+                        'lt': 'lt_filter',
+                        'le': 'le_filter',
+                        'in': 'in_filter',
+                        'nin': 'nin_filter',
+                        'between': 'between_filter',
+                    }[filter_type]
+
+                    fv = filt['filter_value']
+                    if isinstance(fv, str):
+                        filter_value = '"{}"'.format(fv)
+                    elif isinstance(fv, (list, tuple)):
+                        filter_value = 'c({})'.format(
+                            ', '.join('"{}"'.format(v) if isinstance(v, str) else str(v)
+                                      for v in fv))
+                    else:
+                        filter_value = fv
+                    return '{func}(filter_variable = "{filter_variable}", ' \
+                           'filter_value = {filter_value})'.format(
+                        func=func,
+                        filter_variable=filt['filter_variable'],
+                        filter_value=filter_value)
+
+            def _process_aggregation(agg: dict) -> str:
+                assert isinstance(agg, dict)
+
+                aggregation_func = agg['aggregation_func']
+                variable_name = agg['variable_name']
+
+                return '{}_aggregation(variable_name = "{}")'.format(
+                    aggregation_func, variable_name)
+
+            string_form = '''{query_params_func}(
+{spacer}inner_query = {inner_query},
+{spacer}data_fields = api_fields(fields_list = list({fields})),
+{spacer}data_filters = list({filters}),
+{spacer}aggregations = list({aggregations}),
+{spacer}groupby = c({groupby}){order}{join}{query_type})'''.format(
+                query_params_func=query_params_func,
+                inner_query=pretty_print_recursive(
+                    query_params=dict_form['inner_query'],
+                    spacer=spacer + '    '),
+                fields=', '.join(_process_field(f) for f in dict_form['data_fields']),
+                filters=', '.join(_process_filter(f) for f in dict_form['data_filters']),
+                aggregations=', '.join(_process_aggregation(agg)
+                                       for agg in dict_form['aggregations']),
+                groupby=', '.join('"{}"'.format(f) for f in dict_form['groupby']),
+                order=',\n{spacer}order = c({var})'.format(
+                    spacer=spacer,
+                    var=', '.join('"{}"'.format(f) for f in dict_form['order']))
+                if 'order' in dict_form else '',
+                join=',\n{spacer}join = {var}'.format(
+                    spacer=spacer,
+                    var=pretty_print_recursive(
+                        query_params=dict_form['join'],
+                        spacer=spacer + '    ')
+                ) if 'join' in dict_form else '',
+                query_type=',\n{spacer}query_type = "{query_type}"'.format(
+                    spacer=spacer, query_type=dict_form['query_type'])
+                if 'query_type' in dict_form and query_params_func == 'api_query_params' else '',
+                spacer=spacer)
+
+            return string_form
+
+        return pretty_print_recursive(query_params=self)
+
 
 class APIFilterQueryParams(APICalculationQueryParams):
     @property
