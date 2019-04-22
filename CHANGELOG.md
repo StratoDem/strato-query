@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.10.1] - 2019-04-22
+### Changes
+- Changes default timeout value to 60s
+
 ## [2.10.0] - 2019-04-22
 ### Adds
 - Adds the `APICalculationQueryParams` class
