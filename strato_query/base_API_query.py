@@ -28,6 +28,8 @@ __all__ = [
     'APIMedianQueryParams',
     'APIGeoJSONQueryParams',
     'APIGeocoderQueryParams',
+    'APICalculationQueryParams',
+    'APIFilterQueryParams',
 ]
 
 API_TOKEN = os.environ.get('API_TOKEN')
@@ -551,7 +553,7 @@ class APIGeocoderQueryParams(APIQueryParams):
         self._latitude = latitude
         self._longitude = longitude
 
-    def to_api_struct(self):
+    def to_api_struct(self) -> dict:
         """
         Converts the query params into a form that the API can work with
 
@@ -576,6 +578,40 @@ class APIGeocoderQueryParams(APIQueryParams):
     @property
     def longitude(self) -> Union[float, int]:
         return self._longitude
+
+
+class APICalculationQueryParams(APIQueryParams):
+    def __init__(self, inner_query: 'APIQueryParams', **kwargs):
+        super().__init__(**kwargs)
+
+        self._inner_query = inner_query
+
+    def to_api_struct(self) -> dict:
+        """
+        Converts the query params into a form that the API can work with
+
+        Returns
+        -------
+        The query params as a dict
+        """
+        return_dict = super().to_api_struct()
+        return_dict['inner_query'] = self.inner_query
+
+        return return_dict
+
+    @property
+    def query_type(self) -> str:
+        return 'CALCULATION'
+
+    @property
+    def inner_query(self) -> 'APIQueryParams':
+        return self._inner_query
+
+
+class APIFilterQueryParams(APICalculationQueryParams):
+    @property
+    def query_type(self) -> str:
+        return 'FILTER'
 
 
 class BaseAPIQuery:
