@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.10.0] - 2019-04-22
+### Adds
+- Adds the `APICalculationQueryParams` class
+- Adds the `APIFilterQueryParams` class
+
+### Related issues:
+- [#43](https://github.com/StratoDem/strato-query/issues/43)
+
 ## [2.9.0] - 2019-04-17
 ### Adds
 - Adds automatic retries for the POST request if there is a connection issue
