@@ -625,21 +625,33 @@ class APICalculationQueryParams(APIQueryParams):
 
             string_form = '''{query_params_class}(
 {spacer}query_type='{query_type}',
+{spacer}table='{table_name}',
 {spacer}data_fields={fields},
 {spacer}data_filters={filters},
-{spacer}inner_query={inner_query},
 {spacer}aggregations={aggregations},
-{spacer}groupby={groupby},{order}{join}
+{spacer}groupby={groupby},{inner_query}{mean_value}{median_value}{order}{on}{join}
 {spacer})'''.format(
                 query_params_class=query_params_class,
-                inner_query=pretty_print_recursive(
-                    query_params=dict_form['inner_query'],
-                    spacer=spacer + '    '),
+                table_name=dict_form['table'],
+                inner_query='\n{spacer}inner_query={var},'.format(
+                    spacer=spacer,
+                    var=pretty_print_recursive(
+                        query_params=dict_form['inner_query'],
+                        spacer=spacer + '    ')
+                ) if 'inner_query' in dict_form else '',
                 fields=dict_form['data_fields'],
                 filters=dict_form['data_filters'],
                 query_type=dict_form['query_type'],
                 aggregations=dict_form['aggregations'],
                 groupby=dict_form['groupby'],
+                mean_value='\n{spacer}mean_variable_name=\'{var}\','.format(
+                    spacer=spacer,
+                    var=dict_form['mean_variable_name']
+                ) if 'mean_variable_name' in dict_form else '',
+                median_value='\n{spacer}median_variable_name=\'{var}\','.format(
+                    spacer=spacer,
+                    var=dict_form['median_variable_name']
+                ) if 'median_variable_name' in dict_form else '',
                 order='\n{spacer}order={var},'.format(
                     spacer=spacer,
                     var=dict_form['order']) if 'order' in dict_form else '',
@@ -649,6 +661,9 @@ class APICalculationQueryParams(APIQueryParams):
                         query_params=dict_form['join'],
                         spacer=spacer + '    ')
                 ) if 'join' in dict_form else '',
+                on='\n{spacer}on={var},'.format(
+                    spacer=spacer,
+                    var=dict_form['on']) if 'on' in dict_form else '',
                 spacer=spacer)
 
             return string_form
