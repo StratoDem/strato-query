@@ -604,8 +604,8 @@ class APICalculationQueryParams(APIQueryParams):
         return 'CALCULATION'
 
     @property
-    def inner_query(self) -> 'APIQueryParams':
-        return self._inner_query
+    def inner_query(self) -> dict:
+        return self._inner_query.to_api_struct()
 
     def pretty_print(self) -> str:
         """
