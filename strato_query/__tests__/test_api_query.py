@@ -267,3 +267,111 @@ class TestAPIQuery(unittest.TestCase, BaseAPIQuery):
         string_form = median_query_params.pretty_print_r()
         print(string_form)
         self.assertIsInstance(string_form, str)
+
+    @classmethod
+    def test_calculation_query(cls):
+        df = cls.submit_query(
+            query_params=APICalculationQueryParams(
+                data_fields=(
+                    {'calculate:pop_diff': 'current_pop - past_pop'},
+                    'current_pop',
+                    'past_pop'),
+                data_filters=(),
+                table='',
+                inner_query=APIQueryParams(
+                    table='populationforecast_us_annual_population',
+                    data_fields=({'custom:joiner': 1}, {'population': 'current_pop'}),
+                    data_filters=(EqFilter(var='year', val=2019).to_dict(),),
+                    aggregations=(),
+                    groupby=(),
+                    join=APIQueryParams(
+                        table='populationforecast_us_annual_population',
+                        data_fields=({'custom:joiner_b': 1}, {'population': 'past_pop'}),
+                        data_filters=(EqFilter(var='year', val=2018).to_dict(),),
+                        aggregations=(),
+                        groupby=(),
+                        on=dict(left=('joiner',), right=('joiner_b',))
+                    )
+                ),
+                aggregations=(),
+                groupby=()))
+
+        diff = df['CURRENT_POP'].sub(df['PAST_POP']).iloc[0].round(3)
+        assert df['POP_DIFF'].iloc[0].round(3) == diff
+
+    @classmethod
+    def test_filter_query(cls):
+        df = cls.submit_query(
+            query_params=APIFilterQueryParams(
+                data_fields=(),
+                data_filters=(GtrThanOrEqFilter(var='population', val=1).to_dict(),),
+                table='',
+                inner_query=APIQueryParams(
+                    table='populationforecast_us_annual_population',
+                    data_fields=({'custom:joiner': 1}, 'population'),
+                    data_filters=(cls.year_filter,),
+                    aggregations=(),
+                    groupby=(),
+                ),
+                aggregations=(),
+                groupby=()))
+
+        assert len(df) == 1
+
+    @classmethod
+    def test_filter_pretty_print(cls):
+        query_params = APIFilterQueryParams(
+            data_fields=(),
+            data_filters=(GtrThanOrEqFilter(var='population', val=1).to_dict(),),
+            table='',
+            inner_query=APIQueryParams(
+                table='populationforecast_us_annual_population',
+                data_fields=({'custom:joiner': 1}, 'population'),
+                data_filters=(cls.year_filter,),
+                aggregations=(),
+                groupby=(),
+            ),
+            aggregations=(),
+            groupby=())
+
+        string_form = query_params.pretty_print()
+        print(string_form)
+        assert isinstance(string_form, str)
+
+    def test_filter_pretty_print_vba(self):
+        query_params = APIFilterQueryParams(
+            data_fields=(),
+            data_filters=(GtrThanOrEqFilter(var='population', val=1).to_dict(),),
+            table='',
+            inner_query=APIQueryParams(
+                table='populationforecast_us_annual_population',
+                data_fields=({'custom:joiner': 1}, 'population'),
+                data_filters=(self.year_filter,),
+                aggregations=(),
+                groupby=(),
+            ),
+            aggregations=(),
+            groupby=())
+
+        string_form = query_params.pretty_print_vba()
+        print(string_form)
+        assert isinstance(string_form, str)
+
+    def test_filter_pretty_print_r(self):
+        query_params = APIFilterQueryParams(
+            data_fields=(),
+            data_filters=(GtrThanOrEqFilter(var='population', val=1).to_dict(),),
+            table='',
+            inner_query=APIQueryParams(
+                table='populationforecast_us_annual_population',
+                data_fields=({'custom:joiner': 1}, 'population'),
+                data_filters=(self.year_filter,),
+                aggregations=(),
+                groupby=(),
+            ),
+            aggregations=(),
+            groupby=())
+
+        string_form = query_params.pretty_print_r()
+        print(string_form)
+        assert isinstance(string_form, str)
