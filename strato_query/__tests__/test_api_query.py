@@ -267,3 +267,47 @@ class TestAPIQuery(unittest.TestCase, BaseAPIQuery):
         string_form = median_query_params.pretty_print_r()
         print(string_form)
         self.assertIsInstance(string_form, str)
+
+    @classmethod
+    def test_calculation_query(cls):
+        df = cls.submit_query(
+            query_params=APICalculationQueryParams(
+                data_fields=(
+                    {'calculate:pop_diff': 'current_pop - past_pop'},
+                    'current_pop',
+                    'past_pop'),
+                data_filters=(),
+                table='',
+                inner_query=APIQueryParams(
+                    table='populationforecast_us_annual_population',
+                    data_fields=({'custom:joiner': 1}, {'population': 'current_pop'}),
+                    data_filters=(EqFilter(var='year', val=2019).to_dict(),),
+                    aggregations=(),
+                    groupby=(),
+                    join=APIQueryParams(
+                        table='populationforecast_us_annual_population',
+                        data_fields=({'custom: joiner_b': 1}, {'population': 'past_pop'}),
+                        data_filters=(EqFilter(var='year', val=2018).to_dict(),),
+                        aggregations=(),
+                        groupby=(),
+                        on=dict(left=('joiner',), right=('joiner_b',))
+                    )
+                ),
+                aggregations=(),
+                groupby=()))
+
+        assert df['pop_diff'].iloc[0] == df['current_pop'].sub(df['past_pop']).iloc[0]
+
+    @classmethod
+    def test_filter_query(cls):
+        pass
+
+    @classmethod
+    def test_filter_pretty_print(cls):
+        pass
+
+    def test_filter_pretty_print_vba(self):
+        pass
+
+    def test_filter_pretty_print_r(self):
+        pass
