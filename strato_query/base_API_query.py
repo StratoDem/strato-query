@@ -1088,7 +1088,7 @@ def _submit_post_request(json_dict: dict,
     -------
     The JSON result from the query in dict form
     """
-    for retry_num in range(cc.MAX_RETRIES):
+    for retry_num in range(cc.MAX_RETRIES + 1):
         try:
             r = requests.post(url=cc.API_URL, json=json_dict, headers=headers, timeout=timeout)
 
