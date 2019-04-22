@@ -951,7 +951,7 @@ class BaseAPIQuery:
     def submit_query(cls,
                      query_params: Optional[APIQueryParams] = None,
                      queries_params: Optional[Dict[str, APIQueryParams]] = None,
-                     timeout: Optional[float] = 1.0,
+                     timeout: Optional[float] = 60.0,
                      headers: Optional[Dict[str, str]] = None) -> Union[T_DF, Dict[str, T_DF]]:
         """
         Determines the proper method to use and passes values along for request submission
@@ -962,7 +962,7 @@ class BaseAPIQuery:
             A single query params object to submit as part of the request
         queries_params: Optional[Dict[str, APIQueryParams]] = None
             A list of dicts, with query params as the values, to be submitted together
-        timeout: Optional[float]=1.0
+        timeout: Optional[float]=60.0
             The time allowed before a request times out, where 1 second is 1.0
         headers: Optional[Dict[str, str]] = None
             Optional request headers
@@ -982,7 +982,7 @@ class BaseAPIQuery:
 
     @staticmethod
     def query_api_json(query_params: APIQueryParams,
-                       timeout: Optional[float] = 1.0,
+                       timeout: Optional[float] = 60.0,
                        headers: Optional[Dict[str, str]] = None) -> dict:
         """
         Submits the query params and returns the resulting data
@@ -990,7 +990,7 @@ class BaseAPIQuery:
         ----------
         query_params: APIQueryParams
             The query params to be used in the POST request
-        timeout: Optional[float]=1.0
+        timeout: Optional[float]=60.0
             The time allowed before a request times out, where 1 second is 1.0
         headers: Optional[Dict[str, str]] = None
             Optional request headers
@@ -1008,7 +1008,7 @@ class BaseAPIQuery:
 
     @staticmethod
     def query_api_df(query_params: APIQueryParams,
-                     timeout: Optional[float] = 1.0,
+                     timeout: Optional[float] = 60.0,
                      headers: Optional[Dict[str, str]] = None) -> pandas.DataFrame:
         """
         Submits the query params and returns the resulting data
@@ -1017,7 +1017,7 @@ class BaseAPIQuery:
         ----------
         query_params: APIQueryParams
             The query params to be used in the POST request
-        timeout: Optional[float]=1.0
+        timeout: Optional[float]=60.0
             The time allowed before a request times out, where 1 second is 1.0
         headers: Optional[Dict[str, str]] = None
             Optional request headers
@@ -1038,7 +1038,7 @@ class BaseAPIQuery:
 
     @staticmethod
     def query_api_multiple(queries: Dict[str, APIQueryParams],
-                           timeout: Optional[float]=1.0,
+                           timeout: Optional[float]=60.0,
                            headers: Optional[Dict[str, str]] = None) -> Dict[str, pandas.DataFrame]:
         """
         Submits the query params and returns the resulting data
@@ -1047,7 +1047,7 @@ class BaseAPIQuery:
         ----------
         queries: Dict[str, APIQueryParams]
             The query params to be used in the POST request
-        timeout: Optional[float]=1.0
+        timeout: Optional[float]=60.0
             The time allowed before a request times out, where 1 second is 1.0
         headers: Optional[Dict[str, str]] = None
             Optional request headers
