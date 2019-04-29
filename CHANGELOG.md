@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.10.2] - 2019-04-22
+### Changes
+- Changes the pretty print methods in the `APIQueryParams` class so they can handle pretty printing for all query param classes
+- Removes the pretty print methods from the `APICalculationQueryParams` class
+
+### Related issues:
+- [#48](https://github.com/StratoDem/strato-query/issues/48)
+
 ## [2.10.1] - 2019-04-22
 ### Changes
 - Changes default timeout value to 60s
