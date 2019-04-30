@@ -175,6 +175,75 @@ class TestAPIQuery(unittest.TestCase, BaseAPIQuery):
         print(string_form)
         assert isinstance(string_form, str)
 
+        # Test with different query types at each level
+        params = APIGeoJSONQueryParams(
+            table='geocookbook_county_na_shapes_full',
+            data_fields=({'geoid11': 'geoid_shape'}, 'geometry'),
+            data_filters=(),
+            aggregations=(),
+            groupby=(),
+            properties=tuple([
+                'geoid11',
+                'target_households',
+                'median_val',
+                'name']),
+            join=APIFilterQueryParams(
+                data_fields=(),
+                table='',
+                groupby=(),
+                aggregations=(),
+                query_type='FILTER',
+                data_filters=(GtrThanOrEqFilter(var='target_households', val=100).to_dict(),),
+                order=(),
+                on=dict(left=('geoid_shape',), right=('geoid11',)),
+                inner_query=APICalculationQueryParams(
+                    data_fields=(
+                        'geoid11',
+                        'target_households',
+                        'median_val',
+                        'name',
+                    ),
+                    data_filters=(),
+                    table='',
+                    aggregations=(),
+                    groupby=(),
+                    inner_query=APIQueryParams(
+                        table='incomeforecast_geoid11_annual_income_group',
+                        data_fields=('year',
+                                     'geoid11',
+                                     {'households': 'target_households'}),
+                        data_filters=(dict(
+                            filter_type='mile_radius_unweighted',
+                            filter_value=dict(
+                                latitude=42.256922,
+                                longitude=-71.040571,
+                                miles=3),
+                            filter_variable=''),)
+                                     + (GtrThanOrEqFilter(var='income_g', val=10).to_dict(),)
+                                     + (EqFilter(var='year', val=2018).to_dict(),),
+                        aggregations=(dict(aggregation_func='sum', variable_name='households'),),
+                        groupby=('year', 'geoid11'),
+                        join=APIMedianQueryParams(
+                            table='incomeforecast_geoid11_annual_income_group',
+                            data_fields=({'geoid11': 'geoid_join'},
+                                         {'median_value': 'median_val'}),
+                            median_variable_name='income_g',
+                            data_filters=(EqFilter(var='year', val=2018).to_dict(),
+                                          dict(
+                                              filter_type='mile_radius_unweighted',
+                                              filter_value=dict(
+                                                  latitude=42.256922,
+                                                  longitude=-71.040571,
+                                                  miles=3),
+                                              filter_variable='')),
+                            aggregations=(),
+                            groupby=('geoid11',),
+                            on=dict(left=('geoid11',), right=('geoid_join',)))))))
+        string_form = params.pretty_print()
+        print('Test with different query types at each level')
+        print(string_form)
+        assert isinstance(string_form, str)
+
     def test_pretty_print_vba(self):
         query_params = APIQueryParams(
             table='geocookbook_county_na_county_metro',
