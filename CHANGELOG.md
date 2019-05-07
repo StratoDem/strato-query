@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.11.0] - 2019-05-07
+### Adds
+- Adds a new filter, `IntersectsFilter`, for querying all geoids whose geometries intersect with the given bounding geometry
+
+### Related issues:
+- [#50](https://github.com/StratoDem/strato-query/issues/50)
+
 ## [2.10.2] - 2019-04-22
 ### Changes
 - Changes the pretty print methods in the `APIQueryParams` class so they can handle pretty printing for all query param classes

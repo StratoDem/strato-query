@@ -167,6 +167,32 @@ class ExampleQueries(BaseAPIQuery):
         print(df_final.head())
         print('Results truncated')
 
+    @classmethod
+    def example_query_with_intersects_filter(cls):
+        # Returns the geoid and population for all census tracts within the coordinate boundaries
+        df = BaseAPIQuery.query_api_df(
+            APIQueryParams(
+                table='populationforecast_tract_annual_population',
+                data_filters=(
+                    IntersectsFilter(
+                        var='geoid11',
+                        val={"type": "Polygon",
+                             "coordinates": [
+                                 [[-71.17801666259767, 42.43321295705304],
+                                  [-71.0145950317383, 42.43321295705304],
+                                  [-71.0145950317383, 42.3145122534915],
+                                  [-71.17801666259767, 42.3145122534915],
+                                  [-71.17801666259767, 42.43321295705304]]]}).to_dict(),
+                    EqFilter(var='year', val=2019).to_dict()),
+                data_fields=('geoid11', 'population'),
+                groupby=(),
+                aggregations=(),
+            ))
+
+        print('Populations of census tracts within specified boundaries')
+        print(df.head())
+        print('Results truncated')
+
 
 def run_examples():
     ExampleQueries.example_count_query()
@@ -178,6 +204,8 @@ def run_examples():
     ExampleQueries.example_mean_query()
     print('\n\n')
     ExampleQueries.example_multiple_query()
+    print('\n\n')
+    ExampleQueries.example_query_with_intersects_filter()
 
 
 if __name__ == '__main__':

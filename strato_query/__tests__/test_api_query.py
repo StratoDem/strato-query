@@ -444,3 +444,27 @@ class TestAPIQuery(unittest.TestCase, BaseAPIQuery):
         string_form = query_params.pretty_print_r()
         print(string_form)
         assert isinstance(string_form, str)
+
+    @classmethod
+    def test_intersects_filter(cls):
+        df = BaseAPIQuery.query_api_df(
+            APIQueryParams(
+                table='populationforecast_tract_annual_population',
+                data_filters=(
+                    IntersectsFilter(
+                        var='geoid11',
+                        val={"type": "Polygon",
+                             "coordinates": [
+                                 [[-71.17801666259767, 42.43321295705304],
+                                  [-71.0145950317383, 42.43321295705304],
+                                  [-71.0145950317383, 42.3145122534915],
+                                  [-71.17801666259767, 42.3145122534915],
+                                  [-71.17801666259767, 42.43321295705304]]]}).to_dict(),
+                    EqFilter(var='year', val=2019).to_dict()),
+                data_fields=('geoid11', 'population'),
+                groupby=(),
+                aggregations=(),
+            ))
+
+        assert len(df.columns) == 2, df.columns
+        assert len(df['GEOID11']) == 252, df
