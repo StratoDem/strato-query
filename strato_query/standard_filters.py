@@ -23,6 +23,9 @@ __all__ = [
     'LessThanOrEqFilter',
     'NotEqFilter',
     'NotInFilter',
+    'DrivetimeFilter',
+    'MileRadiusFilter',
+    'IntersectsFilter',
 ]
 
 
