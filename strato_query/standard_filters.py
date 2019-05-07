@@ -122,3 +122,11 @@ class DrivetimeFilter(BaseFilter):
             filter_type='drivetime',
             filter_variable='',
             filter_value=dict(latitude=latitude, longitude=longitude, minutes=minutes))
+
+
+class IntersectsFilter(BaseFilter):
+    def __init__(self, var: str, val: dict):
+        super().__init__(
+            filter_type='intersects',
+            filter_variable=var,
+            filter_value=val)
