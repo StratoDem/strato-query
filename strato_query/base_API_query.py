@@ -690,6 +690,8 @@ class BaseAPIQuery:
         """
         assert query_params is None or isinstance(query_params, APIQueryParams)
         assert queries_params is None or isinstance(queries_params, dict)
+        if queries_params is not None:
+            assert all(isinstance(query, APIQueryParams) for query in queries_params.values())
         assert not (query_params is None and queries_params is None)
         assert not (query_params is not None and queries_params is not None)
 
