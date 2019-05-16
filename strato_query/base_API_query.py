@@ -689,7 +689,7 @@ class BaseAPIQuery:
         The result from the request, either a pandas dataframe or a dict with dataframes as values
         """
         assert query_params is None or isinstance(query_params, APIQueryParams)
-        assert queries_params is None or isinstance(queries_params, APIQueryParams)
+        assert queries_params is None or isinstance(queries_params, dict)
         assert not (query_params is None and queries_params is None)
         assert not (query_params is not None and queries_params is not None)
 
