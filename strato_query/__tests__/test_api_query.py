@@ -97,6 +97,30 @@ class TestAPIQuery(unittest.TestCase, BaseAPIQuery):
         assert df['NAME'].values[1] == 'Plymouth County, MA'
 
     @classmethod
+    def test_multi_query(cls):
+        df_dict = cls.submit_query(
+            queries_params=dict(
+                query_1=APIQueryParams(
+                    table='geocookbook_county_na_county_metro',
+                    data_fields=('GEOID5',),
+                    data_filters=(InFilter(var='cbsa', val=[14454]).to_dict(),),
+                    aggregations=(),
+                    groupby=()),
+                query_2=APIQueryParams(
+                    table='geocookbook_county_na_county_name',
+                    data_fields=('GEOID5', 'GEOID2', 'GEOID5_NAME'),
+                    data_filters=(),
+                    aggregations=(),
+                    groupby=(),
+                    on=dict(left=('GEOID5',), right=('GEOID5',))),
+            )
+        )
+
+        assert len(df_dict) == 2
+        assert len(df_dict['query_1']['GEOID5'].values) == 3
+        assert len(df_dict['query_2']['GEOID5'].values) == 3104
+
+    @classmethod
     def test_median_query(cls):
         year_filter = GtrThanOrEqFilter(
             var='year',

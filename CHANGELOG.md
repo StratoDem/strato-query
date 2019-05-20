@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [2.11.1] - 2019-05-16
+### Fixes
+- Fixes an incorrect assertion statement in the `submit_query` method
+
+### Related issues:
+- [#53](https://github.com/StratoDem/strato-query/issues/53)
+
 ## [2.11.0] - 2019-05-07
 ### Adds
 - Adds a new filter, `IntersectsFilter`, for querying all geoids whose geometries intersect with the given bounding geometry
