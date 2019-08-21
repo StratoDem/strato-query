@@ -11,22 +11,24 @@ December 26, 2018
 
 import unittest
 
-from strato_query.base_API_query import *
-from strato_query.standard_filters import *
+from strato_query import *
 
 
-class TestAPIQuery(unittest.TestCase, BaseAPIQuery):
+class TestAPIQuery(unittest.TestCase, SDAPIQuery):
     age_filter = NotInFilter(
         var='age_g_bottom_coded',
         val=[16, 17, 18]).to_dict()
-    year_filter = EqFilter(
+    year_filter = EqualToFilter(
         var='year',
         val=2015).to_dict()
+
+    def setUp(self) -> None:
+        authenticate_to_api()
 
     def test_query_call(self):
         import requests
 
-        age_filter = EqFilter(
+        age_filter = EqualToFilter(
             var='age_g',
             val=18).to_dict()
 
@@ -62,9 +64,8 @@ class TestAPIQuery(unittest.TestCase, BaseAPIQuery):
                 timeout=0.000001
             )
 
-    @classmethod
-    def test_multi_join(cls):
-        df = cls.query_api_df(
+    def test_multi_join(self):
+        df = self.query_api_df(
             query_params=APIQueryParams(
                 table='geocookbook_county_na_county_metro',
                 data_fields=('GEOID5',),
@@ -96,9 +97,8 @@ class TestAPIQuery(unittest.TestCase, BaseAPIQuery):
         assert df['GEOID5'].values[1] == 25023
         assert df['NAME'].values[1] == 'Plymouth County, MA'
 
-    @classmethod
-    def test_multi_query(cls):
-        df_dict = cls.submit_query(
+    def test_multi_query(self):
+        df_dict = self.submit_query(
             queries_params=dict(
                 query_1=APIQueryParams(
                     table='geocookbook_county_na_county_metro',
@@ -120,13 +120,12 @@ class TestAPIQuery(unittest.TestCase, BaseAPIQuery):
         assert len(df_dict['query_1']['GEOID5'].values) == 3
         assert len(df_dict['query_2']['GEOID5'].values) == 3104
 
-    @classmethod
-    def test_median_query(cls):
-        year_filter = GtrThanOrEqFilter(
+    def test_median_query(self):
+        year_filter = GreaterThanOrEqualToFilter(
             var='year',
             val=2013).to_dict()
 
-        df = cls.submit_query(
+        df = self.submit_query(
             query_params=APIMedianQueryParams(
                 median_variable_name='income_g',
                 data_fields=('year', 'median_value'),
@@ -141,13 +140,12 @@ class TestAPIQuery(unittest.TestCase, BaseAPIQuery):
         assert all(x == y for x, y in zip(
             df_sorted['YEAR'].values, [x for x in range(2013, 2019)]))
 
-    @classmethod
-    def test_mean_query(cls):
-        df = cls.submit_query(
+    def test_mean_query(self):
+        df = self.submit_query(
             query_params=APIMeanQueryParams(
                 table='networth_county_annual_net_worth_age_mean',
                 data_fields=('year', 'age_g_bottom_coded', 'mean_value'),
-                data_filters=(cls.year_filter, cls.age_filter),
+                data_filters=(self.year_filter, self.age_filter),
                 aggregations=(),
                 groupby=('year', 'age_g_bottom_coded'),
                 mean_variable_name='net_worth_g',
@@ -156,8 +154,7 @@ class TestAPIQuery(unittest.TestCase, BaseAPIQuery):
 
         assert df['YEAR'].unique() == 2015
 
-    @classmethod
-    def test_pretty_print(cls):
+    def test_pretty_print(self):
         query_params = APIQueryParams(
             table='geocookbook_county_na_county_metro',
             data_fields=('GEOID5',),
@@ -190,7 +187,7 @@ class TestAPIQuery(unittest.TestCase, BaseAPIQuery):
             mean_variable_name='net_worth_g',
             data_fields=('year', 'age_g_bottom_coded', 'mean_value'),
             table='networth_county_annual_net_worth_age_mean',
-            data_filters=(cls.year_filter, cls.age_filter),
+            data_filters=(self.year_filter, self.age_filter),
             aggregations=(),
             groupby=('year', 'age_g_bottom_coded'),
         )
@@ -217,7 +214,7 @@ class TestAPIQuery(unittest.TestCase, BaseAPIQuery):
                 groupby=(),
                 aggregations=(),
                 query_type='FILTER',
-                data_filters=(GtrThanOrEqFilter(var='target_households', val=100).to_dict(),),
+                data_filters=(GreaterThanOrEqualToFilter(var='target_households', val=100).to_dict(),),
                 order=(),
                 on=dict(left=('geoid_shape',), right=('geoid11',)),
                 inner_query=APICalculationQueryParams(
@@ -243,8 +240,8 @@ class TestAPIQuery(unittest.TestCase, BaseAPIQuery):
                                 longitude=-71.040571,
                                 miles=3),
                             filter_variable=''),)
-                                     + (GtrThanOrEqFilter(var='income_g', val=10).to_dict(),)
-                                     + (EqFilter(var='year', val=2018).to_dict(),),
+                                     + (GreaterThanOrEqualToFilter(var='income_g', val=10).to_dict(),)
+                                     + (EqualToFilter(var='year', val=2018).to_dict(),),
                         aggregations=(dict(aggregation_func='sum', variable_name='households'),),
                         groupby=('year', 'geoid11'),
                         join=APIMedianQueryParams(
@@ -252,7 +249,7 @@ class TestAPIQuery(unittest.TestCase, BaseAPIQuery):
                             data_fields=({'geoid11': 'geoid_join'},
                                          {'median_value': 'median_val'}),
                             median_variable_name='income_g',
-                            data_filters=(EqFilter(var='year', val=2018).to_dict(),
+                            data_filters=(EqualToFilter(var='year', val=2018).to_dict(),
                                           dict(
                                               filter_type='mile_radius_unweighted',
                                               filter_value=dict(
@@ -361,9 +358,8 @@ class TestAPIQuery(unittest.TestCase, BaseAPIQuery):
         print(string_form)
         self.assertIsInstance(string_form, str)
 
-    @classmethod
-    def test_calculation_query(cls):
-        df = cls.submit_query(
+    def test_calculation_query(self):
+        df = self.submit_query(
             query_params=APICalculationQueryParams(
                 data_fields=(
                     {'calculate:pop_diff': 'current_pop - past_pop'},
@@ -374,13 +370,13 @@ class TestAPIQuery(unittest.TestCase, BaseAPIQuery):
                 inner_query=APIQueryParams(
                     table='populationforecast_us_annual_population',
                     data_fields=({'custom:joiner': 1}, {'population': 'current_pop'}),
-                    data_filters=(EqFilter(var='year', val=2019).to_dict(),),
+                    data_filters=(EqualToFilter(var='year', val=2019).to_dict(),),
                     aggregations=(),
                     groupby=(),
                     join=APIQueryParams(
                         table='populationforecast_us_annual_population',
                         data_fields=({'custom:joiner_b': 1}, {'population': 'past_pop'}),
-                        data_filters=(EqFilter(var='year', val=2018).to_dict(),),
+                        data_filters=(EqualToFilter(var='year', val=2018).to_dict(),),
                         aggregations=(),
                         groupby=(),
                         on=dict(left=('joiner',), right=('joiner_b',))
@@ -392,17 +388,16 @@ class TestAPIQuery(unittest.TestCase, BaseAPIQuery):
         diff = df['CURRENT_POP'].sub(df['PAST_POP']).iloc[0].round(3)
         assert df['POP_DIFF'].iloc[0].round(3) == diff
 
-    @classmethod
-    def test_filter_query(cls):
-        df = cls.submit_query(
+    def test_filter_query(self):
+        df = self.submit_query(
             query_params=APIFilterQueryParams(
                 data_fields=(),
-                data_filters=(GtrThanOrEqFilter(var='population', val=1).to_dict(),),
+                data_filters=(GreaterThanOrEqualToFilter(var='population', val=1).to_dict(),),
                 table='',
                 inner_query=APIQueryParams(
                     table='populationforecast_us_annual_population',
                     data_fields=({'custom:joiner': 1}, 'population'),
-                    data_filters=(cls.year_filter,),
+                    data_filters=(self.year_filter,),
                     aggregations=(),
                     groupby=(),
                 ),
@@ -411,16 +406,15 @@ class TestAPIQuery(unittest.TestCase, BaseAPIQuery):
 
         assert len(df) == 1
 
-    @classmethod
-    def test_filter_pretty_print(cls):
+    def test_filter_pretty_print(self):
         query_params = APIFilterQueryParams(
             data_fields=(),
-            data_filters=(GtrThanOrEqFilter(var='population', val=1).to_dict(),),
+            data_filters=(GreaterThanOrEqualToFilter(var='population', val=1).to_dict(),),
             table='',
             inner_query=APIQueryParams(
                 table='populationforecast_us_annual_population',
                 data_fields=({'custom:joiner': 1}, 'population'),
-                data_filters=(cls.year_filter,),
+                data_filters=(self.year_filter,),
                 aggregations=(),
                 groupby=(),
             ),
@@ -434,7 +428,7 @@ class TestAPIQuery(unittest.TestCase, BaseAPIQuery):
     def test_filter_pretty_print_vba(self):
         query_params = APIFilterQueryParams(
             data_fields=(),
-            data_filters=(GtrThanOrEqFilter(var='population', val=1).to_dict(),),
+            data_filters=(GreaterThanOrEqualToFilter(var='population', val=1).to_dict(),),
             table='',
             inner_query=APIQueryParams(
                 table='populationforecast_us_annual_population',
@@ -453,7 +447,7 @@ class TestAPIQuery(unittest.TestCase, BaseAPIQuery):
     def test_filter_pretty_print_r(self):
         query_params = APIFilterQueryParams(
             data_fields=(),
-            data_filters=(GtrThanOrEqFilter(var='population', val=1).to_dict(),),
+            data_filters=(GreaterThanOrEqualToFilter(var='population', val=1).to_dict(),),
             table='',
             inner_query=APIQueryParams(
                 table='populationforecast_us_annual_population',
@@ -469,9 +463,8 @@ class TestAPIQuery(unittest.TestCase, BaseAPIQuery):
         print(string_form)
         assert isinstance(string_form, str)
 
-    @classmethod
-    def test_intersects_filter(cls):
-        df = BaseAPIQuery.query_api_df(
+    def test_intersects_filter(self):
+        df = SDAPIQuery.query_api_df(
             APIQueryParams(
                 table='populationforecast_tract_annual_population',
                 data_filters=(
@@ -484,7 +477,7 @@ class TestAPIQuery(unittest.TestCase, BaseAPIQuery):
                                   [-71.0145950317383, 42.3145122534915],
                                   [-71.17801666259767, 42.3145122534915],
                                   [-71.17801666259767, 42.43321295705304]]]}).to_dict(),
-                    EqFilter(var='year', val=2019).to_dict()),
+                    EqualToFilter(var='year', val=2019).to_dict()),
                 data_fields=('geoid11', 'population'),
                 groupby=(),
                 aggregations=(),

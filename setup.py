@@ -13,14 +13,13 @@ from setuptools import setup
 
 setup(
     name='strato_query',
-    version='2.11.1',
+    version='3.0.0',
     author='Michael Clawar, Raaid Arshad, Eric Linden',
     author_email='tech@stratodem.com',
     packages=[
         'strato_query',
-        'strato_query.core',
     ],
     license='MIT',
-    description='StratoDem DB API tools',
+    description='StratoDem Analytics API tools',
     url='https://github.com/StratoDem/strato-query',
 )
