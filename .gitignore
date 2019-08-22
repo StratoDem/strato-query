@@ -87,6 +87,8 @@ celerybeat-schedule
 venv/
 ENV/
 
+.vagrant/
+
 # Spyder project settings
 .spyderproject
 .spyproject

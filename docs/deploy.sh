@@ -207,6 +207,7 @@ sanitize() {
 
 if [[ $1 = --source-only ]]; then
   run_build
+  cp -a build/. .
 elif [[ $1 = --push-only ]]; then
   main "$@"
 else
