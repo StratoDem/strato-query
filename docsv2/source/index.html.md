@@ -19,6 +19,7 @@ includes:
   - query-parameters
   - filters
   - sample-queries
+  - submitting-multiple-queries
   - using-blaise-ml-to-generate-queries
 
 search: true

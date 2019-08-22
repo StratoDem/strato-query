@@ -12,8 +12,8 @@ df = SDAPIQuery.query_api_df(
         data_fields=('year', {'median_value': 'median_income'}),
         median_variable_name='income_g',
         data_filters=(
-            GreaterThanOrEqualToFilter(var='age_g', val=17).to_dict(),
-            BetweenFilter(var='year', val=[2010, 2013]).to_dict(),
+            GreaterThanOrEqualToFilter(var='age_g', val=17),
+            BetweenFilter(var='year', val=[2010, 2013]),
         ),
         groupby=('year',),
         order=('year',),

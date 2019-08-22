@@ -44,6 +44,7 @@ class BaseFilter(abc.ABC):
 
 
 class EqualToFilter(BaseFilter):
+    """Construct a filter that generates var = val comparisons"""
     def __init__(self, var: str, val: Union[float, int, str]):
         super().__init__(filter_type='eq',
                          filter_value=val,

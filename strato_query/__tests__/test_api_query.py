@@ -214,7 +214,7 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
                 groupby=(),
                 aggregations=(),
                 query_type='FILTER',
-                data_filters=(GreaterThanOrEqualToFilter(var='target_households', val=100).to_dict(),),
+                data_filters=[GreaterThanOrEqualToFilter(var='target_households', val=100)],
                 order=(),
                 on=dict(left=('geoid_shape',), right=('geoid11',)),
                 inner_query=APICalculationQueryParams(

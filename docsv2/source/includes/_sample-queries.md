@@ -13,8 +13,8 @@ df = SDAPIQuery.query_api_df(
         table='populationforecast_metro_annual_population',
         data_fields=('year', 'cbsa', {'population': 'population'}),
         data_filters=(
-            LessThanFilter(var='year', val=2015).to_dict(),
-            EqualToFilter(var='cbsa', val=14454).to_dict(),
+            LessThanFilter(var='year', val=2015),
+            EqualToFilter(var='cbsa', val=14454),
         ),
         aggregations=(dict(aggregation_func='sum', variable_name='population'),),
         groupby=('cbsa', 'year'),
@@ -23,7 +23,7 @@ df = SDAPIQuery.query_api_df(
             query_type='AREA',
             table='geocookbook_metro_na_shapes_full',
             data_fields=('cbsa', 'area', 'name'),
-            data_filters=(EqualToFilter(var='cbsa', val=14454).to_dict(),),
+            data_filters=(EqualToFilter(var='cbsa', val=14454),),
             groupby=('cbsa', 'name'),
             aggregations=(),
             on=dict(left=('cbsa',), right=('cbsa',)),
@@ -93,9 +93,9 @@ df = SDAPIQuery.query_api_df(
         data_filters=(
             # Aggregate data within five miles of 40.7589542, -73.9937348
             MileRadiusFilter(
-                latitude=40.75895, longitude=-73.9937, miles=5).to_dict(),
+                latitude=40.75895, longitude=-73.9937, miles=5),
             # Only get data for years between 2010 and 2020 (inclusive)
-            BetweenFilter(var='year', val=[2010, 2020]).to_dict()),
+            BetweenFilter(var='year', val=[2010, 2020])),
         aggregations=({'variable_name': 'population', 'aggregation_func': 'sum'},),
         groupby=('year',)))
 ```
