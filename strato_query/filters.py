@@ -1,12 +1,12 @@
 """
-StratoDem Analytics : standard_filters
-Principal Author(s) : Eric Linden
+StratoDem Analytics : filters
+Principal Author(s) : Eric Linden, Michael Clawar
 Secondary Author(s) :
 Description :
 
 Notes :
 
-December 26, 2018
+August 21, 2019
 """
 
 import abc
@@ -14,14 +14,15 @@ from typing import List, Union
 
 
 __all__ = [
+    'BaseFilter',
     'BetweenFilter',
-    'EqFilter',
+    'EqualToFilter',
     'InFilter',
-    'GtrThanFilter',
+    'GreaterThanFilter',
     'LessThanFilter',
-    'GtrThanOrEqFilter',
-    'LessThanOrEqFilter',
-    'NotEqFilter',
+    'GreaterThanOrEqualToFilter',
+    'LessThanOrEqualToFilter',
+    'NotEqualToFilter',
     'NotInFilter',
     'DrivetimeFilter',
     'MileRadiusFilter',
@@ -42,7 +43,8 @@ class BaseFilter(abc.ABC):
             filter_variable=self._filter_variable)
 
 
-class EqFilter(BaseFilter):
+class EqualToFilter(BaseFilter):
+    """Construct a filter that generates var = val comparisons"""
     def __init__(self, var: str, val: Union[float, int, str]):
         super().__init__(filter_type='eq',
                          filter_value=val,
@@ -66,7 +68,7 @@ class InFilter(BaseFilter):
                          filter_variable=var)
 
 
-class GtrThanFilter(BaseFilter):
+class GreaterThanFilter(BaseFilter):
     def __init__(self, var: str, val: Union[float, int, str]):
         super().__init__(filter_type='gt',
                          filter_value=val,
@@ -80,21 +82,21 @@ class LessThanFilter(BaseFilter):
                          filter_variable=var)
 
 
-class GtrThanOrEqFilter(BaseFilter):
+class GreaterThanOrEqualToFilter(BaseFilter):
     def __init__(self, var: str, val: Union[float, int, str]):
         super().__init__(filter_type='ge',
                          filter_value=val,
                          filter_variable=var)
 
 
-class LessThanOrEqFilter(BaseFilter):
+class LessThanOrEqualToFilter(BaseFilter):
     def __init__(self, var: str, val: Union[float, int, str]):
         super().__init__(filter_type='le',
                          filter_value=val,
                          filter_variable=var)
 
 
-class NotEqFilter(BaseFilter):
+class NotEqualToFilter(BaseFilter):
     def __init__(self, var: str, val: Union[float, int, str]):
         super().__init__(filter_type='ne',
                          filter_value=val,

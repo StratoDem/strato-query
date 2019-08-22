@@ -2,6 +2,46 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.0.0] - 2019-08-22
+### Changes
+- **Breaking** Renames filters to full words in Python package. E.g., `EqFilter` --> `EqualToFilter`
+- Arguments no longer must be `tuple`s, but can also be `list`s :tada:
+- `data_filters` argument for `APIQueryParams` may be an iterable of `BaseFilter` objects, instead of only `dict`s
+- Renames `BaseAPIQuery` --> `SDAPIQuery`
+- New authentication method to support environment variable at `STRATODEM_API_TOKEN` or `authenticate_to_api('my-api-token')`
+- New documentation site with Python, R, Shell, and VBA examples :tada:
+
+```python
+from strato_query import SDAPIQuery, APIQueryParams, EqualToFilter, LessThanFilter
+from strato_query.authentication import authenticate_to_api
+
+authenticate_to_api('my-api-token')
+
+df = SDAPIQuery.query_api_df(
+    query_params=APIQueryParams(
+        query_type='COUNT',
+        table='populationforecast_metro_annual_population',
+        data_fields=('year', 'cbsa', {'population': 'population'}),
+        data_filters=(
+            LessThanFilter(var='year', val=2015),
+            EqualToFilter(var='cbsa', val=14454),
+        ),
+        aggregations=(dict(aggregation_func='sum', variable_name='population'),),
+        groupby=('cbsa', 'year'),
+        order=('year',),
+        join=APIQueryParams(
+            query_type='AREA',
+            table='geocookbook_metro_na_shapes_full',
+            data_fields=('cbsa', 'area', 'name'),
+            data_filters=(EqualToFilter(var='cbsa', val=14454),),
+            groupby=('cbsa', 'name'),
+            aggregations=(),
+            on=dict(left=('cbsa',), right=('cbsa',)),
+        )
+    )
+)
+```
+
 ## [2.11.1] - 2019-05-16
 ### Fixes
 - Fixes an incorrect assertion statement in the `submit_query` method

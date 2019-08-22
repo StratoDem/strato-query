@@ -1,29 +1,22 @@
 """
-StratoDem Analytics : base_API_query
-Principal Author(s) : Eric Linden
+StratoDem Analytics : queries
+Principal Author(s) : Eric Linden, Michael Clawar
 Secondary Author(s) :
 Description :
 
 Notes :
 
-December 26, 2018
+August 21, 2019
 """
 
 import abc
-import os
-import time
 
-from typing import Tuple, Dict, Optional, Union
+from typing import List, Tuple, Optional, Union
+from .filters import BaseFilter
 
-import requests
-
-import pandas
-
-from strato_query.core import constants as cc
 
 __all__ = [
     'APIQueryParams',
-    'BaseAPIQuery',
     'APIMeanQueryParams',
     'APIMedianQueryParams',
     'APIGeoJSONQueryParams',
@@ -32,31 +25,26 @@ __all__ = [
     'APIFilterQueryParams',
 ]
 
-API_TOKEN = os.environ.get('API_TOKEN')
-if API_TOKEN is None:
-    raise ValueError('No API token provided via API_TOKEN environment variable')
-
-T_DF = pandas.DataFrame
-
 
 class APIQueryParams(abc.ABC):
     def __init__(self,
-                 data_fields: Tuple[Union[str, dict], ...],
+                 data_fields: Union[Tuple[Union[str, dict], ...], List[Union[str, dict]]],
                  table: str,
-                 groupby: Tuple[str, ...],
-                 data_filters: Tuple[dict, ...],
-                 aggregations: Tuple[dict, ...],
+                 groupby: Union[Tuple[str, ...], List[str]],
+                 data_filters: Union[Tuple[Union[dict, BaseFilter], ...],
+                                     List[Union[dict, BaseFilter]]],
+                 aggregations: Union[Tuple[dict, ...], List[dict]],
                  query_type: Optional[str] = 'COUNT',
-                 order: Optional[Tuple[str, ...]] = None,
+                 order: Optional[Union[Tuple[str, ...], List[str]]] = None,
                  on: Optional[dict] = None,
                  join: Optional['APIQueryParams'] = None):
-        assert isinstance(data_fields, tuple)
+        assert isinstance(data_fields, (tuple, list))
         assert isinstance(table, str)
-        assert isinstance(groupby, tuple)
-        assert isinstance(data_filters, tuple)
-        assert isinstance(aggregations, tuple)
+        assert isinstance(groupby, (tuple, list))
+        assert isinstance(data_filters, (tuple, list))
+        assert isinstance(aggregations, (tuple, list))
         assert isinstance(query_type, str)
-        assert order is None or isinstance(order, tuple)
+        assert order is None or isinstance(order, (tuple, list))
         assert on is None or isinstance(on, dict)
 
         self._query_type = query_type
@@ -82,7 +70,8 @@ class APIQueryParams(abc.ABC):
             data_fields=self.data_fields,
             table=self.table,
             groupby=self.groupby,
-            data_filters=self.data_filters,
+            data_filters=[f.to_dict() if isinstance(f, BaseFilter) else f
+                          for f in self.data_filters],
             aggregations=self.aggregations)
 
         if self.on is not None:
@@ -100,7 +89,7 @@ class APIQueryParams(abc.ABC):
         return self._query_type
 
     @property
-    def data_fields(self) -> Tuple[Union[str, dict], ...]:
+    def data_fields(self) -> Union[Tuple[Union[str, dict], ...], List[Union[str, dict]]]:
         return self._data_fields
 
     @property
@@ -108,15 +97,15 @@ class APIQueryParams(abc.ABC):
         return self._table
 
     @property
-    def groupby(self) -> Tuple[str, ...]:
+    def groupby(self) -> Union[Tuple[str, ...], List[str]]:
         return self._groupby
 
     @property
-    def data_filters(self) -> Tuple[dict, ...]:
+    def data_filters(self) -> Union[Tuple[dict, ...], List[dict]]:
         return self._data_filters
 
     @property
-    def aggregations(self) -> Tuple[dict, ...]:
+    def aggregations(self) -> Union[Tuple[dict, ...], List[dict]]:
         return self._aggregations
 
     @property
@@ -128,7 +117,7 @@ class APIQueryParams(abc.ABC):
         return None if self._join is None else self._join.to_api_struct()
 
     @property
-    def order(self) -> Union[None, Tuple[str, ...]]:
+    def order(self) -> Union[None, Tuple[str, ...], List[str]]:
         return self._order
 
     @staticmethod
@@ -150,6 +139,7 @@ class APIQueryParams(abc.ABC):
         -------
         The query params as a string
         """
+
         def pretty_print_recursive(query_params, spacer: Optional[str] = '    '):
             dict_form = self._dict_form(query_params)
 
@@ -221,6 +211,7 @@ class APIQueryParams(abc.ABC):
         -------
         The query params as a string
         """
+
         def pretty_print_recursive(query_params, spacer: Optional[str] = '    ') -> str:
             dict_form = self._dict_form(query_params)
 
@@ -287,9 +278,9 @@ class APIQueryParams(abc.ABC):
                         filter_value = fv
                     return '{func}(filterVariable:="{filter_variable}", ' \
                            'filterValue:={filter_value})'.format(
-                            func=func,
-                            filter_variable=filt['filter_variable'],
-                            filter_value=filter_value)
+                        func=func,
+                        filter_variable=filt['filter_variable'],
+                        filter_value=filter_value)
 
             def _process_aggregation(agg: dict) -> str:
                 assert isinstance(agg, dict)
@@ -365,6 +356,7 @@ class APIQueryParams(abc.ABC):
         -------
         The query params as a string
         """
+
         def pretty_print_recursive(query_params, spacer: Optional[str] = '  ') -> str:
             dict_form = self._dict_form(query_params)
 
@@ -437,9 +429,9 @@ class APIQueryParams(abc.ABC):
                         filter_value = fv
                     return '{func}(filter_variable = "{filter_variable}", ' \
                            'filter_value = {filter_value})'.format(
-                            func=func,
-                            filter_variable=filt['filter_variable'],
-                            filter_value=filter_value)
+                        func=func,
+                        filter_variable=filt['filter_variable'],
+                        filter_value=filter_value)
 
             def _process_aggregation(agg: dict) -> str:
                 assert isinstance(agg, dict)
@@ -662,177 +654,3 @@ class APIFilterQueryParams(APICalculationQueryParams):
     @property
     def query_type(self) -> str:
         return 'FILTER'
-
-
-class BaseAPIQuery:
-    @classmethod
-    def submit_query(cls,
-                     query_params: Optional[APIQueryParams] = None,
-                     queries_params: Optional[Dict[str, APIQueryParams]] = None,
-                     timeout: Optional[float] = 60.0,
-                     headers: Optional[Dict[str, str]] = None) -> Union[T_DF, Dict[str, T_DF]]:
-        """
-        Determines the proper method to use and passes values along for request submission
-
-        Parameters
-        ----------
-        query_params: Optional[APIQueryParams] = None
-            A single query params object to submit as part of the request
-        queries_params: Optional[Dict[str, APIQueryParams]] = None
-            A list of dicts, with query params as the values, to be submitted together
-        timeout: Optional[float]=60.0
-            The time allowed before a request times out, where 1 second is 1.0
-        headers: Optional[Dict[str, str]] = None
-            Optional request headers
-        Returns
-        -------
-        The result from the request, either a pandas dataframe or a dict with dataframes as values
-        """
-        assert query_params is None or isinstance(query_params, APIQueryParams)
-        assert queries_params is None or isinstance(queries_params, dict)
-        if queries_params is not None:
-            assert all(isinstance(query, APIQueryParams) for query in queries_params.values())
-        assert not (query_params is None and queries_params is None)
-        assert not (query_params is not None and queries_params is not None)
-
-        if query_params is not None:
-            return cls.query_api_df(query_params=query_params, headers=headers, timeout=timeout)
-        elif queries_params is not None:
-            return cls.query_api_multiple(queries=queries_params, headers=headers, timeout=timeout)
-
-    @staticmethod
-    def query_api_json(query_params: APIQueryParams,
-                       timeout: Optional[float] = 60.0,
-                       headers: Optional[Dict[str, str]] = None) -> dict:
-        """
-        Submits the query params and returns the resulting data
-        Parameters
-        ----------
-        query_params: APIQueryParams
-            The query params to be used in the POST request
-        timeout: Optional[float]=60.0
-            The time allowed before a request times out, where 1 second is 1.0
-        headers: Optional[Dict[str, str]] = None
-            Optional request headers
-
-        Returns
-        -------
-        A dict containing the query result
-        """
-        json_data = _submit_post_request(
-            json_dict=dict(token=API_TOKEN, query=query_params.to_api_struct()),
-            headers=headers,
-            timeout=timeout)
-
-        return json_data['data'][0]
-
-    @staticmethod
-    def query_api_df(query_params: APIQueryParams,
-                     timeout: Optional[float] = 60.0,
-                     headers: Optional[Dict[str, str]] = None) -> pandas.DataFrame:
-        """
-        Submits the query params and returns the resulting data
-
-        Parameters
-        ----------
-        query_params: APIQueryParams
-            The query params to be used in the POST request
-        timeout: Optional[float]=60.0
-            The time allowed before a request times out, where 1 second is 1.0
-        headers: Optional[Dict[str, str]] = None
-            Optional request headers
-
-        Returns
-        -------
-        A pandas dataframe containing the query result
-        """
-        json_data = _submit_post_request(
-            json_dict=dict(token=API_TOKEN, query=query_params.to_api_struct()),
-            headers=headers,
-            timeout=timeout)
-
-        df_ = pandas.DataFrame(json_data['data'])
-        df_.columns = [c.upper() for c in df_.columns]
-
-        return df_
-
-    @staticmethod
-    def query_api_multiple(queries: Dict[str, APIQueryParams],
-                           timeout: Optional[float]=60.0,
-                           headers: Optional[Dict[str, str]] = None) -> Dict[str, pandas.DataFrame]:
-        """
-        Submits the query params and returns the resulting data
-
-        Parameters
-        ----------
-        queries: Dict[str, APIQueryParams]
-            The query params to be used in the POST request
-        timeout: Optional[float]=60.0
-            The time allowed before a request times out, where 1 second is 1.0
-        headers: Optional[Dict[str, str]] = None
-            Optional request headers
-
-        Returns
-        -------
-        A dict with pandas dataframes as the values for each of the query params in the input dict
-        """
-        json_data = _submit_post_request(
-            json_dict=dict(
-                token=API_TOKEN,
-                queries={k: v.to_api_struct() for k, v in queries.items()}),
-            headers=headers,
-            timeout=timeout)
-
-        df_dict = {}
-        for k, v in json_data['data'].items():
-            df_ = pandas.DataFrame(v)
-            df_.columns = [c.upper() for c in df_.columns]
-            df_dict[k] = df_
-
-        return df_dict
-
-
-def _submit_post_request(json_dict: dict,
-                         timeout: float,
-                         headers: Optional[Dict[str, str]] = None) -> dict:
-    """
-    Submits the POST request and retries on connection errors, waiting longer between each retry
-
-    Parameters
-    ----------
-    json_dict: dict
-    timeout: float
-    headers: Optional[Dict[str, str]] = None
-
-    Returns
-    -------
-    The JSON result from the query in dict form
-    """
-    for retry_num in range(cc.MAX_RETRIES + 1):
-        try:
-            r = requests.post(url=cc.API_URL, json=json_dict, headers=headers, timeout=timeout)
-
-            assert r.status_code == 200, (r.status_code, r.content, json_dict)
-
-            json_data = r.json()
-            assert json_data['success'], json_data
-
-            return json_data
-        except (requests.exceptions.ConnectionError, requests.Timeout) as e:
-            if retry_num >= cc.MAX_RETRIES:
-                raise e
-            else:
-                time.sleep(0.5 * (1 + retry_num))
-
-
-if __name__ == '__main__':
-    print(
-        BaseAPIQuery.submit_query(
-            query_params=APIGeocoderQueryParams(
-                data_fields=('geoid11', 'geoid5',),
-                table='geocookbook_tract_na_shapes_full',
-                data_filters=(),
-                groupby=(),
-                aggregations=(),
-                latitude=42.983899,
-                longitude=-99.306204)))

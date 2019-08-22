@@ -11,11 +11,18 @@ January 09, 2019
 
 import pandas
 
-from strato_query.base_API_query import *
-from strato_query.standard_filters import *
+from strato_query import SDAPIQuery, APIQueryParams, APIMedianQueryParams, APIMeanQueryParams
+from strato_query.filters import \
+    BetweenFilter, \
+    GreaterThanOrEqualToFilter, \
+    EqualToFilter, \
+    LessThanFilter, \
+    LessThanOrEqualToFilter, \
+    IntersectsFilter, \
+    DrivetimeFilter
 
 
-class ExampleQueries(BaseAPIQuery):
+class ExampleQueries(SDAPIQuery):
     @classmethod
     def example_count_query(cls):
         # Number of households ages 25-39 with net worth of at least $50,000
@@ -28,15 +35,12 @@ class ExampleQueries(BaseAPIQuery):
                 data_fields=('year', 'age_g_bottom_coded', 'net_worth_g', 'households'),
                 data_filters=(
                     BetweenFilter(var='age_g_bottom_coded', val=[6, 8]).to_dict(),
-                    GtrThanOrEqFilter(var='net_worth_g', val=3).to_dict(),
-                    EqFilter(var='year', val=2017).to_dict(),
-                    dict(
-                        filter_type='drivetime',
-                        filter_value=dict(
-                            latitude=42.256922,
-                            longitude=-71.040571,
-                            minutes=20),
-                        filter_variable='')
+                    GreaterThanOrEqualToFilter(var='net_worth_g', val=3).to_dict(),
+                    EqualToFilter(var='year', val=2017).to_dict(),
+                    DrivetimeFilter(
+                        latitude=42.256922,
+                        longitude=-71.040571,
+                        minutes=20).to_dict(),
                 ),
                 groupby=(),
                 order=(),
@@ -59,7 +63,7 @@ class ExampleQueries(BaseAPIQuery):
                 data_fields=('year', 'cbsa', {'population': 'population'}),
                 data_filters=(
                     LessThanFilter(var='year', val=2015).to_dict(),
-                    EqFilter(var='cbsa', val=14454).to_dict(),
+                    EqualToFilter(var='cbsa', val=14454).to_dict(),
                 ),
                 aggregations=(dict(aggregation_func='sum', variable_name='population'),),
                 groupby=('cbsa', 'year'),
@@ -94,7 +98,7 @@ class ExampleQueries(BaseAPIQuery):
                 data_fields=('year', {'median_value': 'median_income'}),
                 median_variable_name='income_g',
                 data_filters=(
-                    GtrThanOrEqFilter(var='age_g', val=17).to_dict(),
+                    GreaterThanOrEqualToFilter(var='age_g', val=17).to_dict(),
                     BetweenFilter(var='year', val=[2010, 2013]).to_dict(),
                 ),
                 groupby=('year',),
@@ -116,7 +120,7 @@ class ExampleQueries(BaseAPIQuery):
                 data_fields=('year', {'mean_value': 'mean_home_value'}),
                 data_filters=(
                     BetweenFilter(var='year', val=[2006, 2010]).to_dict(),
-                    GtrThanOrEqFilter(var='age_g', val=13).to_dict(),
+                    GreaterThanOrEqualToFilter(var='age_g', val=13).to_dict(),
                 ),
                 query_type='MEAN',
                 mean_variable_name='home_value_g2',
@@ -140,10 +144,10 @@ class ExampleQueries(BaseAPIQuery):
                     table='incomeforecast_county_annual_income_group_age',
                     data_fields=('geoid5', 'year', 'income_g', 'age_g', 'households'),
                     data_filters=(
-                        EqFilter(var='year', val=2010).to_dict(),
+                        EqualToFilter(var='year', val=2010).to_dict(),
                         BetweenFilter(var='age_g', val=[7, 12]).to_dict(),
-                        LessThanOrEqFilter(var='income_g', val=12).to_dict(),
-                        EqFilter(var='geoid5', val=25025).to_dict(),
+                        LessThanOrEqualToFilter(var='income_g', val=12).to_dict(),
+                        EqualToFilter(var='geoid5', val=25025).to_dict(),
                     ),
                     query_type='COUNT',
                     aggregations=(),
@@ -170,7 +174,7 @@ class ExampleQueries(BaseAPIQuery):
     @classmethod
     def example_query_with_intersects_filter(cls):
         # Returns the geoid and population for all census tracts within the coordinate boundaries
-        df = BaseAPIQuery.query_api_df(
+        df = SDAPIQuery.query_api_df(
             APIQueryParams(
                 table='populationforecast_tract_annual_population',
                 data_filters=(
@@ -183,7 +187,7 @@ class ExampleQueries(BaseAPIQuery):
                                   [-71.0145950317383, 42.3145122534915],
                                   [-71.17801666259767, 42.3145122534915],
                                   [-71.17801666259767, 42.43321295705304]]]}).to_dict(),
-                    EqFilter(var='year', val=2019).to_dict()),
+                    EqualToFilter(var='year', val=2019).to_dict()),
                 data_fields=('geoid11', 'population'),
                 groupby=(),
                 aggregations=(),
