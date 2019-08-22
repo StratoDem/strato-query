@@ -18,7 +18,8 @@ from strato_query.filters import \
     EqualToFilter, \
     LessThanFilter, \
     LessThanOrEqualToFilter, \
-    IntersectsFilter
+    IntersectsFilter, \
+    DrivetimeFilter
 
 
 class ExampleQueries(SDAPIQuery):
@@ -36,13 +37,10 @@ class ExampleQueries(SDAPIQuery):
                     BetweenFilter(var='age_g_bottom_coded', val=[6, 8]).to_dict(),
                     GreaterThanOrEqualToFilter(var='net_worth_g', val=3).to_dict(),
                     EqualToFilter(var='year', val=2017).to_dict(),
-                    dict(
-                        filter_type='drivetime',
-                        filter_value=dict(
-                            latitude=42.256922,
-                            longitude=-71.040571,
-                            minutes=20),
-                        filter_variable='')
+                    DrivetimeFilter(
+                        latitude=42.256922,
+                        longitude=-71.040571,
+                        minutes=20).to_dict(),
                 ),
                 groupby=(),
                 order=(),

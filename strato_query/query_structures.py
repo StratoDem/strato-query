@@ -12,6 +12,7 @@ August 21, 2019
 import abc
 
 from typing import List, Tuple, Optional, Union
+from .filters import BaseFilter
 
 
 __all__ = [
@@ -30,7 +31,8 @@ class APIQueryParams(abc.ABC):
                  data_fields: Union[Tuple[Union[str, dict], ...], List[Union[str, dict]]],
                  table: str,
                  groupby: Union[Tuple[str, ...], List[str]],
-                 data_filters: Union[Tuple[dict, ...], List[dict]],
+                 data_filters: Union[Tuple[Union[dict, BaseFilter], ...],
+                                     List[Union[dict, BaseFilter]]],
                  aggregations: Union[Tuple[dict, ...], List[dict]],
                  query_type: Optional[str] = 'COUNT',
                  order: Optional[Union[Tuple[str, ...], List[str]]] = None,
@@ -68,7 +70,8 @@ class APIQueryParams(abc.ABC):
             data_fields=self.data_fields,
             table=self.table,
             groupby=self.groupby,
-            data_filters=self.data_filters,
+            data_filters=[f.to_dict() if isinstance(f, BaseFilter) else f
+                          for f in self.data_filters],
             aggregations=self.aggregations)
 
         if self.on is not None:

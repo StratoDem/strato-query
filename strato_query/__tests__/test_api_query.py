@@ -30,7 +30,7 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
 
         age_filter = EqualToFilter(
             var='age_g',
-            val=18).to_dict()
+            val=18)
 
         year_filter = BetweenFilter(
             var='year',
@@ -103,7 +103,7 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
                 query_1=APIQueryParams(
                     table='geocookbook_county_na_county_metro',
                     data_fields=('GEOID5',),
-                    data_filters=(InFilter(var='cbsa', val=[14454]).to_dict(),),
+                    data_filters=[InFilter(var='cbsa', val=[14454])],
                     aggregations=(),
                     groupby=()),
                 query_2=APIQueryParams(
@@ -123,7 +123,7 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
     def test_median_query(self):
         year_filter = GreaterThanOrEqualToFilter(
             var='year',
-            val=2013).to_dict()
+            val=2013)
 
         df = self.submit_query(
             query_params=APIMedianQueryParams(
@@ -218,12 +218,12 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
                 order=(),
                 on=dict(left=('geoid_shape',), right=('geoid11',)),
                 inner_query=APICalculationQueryParams(
-                    data_fields=(
+                    data_fields=[
                         'geoid11',
                         'target_households',
                         'median_val',
                         'name',
-                    ),
+                    ],
                     data_filters=(),
                     table='',
                     aggregations=(),

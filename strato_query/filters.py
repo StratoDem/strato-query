@@ -14,6 +14,7 @@ from typing import List, Union
 
 
 __all__ = [
+    'BaseFilter',
     'BetweenFilter',
     'EqualToFilter',
     'InFilter',
