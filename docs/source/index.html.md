@@ -35,6 +35,6 @@ search: true
 
 # Introduction
 
-Welcome to the StratoDem Analytics API. You can use the API to query economic and geo-demographic data from the StratoDem Analytics database.
+Welcome to the StratoDem Analytics API! You can use the API to query economic and geo-demographic data from the StratoDem Analytics database.
 
 We have language bindings in Python, R and VBA (for Excel). You can view code examples in the dark area to the right, and you can switch the programming language of the examples with the tabs in the top right.

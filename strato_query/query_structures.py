@@ -13,7 +13,7 @@ import abc
 
 from typing import List, Tuple, Optional, Union
 from .filters import BaseFilter
-
+from .aggregations import BaseAggregation
 
 __all__ = [
     'APIQueryParams',
@@ -33,7 +33,8 @@ class APIQueryParams(abc.ABC):
                  groupby: Union[Tuple[str, ...], List[str]],
                  data_filters: Union[Tuple[Union[dict, BaseFilter], ...],
                                      List[Union[dict, BaseFilter]]],
-                 aggregations: Union[Tuple[dict, ...], List[dict]],
+                 aggregations: Union[Tuple[Union[dict, BaseAggregation], ...],
+                                     List[Union[dict, BaseAggregation]]],
                  query_type: Optional[str] = 'COUNT',
                  order: Optional[Union[Tuple[str, ...], List[str]]] = None,
                  on: Optional[dict] = None,
@@ -72,7 +73,8 @@ class APIQueryParams(abc.ABC):
             groupby=self.groupby,
             data_filters=[f.to_dict() if isinstance(f, BaseFilter) else f
                           for f in self.data_filters],
-            aggregations=self.aggregations)
+            aggregations=[agg.to_dict() if isinstance(agg, BaseAggregation) else agg
+                          for agg in self.aggregations])
 
         if self.on is not None:
             return_dict['on'] = self.on
@@ -105,7 +107,8 @@ class APIQueryParams(abc.ABC):
         return self._data_filters
 
     @property
-    def aggregations(self) -> Union[Tuple[dict, ...], List[dict]]:
+    def aggregations(self) -> Union[Tuple[Union[dict, BaseAggregation], ...],
+                                    List[Union[dict, BaseAggregation]]]:
         return self._aggregations
 
     @property

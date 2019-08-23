@@ -7,6 +7,8 @@ All notable changes to this project will be documented in this file. This projec
 - **Breaking** Renames filters to full words in Python package. E.g., `EqFilter` --> `EqualToFilter`
 - Arguments no longer must be `tuple`s, but can also be `list`s :tada:
 - `data_filters` argument for `APIQueryParams` may be an iterable of `BaseFilter` objects, instead of only `dict`s
+- `BaseAggregation` and `SumAggregation` added to handle aggregations instead of relying on arbitrary `dict`s
+- `aggregations` argument for `APIQueryParams` may be an iterable of `BaseAggregation` objects, instead of only `dict`s
 - Renames `BaseAPIQuery` --> `SDAPIQuery`
 - New authentication method to support environment variable at `STRATODEM_API_TOKEN` or `authenticate_to_api('my-api-token')`
 - New documentation site with Python, R, Shell, and VBA examples :tada:

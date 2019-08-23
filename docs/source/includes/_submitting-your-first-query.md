@@ -3,7 +3,8 @@
 > Finds median household income in the US for those 80+ from 2010 to 2013
 
 ```python
-from strato_query import SDAPIQuery, APIMedianQueryParams, GreaterThanOrEqualToFilter, BetweenFilter
+from strato_query import SDAPIQuery, APIMedianQueryParams
+from strato_query.filters import GreaterThanOrEqualToFilter, BetweenFilter
 
 df = SDAPIQuery.query_api_df(
     query_params=APIMedianQueryParams(

@@ -241,7 +241,7 @@ The `NotInFilter` constructs a filter equivalent to `var NOT IN (val1, val2, val
 ## `MileRadiusFilter`
 
 > Use this filter to restrict results to geographies within a mile radius
->
+
 ```python
 from strato_query.filters import MileRadiusFilter
 

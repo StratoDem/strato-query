@@ -41,8 +41,7 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
                 data_fields=('year', 'population'),
                 table='populationforecast_us_annual_population_age',
                 data_filters=(age_filter, year_filter),
-                aggregations=(dict(aggregation_func='sum',
-                                   variable_name='population'),),
+                aggregations=[SumAggregation('population')],
                 groupby=('year',),
             ),
         )
