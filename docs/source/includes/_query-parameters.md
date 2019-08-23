@@ -129,7 +129,7 @@ Set query = apiQueryParameters( _
     dataFilters:=Array( _
         equalToFilter(filterVariable:="geoid2", filterValue:=6), _
         greaterThanOrEqualToFilter(filterVariable:="age_g", filterValue:=16), _
-        greaterThanOrEqualToFilter(filterVariable:="inocme_g", filterValue:=10)), _
+        greaterThanOrEqualToFilter(filterVariable:="income_g", filterValue:=10)), _
     groupby:=Array("year", "geoid5"), _
     order:=Array("year", "geoid5"), _
     aggregations:=Array(sumAggregation(variableName:="households")))
@@ -278,6 +278,149 @@ To query mean household income, net worth, home values, or other metrics, a spec
 These queries require a `mean_variable_name` argument, which tells the API service which variable to 
 use to compute the mean value.
 
+## Combining multiple queries
+
+> This query joins two results on common columns to compute population density
+
+```python
+from strato_query import SDAPIQuery, APIQueryParams
+from strato_query.filters import EqualToFilter, LessThanFilter
+
+df = SDAPIQuery.query_api_df(
+    query_params=APIQueryParams(
+        query_type='COUNT',
+        table='populationforecast_metro_annual_population',
+        data_fields=('year', 'cbsa', {'population': 'population'}),
+        data_filters=(
+            LessThanFilter(var='year', val=2015),
+            EqualToFilter(var='cbsa', val=14454),
+        ),
+        aggregations=(dict(aggregation_func='sum', variable_name='population'),),
+        groupby=('cbsa', 'year'),
+        order=('year',),
+        join=APIQueryParams(
+            query_type='AREA',
+            table='geocookbook_metro_na_shapes_full',
+            data_fields=('cbsa', 'area', 'name'),
+            data_filters=[EqualToFilter(var='cbsa', val=14454)],
+            groupby=('cbsa', 'name'),
+            aggregations=(),
+            on=dict(left=('cbsa',), right=('cbsa',)),
+        )
+    )
+)
+
+df['POP_PER_SQ_MI'] = df['POPULATION'].div(df['AREA'])
+df_final = df[['YEAR', 'NAME', 'POP_PER_SQ_MI']]
+```
+
+```r
+library(stRatoquery)
+
+api_query_params(
+  table = 'populationforecast_metro_annual_population',
+  data_fields = api_fields(fields_list = list('year', 'cbsa', list('population' = 'population'))),
+  data_filters = list(lt_filter(filter_variable = "year", filter_value = 2015), eq_filter(filter_variable = "cbsa", filter_value = 14454)),
+  aggregations = list(sum_aggregation(variable_name = "population")),
+  groupby = c("cbsa", "year"),
+  order = c("year"),
+  join = api_query_params(
+      table = 'geocookbook_metro_na_shapes_full',
+      data_fields = api_fields(fields_list = list('cbsa', 'area', 'name')),
+      data_filters = list(eq_filter(filter_variable = "cbsa", filter_value = 14454)),
+      aggregations = list(),
+      groupby = c("cbsa", "name"),
+      on = list(left = c('cbsa'), right = c('cbsa')),
+      query_type = "AREA"),
+  query_type = "COUNT")
+```
+
+```shell
+$ curl -X POST "https://api.stratodem.com/api" \
+    -H "accept: application/json" \
+    -H "Content-Type: application/json" \
+    - d "{\"query_type\": \"COUNT\", \"data_fields\": [\"year\", \"cbsa\", {\"population\": \"population\"}], \"table\": \"populationforecast_metro_annual_population\", \"groupby\": [\"cbsa\", \"year\"], \"data_filters\": [{\"filter_type\": \"lt\", \"filter_value\": 2015, \"filter_variable\": \"year\"}, {\"filter_type\": \"eq\", \"filter_value\": 14454, \"filter_variable\": \"cbsa\"}], \"aggregations\": [{\"aggregation_func\": \"sum\", \"variable_name\": \"population\"}], \"join\": {\"query_type\": \"AREA\", \"data_fields\": [\"cbsa\", \"area\", \"name\"], \"table\": \"geocookbook_metro_na_shapes_full\", \"groupby\": [\"cbsa\", \"name\"], \"data_filters\": [{\"filter_type\": \"eq\", \"filter_value\": 14454, \"filter_variable\": \"cbsa\"}], \"aggregations\": [], \"on\": {\"left\": [\"cbsa\"], \"right\": [\"cbsa\"]}}, \"order\": [\"year\"]}"
+```
+
+```vb
+apiQueryParameters( _
+    table:="populationforecast_metro_annual_population", _
+    dataFields:=Array("year", "cbsa", renameVariable(original:="population", renamed:="population")), _
+    dataFilters:=Array(lessThanFilter(filterVariable:="year", filterValue:=2015), equalToFilter(filterVariable:="cbsa", filterValue:=14454)), _
+    aggregations:=Array(sumAggregation(variableName:="population")), _
+    groupby:=Array("cbsa", "year"), order:=Array("year"), _
+    join:=apiQueryParameters( _
+        table:="geocookbook_metro_na_shapes_full", _
+        dataFields:=Array("cbsa", "area", "name"), _
+        dataFilters:=Array(equalToFilter(filterVariable:="cbsa", filterValue:=14454)), _
+        aggregations:=Array(), _
+        groupby:=Array("cbsa", "name"), _
+        joinOn:=joinOnStructure(left:=Array("cbsa"), right:=Array("cbsa")), _
+        queryType:="AREA"), _
+    queryType:="COUNT")
+```
+
+In many cases, we need to derive data from two or more variables. For example, when calculating 
+population density, we need to take the population and divide by the area. In this case, those two 
+metrics come from different sources in the StratoDem Analytics database, and we need to `JOIN` two queries 
+using the `join` argument. 
+
+A `join` takes another `APIQueryParams` object to join (effectively joining the results of two SELECT statements),
+with that new `APIQueryParams` object requiring an `on` argument, to tell the API service which column(s) to join on.
+
+For example, `on={"left": [cbsa], "right": [cbsa]}` tells the API to join the two subqueries on the `cbsa` column.
+
 ## GeoJSON queries
 
-## Combining queries
+> This query returns a GeoJSON FeatureCollection with median household income stored in properties for all census tracts within a 15-minute drive of the lat-lng
+
+```python
+from strato_query import SDAPIQuery, APIGeoJSONQueryParams, APIMedianQueryParams
+from strato_query.filters import EqualToFilter, DrivetimeFilter
+
+geojson = SDAPIQuery.query_api_json(
+    APIGeoJSONQueryParams(
+        properties=[
+            'geoid11',
+            'name',
+            'median_hhi'
+        ],
+        data_fields=['geoid11', 'geometry', 'name'],
+        table='geocookbook_tract_na_shapes_full',
+        groupby=(),
+        data_filters=(),
+        aggregations=(),
+        join=APIMedianQueryParams(
+            on={'left': ['geoid11'], 'right': ['geoid']},
+            table='incomeforecast_tract_annual_income_group',
+            median_variable_name='income_g',
+            data_fields=[{'geoid11': 'geoid'}, {'median_value': 'median_hhi'}],
+            data_filters=[
+                EqualToFilter('year', 2019),
+                DrivetimeFilter(latitude=42.1, longitude=-120.1, minutes=15, detailed_type='drivetime_unweighted'),
+            ],
+            groupby=['geoid11'],
+            aggregations=(),
+        )
+    ))
+```
+
+```r
+```
+
+```shell
+$ curl -X POST "https://api.stratodem.com/api" \
+    -H "accept: application/json" \
+    -H "Content-Type: application/json" \
+    -d "{\"query_type\": \"GEOJSON\", \"data_fields\": [\"geoid11\", \"geometry\", \"name\"], \"table\": \"geocookbook_tract_na_shapes_full\", \"groupby\": [], \"data_filters\": [], \"aggregations\": [], \"join\": {\"query_type\": \"MEDIAN\", \"data_fields\": [{\"geoid11\": \"geoid\"}, {\"median_value\": \"median_hhi\"}], \"table\": \"incomeforecast_tract_annual_income_group\", \"groupby\": [\"geoid11\"], \"data_filters\": [{\"filter_type\": \"eq\", \"filter_value\": 2019, \"filter_variable\": \"year\"}, {\"filter_type\": \"drivetime_unweighted\", \"filter_value\": {\"latitude\": 42.1, \"longitude\": -120.1, \"minutes\": 15, \"traffic\": \"disabled\", \"start_time\": null}, \"filter_variable\": \"\"}], \"aggregations\": [], \"on\": {\"left\": [\"geoid11\"], \"right\": [\"geoid\"]}, \"median_variable_name\": \"income_g\"}, \"properties\": [\"geoid11\", \"name\", \"median_hhi\"]}"
+```
+
+```vb
+```
+
+To return a GeoJSON `FeatureCollection`, use the `APIGeoJSONQueryParams`. This query structure adds the 
+`properties` argument, which specifies which fields will show up in each `Feature`'s `properties` field in the GeoJSON response.
+
+The example to the right returns the GeoJSON `FeatureCollection` for the one census tract within a 15-minute drive of 42.1,-120.1 (lat, lng).
+
+`{"type": "FeatureCollection", "features": [{"type": "Feature", "geometry": {"type": "Polygon", "coordinates": ["DUMMY DATA HERE"]}, "properties": {"geoid11": 41037960100, "name": "Census Tract: 41037960100", "median_hhi": 42182}}]}`

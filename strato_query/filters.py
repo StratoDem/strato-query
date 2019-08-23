@@ -10,7 +10,7 @@ August 21, 2019
 """
 
 import abc
-from typing import List, Union
+from typing import List, Union, Optional
 
 
 __all__ = [
@@ -114,19 +114,81 @@ class NotInFilter(BaseFilter):
 
 
 class MileRadiusFilter(BaseFilter):
-    def __init__(self, latitude: float, longitude: float, miles: Union[int, float]):
+    def __init__(self,
+                 latitude: float,
+                 longitude: float,
+                 miles: Union[int, float],
+                 detailed_type: str = 'mile_radius'):
+        """
+        Filter a query to geographies contained by the drive time area
+
+        Parameters
+        ----------
+        latitude: float
+            Center latitude
+        longitude: float
+            Center longitude
+        miles: int or float
+            Miles from latitude-longitude center
+        detailed_type: str
+            One of:
+            - 'mile_radius': use a normal mile radius, which weights results
+            - 'mile_radius_simple': use a mile radius with weights, but using simplified shapes
+            - 'mile_radius_unweighted': return unweighted results (used to get all geographies
+                intersecting at all with the mile radius buffer)
+        """
+        assert detailed_type in {'mile_radius', 'mile_radius_simple', 'mile_radius_unweighted'}
+
         super().__init__(
-            filter_type='mile_radius',
+            filter_type=detailed_type,
             filter_variable='',
             filter_value=dict(latitude=latitude, longitude=longitude, miles=miles))
 
 
 class DrivetimeFilter(BaseFilter):
-    def __init__(self, latitude: float, longitude: float, minutes: Union[int, float]):
+    def __init__(self,
+                 latitude: float,
+                 longitude: float,
+                 minutes: Union[int, float],
+                 detailed_type: str = 'drivetime',
+                 with_traffic: bool = False,
+                 start_time: Optional[str] = None):
+        """
+        Filter a query to geographies contained by the drive time area
+
+        Parameters
+        ----------
+        latitude: float
+            Center latitude
+        longitude: float
+            Center longitude
+        minutes: int or float
+            Minutes drive from latitude-longitude center
+        detailed_type: str
+            One of:
+            - 'drivetime': use a normal drivetime, which weights results
+            - 'drivetime_simple': use a drivetime with weights, but using simplified shapes
+            - 'drivetime_unweighted': return unweighted results (used to get all geographies
+                intersecting at all with the drive time area)
+        with_traffic: bool
+            Use traffic estimates to compute the drive time area?
+        start_time: str
+            The departure time for the drivetime, used in concert with "with_traffic" set to True
+            e.g., "2019-05-25T18:00:00"
+        """
+        assert detailed_type in {'drivetime', 'drivetime_simple', 'drivetime_unweighted'}
+        assert isinstance(with_traffic, bool)
+        assert start_time is None or isinstance(start_time, str)
+
         super().__init__(
-            filter_type='drivetime',
+            filter_type=detailed_type,
             filter_variable='',
-            filter_value=dict(latitude=latitude, longitude=longitude, minutes=minutes))
+            filter_value=dict(
+                latitude=latitude,
+                longitude=longitude,
+                minutes=minutes,
+                traffic='enabled' if with_traffic else 'disabled',
+                start_time=start_time))
 
 
 class IntersectsFilter(BaseFilter):

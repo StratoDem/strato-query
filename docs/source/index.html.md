@@ -18,6 +18,7 @@ includes:
   - submitting-your-first-query
   - query-parameters
   - filters
+  - aggregations
   - sample-queries
   - submitting-multiple-queries
   - using-blaise-ml-to-generate-queries

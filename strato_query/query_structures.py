@@ -559,8 +559,10 @@ class APIMedianQueryParams(APIQueryParams):
 
 
 class APIGeoJSONQueryParams(APIQueryParams):
-    def __init__(self, properties: Tuple[Union[str, dict], ...], **kwargs):
-        assert isinstance(properties, tuple)
+    def __init__(self,
+                 properties: Union[Tuple[Union[str, dict], ...], List[Union[str, dict]]],
+                 **kwargs):
+        assert isinstance(properties, (list, tuple))
 
         super().__init__(**kwargs)
 

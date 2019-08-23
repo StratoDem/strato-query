@@ -246,6 +246,10 @@ The `NotInFilter` constructs a filter equivalent to `var NOT IN (val1, val2, val
 from strato_query.filters import MileRadiusFilter
 
 MileRadiusFilter(latitude=40.7589, longitude=-73.9937, miles=5)
+
+# This gets all geographies intersecting with the mile radius 
+# (any amount of intersection), and does not apply weights
+MileRadiusFilter(latitude=40.7590, longitude=-73.9937, miles=5, detailed_type='mile_radius_unweighted')
 ```
 
 ```r
@@ -256,6 +260,8 @@ mile_radius_filter(latitude = 40.7589, longitude = -73.9937, miles = 5)
 
 ```shell
 {"filter_type": "mile_radius", "filter_variable": "", "filter_value": {"latitude": 40.7590, "longitude": -73.9936, "miles": 5}}
+{"filter_type": "mile_radius_simple", "filter_variable": "", "filter_value": {"latitude": 40.7590, "longitude": -73.9936, "miles": 5}}
+{"filter_type": "mile_radius_unweighted", "filter_variable": "", "filter_value": {"latitude": 40.7590, "longitude": -73.9936, "miles": 5}}
 ```
 
 ```vb
@@ -263,6 +269,14 @@ mileRadiusFilter(latitude:=40.7589, longitude:=-73.9937, miles:=5)
 ```
 
 The `MileRadiusFilter` constructs a filter to restrict results to geographies intersecting/contained by the mile radius buffer
+
+### Advanced options
+
+An advanced option for the `MileRadiusFilter` is the `detailed_type` argument, which allows one of three options:
+
+- `mile_radius` (default): Apply weights to the results based on the population-weighted intersection of the mile radius buffer and geographies
+- `mile_radius_simple`: Apply weights to the results based on the population-weighted intersection of the mile radius buffer and simplified geographies
+- `mile_radius_unweighted`: Do not apply weights. Only return all geographies intersecting with the mile radius buffer
 
 ## `DrivetimeFilter`
 
@@ -272,6 +286,11 @@ The `MileRadiusFilter` constructs a filter to restrict results to geographies in
 from strato_query.filters import DrivetimeFilter
 
 DrivetimeFilter(latitude=40.7589, longitude=-73.9937, minutes=15)
+# Compute 15-minute drive with traffic
+DrivetimeFilter(latitude=40.7589, longitude=-73.9937, minutes=15, with_traffic=True, start_time='2019-05-25T18:00:00')
+# This gets all geographies intersecting with the drive time buffer
+# (any amount of intersection) and does not apply weights
+DrivetimeFilter(latitude=40.7589, longitude=-73.9937, minutes=15, detailed_type='drivetime_unweighted')
 ```
 
 ```r
@@ -282,6 +301,9 @@ drivetime_filter(latitude = 40.7589, longitude = -73.9937, minutes = 15)
 
 ```shell
 {"filter_type": "drivetime", "filter_variable": "", "filter_value": {"latitude": 40.7590, "longitude": -73.9936, "minutes": 15}}
+{"filter_type": "drivetime_simple", "filter_variable": "", "filter_value": {"latitude": 40.7590, "longitude": -73.9936, "minutes": 15}}
+{"filter_type": "drivetime_unweighted", "filter_variable": "", "filter_value": {"latitude": 40.7590, "longitude": -73.9936, "minutes": 15}}
+{"filter_type": "drivetime", "filter_variable": "", "filter_value": {"latitude": 40.7590, "longitude": -73.9936, "minutes": 15, "with_traffic": true, "start_time": "2019-05-25T18:00:00"}}
 ```
 
 ```vb
@@ -289,6 +311,19 @@ drivetimeFilter(latitude:=40.7589, longitude:=-73.9937, minutes:=5)
 ```
 
 The `DrivetimeFilter` constructs a filter to restrict results to geographies intersecting/contained by the drive time buffer
+
+### Advanced options
+
+An advanced option for the `DrivetimeFilter` is the `detailed_type` argument, which allows one of three options:
+
+- `drivetime` (default): Apply weights to the results based on the population-weighted intersection of the drive time buffer and geographies
+- `drivetime_simple`: Apply weights to the results based on the population-weighted intersection of the drive time buffer and simplified geographies
+- `drivetime_unweighted`: Do not apply weights. Only return all geographies intersecting with the drive time buffer
+
+To compute drive time estimates with traffic, two arguments are used: `with_traffic` and `start_time`:
+
+- `with_traffic` (defaults to `False`) toggles on (`True`) or off (`False`) traffic calculations
+- `start_time` (defaults to `None`) adjusts the departure time used to compute the traffic buffer
 
 ## `IntersectsFilter`
 
