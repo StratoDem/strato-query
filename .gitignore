@@ -88,6 +88,8 @@ venv/
 ENV/
 
 .vagrant/
+docs/vendor/
+docs/lib/
 
 # Spyder project settings
 .spyderproject
