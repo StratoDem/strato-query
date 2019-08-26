@@ -20,6 +20,7 @@ import pandas
 from strato_query import constants as cc
 from .query_structures import *
 from .authentication import get_api_token
+from .exceptions import APIQueryFailedException
 
 
 __all__ = ['SDAPIQuery']
@@ -175,10 +176,16 @@ def _submit_post_request(json_dict: dict,
         try:
             r = requests.post(url=cc.API_URL, json=json_dict, headers=headers, timeout=timeout)
 
-            assert r.status_code == 200, (r.status_code, r.content, json_dict)
+            if not r.status_code == 200:
+                raise APIQueryFailedException(
+                    r.status_code,
+                    r.content,
+                    {**json_dict, 'token': '**********'})
 
             json_data = r.json()
-            assert json_data['success'], json_data
+
+            if not json_data['success']:
+                raise APIQueryFailedException(json_data)
 
             return json_data
         except (requests.exceptions.ConnectionError, requests.Timeout) as e:

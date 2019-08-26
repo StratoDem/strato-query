@@ -9,7 +9,7 @@ Notes :
 August 21, 2019
 """
 
-__all__ = ['StratoDemAPIException', 'APITokenNotFoundException']
+__all__ = ['StratoDemAPIException', 'APITokenNotFoundException', 'APIQueryFailedException']
 
 
 class StratoDemAPIException(Exception):
@@ -17,4 +17,8 @@ class StratoDemAPIException(Exception):
 
 
 class APITokenNotFoundException(StratoDemAPIException):
+    pass
+
+
+class APIQueryFailedException(StratoDemAPIException):
     pass

@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.0.1] - 2019-08-26
+### Changes
+- Failed API queries no longer include API token value in the error message (replaced by `**********`)
+
 ## [3.0.0] - 2019-08-22
 ### Changes
 - **Breaking** Renames filters to full words in Python package. E.g., `EqFilter` --> `EqualToFilter`
