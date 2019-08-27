@@ -22,7 +22,6 @@ from .query_structures import *
 from .authentication import get_api_token
 from .exceptions import APIQueryFailedException
 
-
 __all__ = ['SDAPIQuery']
 
 T_DF = pandas.DataFrame
