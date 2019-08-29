@@ -117,7 +117,7 @@ df = submit_api_query(
 $ curl -X POST "https://api.stratodem.com/api" \
     -H "accept: application/json" \
     -H "Content-Type: application/json" \
-    -d "{\"query_type\": \"COUNT\", \"data_fields\": [\"year\", \"geoid5\", {\"households\": \"households_age_75plus_hhi_50k_plus\"}], \"table\": \"incomeforecast_county_annual_income_group_age\", \"groupby\": [\"year\", \"geoid5\"], \"data_filters\": [{\"filter_type\": \"eq\", \"filter_value\": 6, \"filter_variable\": \"geoid2\"}, {\"filter_type\": \"ge\", \"filter_value\": 16, \"filter_variable\": \"age_g\"}, {\"filter_type\": \"ge\", \"filter_value\": 10, \"filter_variable\": \"income_g\"}], \"aggregations\": [{\"aggregation_func\": \"sum\", \"variable_name\": \"households\"}], \"order\": [\"year\", \"geoid5\"]}"
+    -d "{ \"token\": \"my-api-token\", \"query\": {\"query_type\": \"COUNT\", \"data_fields\": [\"year\", \"geoid5\", {\"households\": \"households_age_75plus_hhi_50k_plus\"}], \"table\": \"incomeforecast_county_annual_income_group_age\", \"groupby\": [\"year\", \"geoid5\"], \"data_filters\": [{\"filter_type\": \"eq\", \"filter_value\": 6, \"filter_variable\": \"geoid2\"}, {\"filter_type\": \"ge\", \"filter_value\": 16, \"filter_variable\": \"age_g\"}, {\"filter_type\": \"ge\", \"filter_value\": 10, \"filter_variable\": \"income_g\"}], \"aggregations\": [{\"aggregation_func\": \"sum\", \"variable_name\": \"households\"}], \"order\": [\"year\", \"geoid5\"]}}"
 ```
 
 ```vb
@@ -188,7 +188,7 @@ df = submit_api_query(
 $ curl -X POST "https://api.stratodem.com/api" \
     -H "accept: application/json" \
     -H "Content-Type: application/json" \
-    - d "{\"query_type\": \"MEDIAN\", \"data_fields\": [\"year\", \"geoid11\", \"median_value\"], \"table\": \"incomeforecast_tract_annual_income_group\", \"groupby\": [\"year\", \"geoid11\"], \"data_filters\": [{\"filter_type\": \"eq\", \"filter_value\": 2019, \"filter_variable\": \"year\"}, {\"filter_type\": \"eq\", \"filter_value\": 25025, \"filter_variable\": \"geoid5\"}], \"aggregations\": [], \"median_variable_name\": \"income_g\"}"
+    - d "{ \"token\": \"my-api-token\", \"query\": {\"query_type\": \"MEDIAN\", \"data_fields\": [\"year\", \"geoid11\", \"median_value\"], \"table\": \"incomeforecast_tract_annual_income_group\", \"groupby\": [\"year\", \"geoid11\"], \"data_filters\": [{\"filter_type\": \"eq\", \"filter_value\": 2019, \"filter_variable\": \"year\"}, {\"filter_type\": \"eq\", \"filter_value\": 25025, \"filter_variable\": \"geoid5\"}], \"aggregations\": [], \"median_variable_name\": \"income_g\"}}"
 ```
 
 ```vb
@@ -255,7 +255,7 @@ df = submit_api_query(
 $ curl -X POST "https://api.stratodem.com/api" \
     -H "accept: application/json" \
     -H "Content-Type: application/json" \
-    - d "{\"query_type\": \"MEAN\", \"data_fields\": [\"year\", \"geoid11\", \"mean_value\"], \"table\": \"incomeforecast_tract_annual_income_group\", \"groupby\": [\"year\", \"geoid11\"], \"data_filters\": [{\"filter_type\": \"eq\", \"filter_value\": 2019, \"filter_variable\": \"year\"}, {\"filter_type\": \"eq\", \"filter_value\": 25025, \"filter_variable\": \"geoid5\"}], \"aggregations\": [], \"mean_variable_name\": \"income_g\"}"
+    - d "{ \"token\": \"my-api-token\", \"query\": {\"query_type\": \"MEAN\", \"data_fields\": [\"year\", \"geoid11\", \"mean_value\"], \"table\": \"incomeforecast_tract_annual_income_group\", \"groupby\": [\"year\", \"geoid11\"], \"data_filters\": [{\"filter_type\": \"eq\", \"filter_value\": 2019, \"filter_variable\": \"year\"}, {\"filter_type\": \"eq\", \"filter_value\": 25025, \"filter_variable\": \"geoid5\"}], \"aggregations\": [], \"mean_variable_name\": \"income_g\"}}"
 ```
 
 ```vb
@@ -339,7 +339,7 @@ api_query_params(
 $ curl -X POST "https://api.stratodem.com/api" \
     -H "accept: application/json" \
     -H "Content-Type: application/json" \
-    - d "{\"query_type\": \"COUNT\", \"data_fields\": [\"year\", \"cbsa\", {\"population\": \"population\"}], \"table\": \"populationforecast_metro_annual_population\", \"groupby\": [\"cbsa\", \"year\"], \"data_filters\": [{\"filter_type\": \"lt\", \"filter_value\": 2015, \"filter_variable\": \"year\"}, {\"filter_type\": \"eq\", \"filter_value\": 14454, \"filter_variable\": \"cbsa\"}], \"aggregations\": [{\"aggregation_func\": \"sum\", \"variable_name\": \"population\"}], \"join\": {\"query_type\": \"AREA\", \"data_fields\": [\"cbsa\", \"area\", \"name\"], \"table\": \"geocookbook_metro_na_shapes_full\", \"groupby\": [\"cbsa\", \"name\"], \"data_filters\": [{\"filter_type\": \"eq\", \"filter_value\": 14454, \"filter_variable\": \"cbsa\"}], \"aggregations\": [], \"on\": {\"left\": [\"cbsa\"], \"right\": [\"cbsa\"]}}, \"order\": [\"year\"]}"
+    - d "{ \"token\": \"my-api-token\", \"query\": {\"query_type\": \"COUNT\", \"data_fields\": [\"year\", \"cbsa\", {\"population\": \"population\"}], \"table\": \"populationforecast_metro_annual_population\", \"groupby\": [\"cbsa\", \"year\"], \"data_filters\": [{\"filter_type\": \"lt\", \"filter_value\": 2015, \"filter_variable\": \"year\"}, {\"filter_type\": \"eq\", \"filter_value\": 14454, \"filter_variable\": \"cbsa\"}], \"aggregations\": [{\"aggregation_func\": \"sum\", \"variable_name\": \"population\"}], \"join\": {\"query_type\": \"AREA\", \"data_fields\": [\"cbsa\", \"area\", \"name\"], \"table\": \"geocookbook_metro_na_shapes_full\", \"groupby\": [\"cbsa\", \"name\"], \"data_filters\": [{\"filter_type\": \"eq\", \"filter_value\": 14454, \"filter_variable\": \"cbsa\"}], \"aggregations\": [], \"on\": {\"left\": [\"cbsa\"], \"right\": [\"cbsa\"]}}, \"order\": [\"year\"]}}"
 ```
 
 ```vb
@@ -412,7 +412,7 @@ geojson = SDAPIQuery.query_api_json(
 $ curl -X POST "https://api.stratodem.com/api" \
     -H "accept: application/json" \
     -H "Content-Type: application/json" \
-    -d "{\"query_type\": \"GEOJSON\", \"data_fields\": [\"geoid11\", \"geometry\", \"name\"], \"table\": \"geocookbook_tract_na_shapes_full\", \"groupby\": [], \"data_filters\": [], \"aggregations\": [], \"join\": {\"query_type\": \"MEDIAN\", \"data_fields\": [{\"geoid11\": \"geoid\"}, {\"median_value\": \"median_hhi\"}], \"table\": \"incomeforecast_tract_annual_income_group\", \"groupby\": [\"geoid11\"], \"data_filters\": [{\"filter_type\": \"eq\", \"filter_value\": 2019, \"filter_variable\": \"year\"}, {\"filter_type\": \"drivetime_unweighted\", \"filter_value\": {\"latitude\": 42.1, \"longitude\": -120.1, \"minutes\": 15, \"traffic\": \"disabled\", \"start_time\": null}, \"filter_variable\": \"\"}], \"aggregations\": [], \"on\": {\"left\": [\"geoid11\"], \"right\": [\"geoid\"]}, \"median_variable_name\": \"income_g\"}, \"properties\": [\"geoid11\", \"name\", \"median_hhi\"]}"
+    -d "{ \"token\": \"my-api-token\", \"query\": {\"query_type\": \"GEOJSON\", \"data_fields\": [\"geoid11\", \"geometry\", \"name\"], \"table\": \"geocookbook_tract_na_shapes_full\", \"groupby\": [], \"data_filters\": [], \"aggregations\": [], \"join\": {\"query_type\": \"MEDIAN\", \"data_fields\": [{\"geoid11\": \"geoid\"}, {\"median_value\": \"median_hhi\"}], \"table\": \"incomeforecast_tract_annual_income_group\", \"groupby\": [\"geoid11\"], \"data_filters\": [{\"filter_type\": \"eq\", \"filter_value\": 2019, \"filter_variable\": \"year\"}, {\"filter_type\": \"drivetime_unweighted\", \"filter_value\": {\"latitude\": 42.1, \"longitude\": -120.1, \"minutes\": 15, \"traffic\": \"disabled\", \"start_time\": null}, \"filter_variable\": \"\"}], \"aggregations\": [], \"on\": {\"left\": [\"geoid11\"], \"right\": [\"geoid\"]}, \"median_variable_name\": \"income_g\"}, \"properties\": [\"geoid11\", \"name\", \"median_hhi\"]}}"
 ```
 
 ```vb
@@ -424,3 +424,59 @@ To return a GeoJSON `FeatureCollection`, use the `APIGeoJSONQueryParams`. This q
 The example to the right returns the GeoJSON `FeatureCollection` for the one census tract within a 15-minute drive of 42.1,-120.1 (lat, lng).
 
 `{"type": "FeatureCollection", "features": [{"type": "Feature", "geometry": {"type": "Polygon", "coordinates": ["DUMMY DATA HERE"]}, "properties": {"geoid11": 41037960100, "name": "Census Tract: 41037960100", "median_hhi": 42182}}]}`
+
+## Advanced queries
+
+To compute derivative values, a `APICalculationQueryParams` may be used.
+
+These queries allow for computing values based on multiple columns. For example, GDP per capita 
+estimates may be created as the local market output estimate divided by the population estimate.
+
+> This query returns GDP per capita estimates for counties
+
+```python
+from strato_query import SDAPIQuery, APICalculationQueryParams, APIQueryParams
+from strato_query.filters import EqualToFilter
+
+df = SDAPIQuery.query_api_df(
+    APICalculationQueryParams(
+        data_fields=(
+            'year',
+            'geoid5',
+            'real_gp',
+            # Take the real_gp column and divide by population to get gdp_per_capita
+            {'calculate:gdp_per_capita': 'real_gp / population'}),
+        table='',
+        aggregations=(),
+        groupby=(),
+        data_filters=(),
+        inner_query=APIQueryParams(
+            data_fields=('year', 'geoid5', 'real_gp'),
+            data_filters=(EqualToFilter('month', 6),),
+            table='grossproduct_county_monthly_forecasts',
+            aggregations=(),
+            groupby=(),
+            join=APIQueryParams(
+                data_fields=({'year': 'year_pop'}, {'geoid5': 'geoid5_pop'}, 'population'),
+                data_filters=(),
+                table='populationforecast_county_annual_population',
+                aggregations=(),
+                groupby=(),
+                on={'left': ['year', 'geoid5'], 'right': ['year_pop', 'geoid5_pop']}
+            ))))
+```
+
+```r
+# Not yet in R
+```
+
+```shell
+$ curl -X POST "https://api.stratodem.com/api" \
+    -H "accept: application/json" \
+    -H "Content-Type: application/json" \
+    -d "{ \"token\": \"my-api-token\", \"query\": {\"query_type\": \"CALCULATION\", \"data_fields\": [\"year\", \"geoid5\", \"real_gp\", {\"calculate:gdp_per_capita\": \"real_gp / population\"}], \"table\": \"\", \"groupby\": [], \"data_filters\": [], \"aggregations\": [], \"inner_query\": {\"query_type\": \"COUNT\", \"data_fields\": [\"year\", \"geoid5\", \"real_gp\"], \"table\": \"grossproduct_county_monthly_forecasts\", \"groupby\": [], \"data_filters\": [{\"filter_type\": \"eq\", \"filter_value\": 6, \"filter_variable\": \"month\"}], \"aggregations\": [], \"join\": {\"query_type\": \"COUNT\", \"data_fields\": [{\"year\": \"year_pop\"}, {\"geoid5\": \"geoid5_pop\"}, \"population\"], \"table\": \"populationforecast_county_annual_population\", \"groupby\": [], \"data_filters\": [], \"aggregations\": [], \"on\": {\"left\": [\"year\", \"geoid5\"], \"right\": [\"year_pop\", \"geoid5_pop\"]}}}}}"
+```
+
+```vb
+' Not yet in VB
+```
