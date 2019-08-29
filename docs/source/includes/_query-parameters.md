@@ -427,11 +427,6 @@ The example to the right returns the GeoJSON `FeatureCollection` for the one cen
 
 ## Advanced queries
 
-To compute derivative values, a `APICalculationQueryParams` may be used.
-
-These queries allow for computing values based on multiple columns. For example, GDP per capita 
-estimates may be created as the local market output estimate divided by the population estimate.
-
 > This query returns GDP per capita estimates for counties
 
 ```python
@@ -480,3 +475,8 @@ $ curl -X POST "https://api.stratodem.com/api" \
 ```vb
 ' Not yet in VB
 ```
+
+To compute derivative values, a `APICalculationQueryParams` may be used.
+
+These queries allow for computing values based on multiple columns. For example, GDP per capita 
+estimates may be created as the local market output estimate divided by the population estimate.
