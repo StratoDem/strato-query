@@ -5,7 +5,7 @@ Excel, R, Python, and by HTTP request.
 <img src="assets/images/api_query_in_R.png" alt="API query in R" />
 
 ### Choose a language/setup:
-- [Excel (VBA)](/vba-examples.html)
-- [R](/r-examples.html)
-- [Python](/python-examples.html)
-- [curl / POST request](/json-examples.html)
+- [Excel (VBA)](https://github.com/StratoDem/strato-query/blob/master/zdocs/vba-examples.md)
+- [R](https://github.com/StratoDem/strato-query/blob/master/zdocs/r-examples.md)
+- [Python](https://github.com/StratoDem/strato-query/blob/master/zdocs/python-examples.md)
+- [curl / POST request](https://github.com/StratoDem/strato-query/blob/master/zdocs/json-examples.md)
