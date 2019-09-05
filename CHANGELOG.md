@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.0.2] - 2019-09-05
+### Fixes
+- Fixes broken links to examples in documentation
+
 ## [3.0.1] - 2019-08-26
 ### Changes
 - Failed API queries no longer include API token value in the error message (replaced by `**********`)
