@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file. This projec
 
 ## [3.0.2] - 2019-09-05
 ### Fixes
-- Fixes broken links to examples in documentation
+- Fixes broken links to examples in documentation. Now links to new docs site at code.stratodem.com
 
 ## [3.0.1] - 2019-08-26
 ### Changes
