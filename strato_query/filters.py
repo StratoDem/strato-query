@@ -27,6 +27,7 @@ __all__ = [
     'DrivetimeFilter',
     'MileRadiusFilter',
     'IntersectsFilter',
+    'OverlapsFilter',
 ]
 
 
