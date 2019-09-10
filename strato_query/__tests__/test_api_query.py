@@ -493,8 +493,8 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
                 data_fields=('c_name', 'c_street_address'),
                 data_filters=(OverlapsFilter(
                     var='geometry',
-                    geometry=json.dumps({"type": "Point", "coordinates": [-96.91386923077042,
-                                                                          33.28536026887235]}),
+                    geometry=json.dumps(dict(type="Point", coordinates=[-96.91386923077042,
+                                                                        33.28536026887235])),
                     miles=20),
                 ),
                 aggregations=(),
@@ -509,9 +509,9 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
                 data_fields=('c_name', 'c_street_address'),
                 data_filters=(OverlapsFilter(
                     var='geometry',
-                    geometry=json.dumps({
-                        "type": "Polygon",
-                        "coordinates": [
+                    geometry=json.dumps(dict(
+                        type="Polygon",
+                        coordinates=[
                             [
                                 [
                                     -97.09716796875,
@@ -546,10 +546,8 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
                                     33.05932046347212
                                 ]
                             ]
-                        ]
-                    }),
-                    miles=20),
-                ),
+                        ])),
+                    miles=20),),
                 aggregations=(),
                 groupby=()))
 
