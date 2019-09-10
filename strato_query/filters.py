@@ -27,7 +27,9 @@ __all__ = [
     'DrivetimeFilter',
     'MileRadiusFilter',
     'IntersectsFilter',
-    'OverlapsFilter',
+    'OverlapsMileRadiusFilter',
+    'OverlapsDrivetimeFilter',
+    'OverlapsWalktimeFilter',
 ]
 
 
@@ -200,44 +202,108 @@ class IntersectsFilter(BaseFilter):
             filter_value=val)
 
 
-class OverlapsFilter(BaseFilter):
+class OverlapsMileRadiusFilter(BaseFilter):
     def __init__(self,
                  var: str,
-                 geometry: str,
-                 miles: Optional[Union[int, float]] = 0):
+                 latitude: float,
+                 longitude: float,
+                 miles: Union[int, float]):
         """
-        Filter a query by geometries overlapping the market shape and surrounding buffer
+        Filter a query by geometries overlapping the point's surrounding buffer
 
         Parameters
         ----------
         var: str
             The name of the geometry column against which this filter will check
-        geometry: str
-            The geojson for the market shape. Can be a single point, or a polygon
-
-            Examples
-                geometry='{"type": "Point", "coordinates": [-96.91386923077042, 33.08536026887235]}'
-                geometry='{"type": "Polygon",
-                           "coordinates": [[[-71.06944084167479, 42.35721199960259],
-                                            [-71.07012748718262, 42.34205151655285],
-                                            [-71.03416442871094, 42.342685919682445],
-                                            [-71.03579521179199, 42.35537263800411],
-                                            [-71.05021476745605, 42.3647591610627],
-                                            [-71.06944084167479, 42.35721199960259]]]}'
-
-
-        miles: Optional[Union[int, float]]
-            Default 0. The number of miles out from the given market geometry. If that geometry
-            is a point, this value should be set explicitly. If the geometry is a polygon, this
-            value can be omitted.
+        latitude: float
+        longitude: float
+        miles: Union[int, float]
+            The number of miles around the provided latitude and longitude point.
         """
         assert isinstance(var, str)
-        assert isinstance(geometry, str)
+        assert isinstance(latitude, float)
+        assert isinstance(longitude, float)
         assert miles is None or isinstance(miles, (int, float))
 
         super().__init__(
-            filter_type='overlaps',
+            filter_type='overlaps_mile_radius',
             filter_variable=var,
             filter_value=dict(
-                geometry=geometry,
+                latitude=latitude,
+                longitude=longitude,
                 miles=miles))
+
+
+class OverlapsDrivetimeFilter(BaseFilter):
+    def __init__(self,
+                 var: str,
+                 latitude: float,
+                 longitude: float,
+                 minutes: Union[int, float],
+                 with_traffic: bool = False,
+                 start_time: Optional[str] = None):
+        """
+        Filter a query by geometries overlapping the point's surrounding buffer
+
+        Parameters
+        ----------
+        var: str
+            The name of the geometry column against which this filter will check
+        latitude: float
+        longitude: float
+        minutes: int or float
+            Minutes drive from latitude-longitude center
+        with_traffic: bool
+            Use traffic estimates to compute the drive time area?
+        start_time: str
+            The departure time for the drivetime, used in concert with "with_traffic" set to True
+            e.g., "2019-05-25T18:00:00"
+        """
+        assert isinstance(var, str)
+        assert isinstance(latitude, float)
+        assert isinstance(longitude, float)
+        assert isinstance(minutes, (int, float))
+        assert with_traffic is None or isinstance(with_traffic, bool)
+        assert start_time is None or isinstance(start_time, str)
+
+        super().__init__(
+            filter_type='overlaps_drivetime',
+            filter_variable=var,
+            filter_value=dict(
+                latitude=latitude,
+                longitude=longitude,
+                minutes=minutes,
+                with_traffic='enabled' if with_traffic else 'disabled',
+                start_time=start_time))
+
+
+class OverlapsWalktimeFilter(BaseFilter):
+    def __init__(self,
+                 var: str,
+                 latitude: float,
+                 longitude: float,
+                 minutes: Union[int, float]):
+        """
+        Filter a query by geometries overlapping the point's surrounding buffer
+
+        Parameters
+        ----------
+        var: str
+            The name of the geometry column against which this filter will check
+        latitude: float
+        longitude: float
+        minutes: int or float
+            Minutes walk from latitude-longitude center
+        """
+        assert isinstance(var, str)
+        assert isinstance(latitude, float)
+        assert isinstance(longitude, float)
+        assert isinstance(minutes, (int, float))
+
+        super().__init__(
+            filter_type='overlaps_walktime',
+            filter_variable=var,
+            filter_value=dict(
+                latitude=latitude,
+                longitude=longitude,
+                minutes=minutes))
