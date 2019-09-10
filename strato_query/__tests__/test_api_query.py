@@ -484,3 +484,74 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
 
         assert len(df.columns) == 2, df.columns
         assert len(df['GEOID11']) == 252, df
+
+    def test_overlaps_filter(self):
+        import json
+        df = SDAPIQuery.query_api_df(
+            query_params=APIQueryParams(
+                table='userupload_1_785b538b2dd64b67a0fcbab710f3',
+                data_fields=('c_name', 'c_street_address'),
+                data_filters=(OverlapsFilter(
+                    var='geometry',
+                    geometry=json.dumps({"type": "Point", "coordinates": [-96.91386923077042,
+                                                                          33.28536026887235]}),
+                    miles=20),
+                ),
+                aggregations=(),
+                groupby=()))
+
+        assert len(df.columns) == 2, df.columns
+        assert len(df['C_NAME']) == 82, df
+
+        df = SDAPIQuery.query_api_df(
+            query_params=APIQueryParams(
+                table='userupload_1_785b538b2dd64b67a0fcbab710f3',
+                data_fields=('c_name', 'c_street_address'),
+                data_filters=(OverlapsFilter(
+                    var='geometry',
+                    geometry=json.dumps({
+                        "type": "Polygon",
+                        "coordinates": [
+                            [
+                                [
+                                    -97.09716796875,
+                                    33.05932046347212
+                                ],
+                                [
+                                    -97.05322265625,
+                                    32.7872745269555
+                                ],
+                                [
+                                    -96.8609619140625,
+                                    32.491230287947594
+                                ],
+                                [
+                                    -96.3775634765625,
+                                    32.59310597426537
+                                ],
+                                [
+                                    -96.26220703125,
+                                    32.89803818160521
+                                ],
+                                [
+                                    -96.5423583984375,
+                                    33.10534697199519
+                                ],
+                                [
+                                    -96.822509765625,
+                                    33.18813395605041
+                                ],
+                                [
+                                    -97.09716796875,
+                                    33.05932046347212
+                                ]
+                            ]
+                        ]
+                    }),
+                    miles=20),
+                ),
+                aggregations=(),
+                groupby=()))
+
+        assert len(df.columns) == 2, df.columns
+        assert len(df['C_NAME']) == 238, df
