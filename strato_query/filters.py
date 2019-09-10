@@ -197,3 +197,61 @@ class IntersectsFilter(BaseFilter):
             filter_type='intersects',
             filter_variable=var,
             filter_value=val)
+
+
+class OverlapsFilter(BaseFilter):
+    def __init__(self,
+                 var: str,
+                 latitude: float,
+                 longitude: float,
+                 detailed_type: str,
+                 miles: Optional[Union[int, float]] = None,
+                 minutes: Optional[Union[int, float]] = None,
+                 with_traffic: Optional[bool] = False,
+                 start_time: Optional[str] = None):
+        """
+        Filter a query by geometries overlapping the market shape, specified by market center and
+        buffer details (miles, time traveled by auto or foot)
+
+        Parameters
+        ----------
+        var: str
+            The name of the geometry column against which this filter will check
+        latitude: float
+            Center latitude
+        longitude: float
+            Center longitude
+        detailed_type: str
+            One of the following buffers from the latitude/longitude center:
+            - 'overlaps_mile_radius': use a mile distance buffer
+            - 'overlaps_drivetime': use a drivetime buffer, can be with or without traffic
+            - 'overlaps_walktime': use a walktime buffer
+        miles: Optional[Union[int, float]]
+            Default None. Miles traveled from latitude/longitude center
+        minutes: Optional[Union[int, float]]
+            Default None. Minutes drive from latitude/longitude center
+        with_traffic: Optional[bool]
+            Default False. Use traffic estimates to compute the drive time area?
+        start_time: Optional[str]
+            Default None. The departure time for the drivetime, used in concert with "with_traffic"
+            set to True
+                Example: "2019-05-25T18:00:00"
+        """
+        assert detailed_type in {'overlaps_mile_radius', 'overlaps_drivetime', 'overlaps_walktime'}
+        assert isinstance(latitude, float)
+        assert isinstance(longitude, float)
+        assert miles is None or isinstance(miles, (int, float))
+        assert minutes is None or isinstance(minutes, (int, float))
+        assert isinstance(with_traffic, bool)
+        assert start_time is None or isinstance(start_time, str)
+
+        super().__init__(
+            filter_type=detailed_type,
+            filter_variable=var,
+            filter_value=dict(
+                latitude=latitude,
+                longitude=longitude,
+                miles=miles,
+                minutes=minutes,
+                traffic='enabled' if with_traffic else 'disabled',
+                start_time=start_time))
