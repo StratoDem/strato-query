@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.1.0] - 2019-09-10
+### Adds
+- Adds new filter type for overlap filter
+
+## Related issues
+- [69](https://github.com/StratoDem/strato-query/issues/69)
+
+
 ## [3.0.2] - 2019-09-05
 ### Fixes
 - Fixes broken links to examples in documentation. Now links to new docs site at code.stratodem.com
