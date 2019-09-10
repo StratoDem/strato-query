@@ -484,3 +484,50 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
 
         assert len(df.columns) == 2, df.columns
         assert len(df['GEOID11']) == 252, df
+
+    def test_overlaps_filter(self):
+        import json
+        df = SDAPIQuery.query_api_df(
+            query_params=APIQueryParams(
+                table='userupload_1_785b538b2dd64b67a0fcbab710f3',
+                data_fields=('c_name', 'c_street_address'),
+                data_filters=(OverlapsMileRadiusFilter(
+                    var='geometry',
+                    longitude=-96.91386923077042,
+                    latitude=33.28536026887235,
+                    miles=20),),
+                aggregations=(),
+                groupby=()))
+
+        assert len(df.columns) == 2, df.columns
+        assert len(df['C_NAME']) == 82, df
+
+        df = SDAPIQuery.query_api_df(
+            query_params=APIQueryParams(
+                table='userupload_1_785b538b2dd64b67a0fcbab710f3',
+                data_fields=('c_name', 'c_street_address'),
+                data_filters=(OverlapsDrivetimeFilter(
+                    var='geometry',
+                    longitude=-96.91386923077042,
+                    latitude=33.28536026887235,
+                    minutes=20),),
+                aggregations=(),
+                groupby=()))
+
+        assert len(df.columns) == 2, df.columns
+        assert len(df['C_NAME']) == 2, df
+
+        df = SDAPIQuery.query_api_df(
+            query_params=APIQueryParams(
+                table='userupload_1_785b538b2dd64b67a0fcbab710f3',
+                data_fields=('c_name', 'c_street_address'),
+                data_filters=(OverlapsWalktimeFilter(
+                    var='geometry',
+                    longitude=-96.84885501,
+                    latitude=33.16587,
+                    minutes=20),),
+                aggregations=(),
+                groupby=()))
+
+        assert len(df.columns) == 2, df.columns
+        assert len(df['C_NAME']) == 2, df
