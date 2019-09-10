@@ -5,6 +5,8 @@ All notable changes to this project will be documented in this file. This projec
 ## [3.1.0] - 2019-09-10
 ### Adds
 - Adds new filter type for overlap filter
+    
+    The filter must be given a geometry and, optionally, a mile buffer. The mile buffer defaults to 0 so that a polygon geometry is used exactly, rather than adding an additional buffer on top of it. The mile value should be set explicitly when using a latitude/longitude point.
 
 ## Related issues
 - [69](https://github.com/StratoDem/strato-query/issues/69)
