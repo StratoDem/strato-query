@@ -12,7 +12,6 @@ All notable changes to this project will be documented in this file. This projec
 ## Related issues
 - [69](https://github.com/StratoDem/strato-query/issues/69)
 
-
 ## [3.0.2] - 2019-09-05
 ### Fixes
 - Fixes broken links to examples in documentation. Now links to new docs site at code.stratodem.com
