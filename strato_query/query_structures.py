@@ -597,6 +597,19 @@ class APIPureShapeQueryParams(APIGeoJSONQueryParams):
         return 'PURE_SHAPE'
 
 
+class APIPureShapeUnionQueryParams(APIGeoJSONQueryParams):
+    def __init__(self, join: List['APIQueryParams'], **kwargs):
+        assert isinstance(join, list)
+
+        super().__init__(**kwargs)
+
+        self._join = join
+
+    @property
+    def query_type(self) -> str:
+        return 'SHAPES_UNION'
+
+
 class APIGeocoderQueryParams(APIQueryParams):
     def __init__(self, latitude: Union[int, float], longitude: Union[int, float], **kwargs):
         assert isinstance(latitude, (int, float))
