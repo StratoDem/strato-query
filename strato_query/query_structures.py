@@ -20,6 +20,7 @@ __all__ = [
     'APIMeanQueryParams',
     'APIMedianQueryParams',
     'APIGeoJSONQueryParams',
+    'APIPureShapeQueryParams',
     'APIGeocoderQueryParams',
     'APICalculationQueryParams',
     'APIFilterQueryParams',
@@ -588,6 +589,12 @@ class APIGeoJSONQueryParams(APIQueryParams):
     @property
     def properties(self) -> Tuple[Union[str, dict], ...]:
         return self._properties
+
+
+class APIPureShapeQueryParams(APIGeoJSONQueryParams):
+    @property
+    def query_type(self) -> str:
+        return 'PURE_SHAPE'
 
 
 class APIGeocoderQueryParams(APIQueryParams):
