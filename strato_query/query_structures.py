@@ -21,6 +21,7 @@ __all__ = [
     'APIMedianQueryParams',
     'APIGeoJSONQueryParams',
     'APIPureShapeQueryParams',
+    'APIPureShapeUnionQueryParams',
     'APIGeocoderQueryParams',
     'APICalculationQueryParams',
     'APIFilterQueryParams',
