@@ -610,6 +610,10 @@ class APIPureShapeUnionQueryParams(APIGeoJSONQueryParams):
     def query_type(self) -> str:
         return 'SHAPES_UNION'
 
+    @property
+    def join(self) -> Union[None, List[dict]]:
+        return None if self._join is None else [query.to_api_struct() for query in self._join]
+
 
 class APIGeocoderQueryParams(APIQueryParams):
     def __init__(self, latitude: Union[int, float], longitude: Union[int, float], **kwargs):
