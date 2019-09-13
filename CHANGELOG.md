@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file. This projec
 - Adds new query param classes
     - `APIPureShapeQueryParams`
     - `APIPureShapeUnionQueryParams`
+- Adds examples of new query params classes
 
 ## Related issues
 - [69](https://github.com/StratoDem/strato-query/issues/69)
