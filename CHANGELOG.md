@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.2.0] - 2019-09-10
+### Adds
+- Adds new query param classes
+    - `APIPureShapeQueryParams`
+    - `APIPureShapeUnionQueryParams`
+
+## Related issues
+- [69](https://github.com/StratoDem/strato-query/issues/69)
+
 ## [3.1.0] - 2019-09-10
 ### Adds
 - Adds new filter types for overlaps. Each one takes the data needed to create the shape used to check against the specified geometry column
