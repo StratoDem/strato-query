@@ -20,6 +20,8 @@ __all__ = [
     'APIMeanQueryParams',
     'APIMedianQueryParams',
     'APIGeoJSONQueryParams',
+    'APIPureShapeQueryParams',
+    'APIPureShapeUnionQueryParams',
     'APIGeocoderQueryParams',
     'APICalculationQueryParams',
     'APIFilterQueryParams',
@@ -588,6 +590,29 @@ class APIGeoJSONQueryParams(APIQueryParams):
     @property
     def properties(self) -> Tuple[Union[str, dict], ...]:
         return self._properties
+
+
+class APIPureShapeQueryParams(APIGeoJSONQueryParams):
+    @property
+    def query_type(self) -> str:
+        return 'PURE_SHAPE'
+
+
+class APIPureShapeUnionQueryParams(APIGeoJSONQueryParams):
+    def __init__(self, join: List['APIQueryParams'], **kwargs):
+        assert isinstance(join, list)
+
+        super().__init__(**kwargs)
+
+        self._join = join
+
+    @property
+    def query_type(self) -> str:
+        return 'SHAPES_UNION'
+
+    @property
+    def join(self) -> Union[None, List[APIQueryParams]]:
+        return None if self._join is None else [query.to_api_struct() for query in self._join]
 
 
 class APIGeocoderQueryParams(APIQueryParams):

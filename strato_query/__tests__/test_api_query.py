@@ -531,3 +531,60 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
 
         assert len(df.columns) == 2, df.columns
         assert len(df['C_NAME']) == 2, df
+
+    def test_pure_shape_query(self):
+        df = self.submit_query(
+            query_params=APIPureShapeQueryParams(
+                table='',
+                data_fields=(),
+                data_filters=(dict(
+                    filter_variable='',
+                    filter_type='mile_radius',
+                    filter_value=dict(
+                        latitude=42.256922,
+                        longitude=-71.040571,
+                        miles=3)),),
+                aggregations=(),
+                properties=(),
+                groupby=()))
+        assert 'geometry' in df['FEATURES'][0][0]
+
+    def test_pure_shape_union_query(self):
+        df = self.submit_query(
+            query_params=APIPureShapeUnionQueryParams(
+                table='',
+                data_fields=(),
+                data_filters=(),
+                aggregations=(),
+                properties=(),
+                groupby=(),
+                join=[
+                    APIPureShapeQueryParams(
+                        table='',
+                        data_fields=(),
+                        data_filters=(dict(
+                            filter_variable='',
+                            filter_type='mile_radius',
+                            filter_value=dict(
+                                latitude=42.256922,
+                                longitude=-71.040571,
+                                miles=3)),),
+                        aggregations=(),
+                        properties=(),
+                        groupby=()),
+                    APIPureShapeQueryParams(
+                        table='',
+                        data_fields=(),
+                        data_filters=(dict(
+                            filter_variable='',
+                            filter_type='mile_radius',
+                            filter_value=dict(
+                                latitude=42.256922,
+                                longitude=-71.040571,
+                                miles=5)),),
+                        aggregations=(),
+                        properties=(),
+                        groupby=())
+                ]))
+        assert 'geometry' in df['FEATURES'][0][0]
+        assert len(df['FEATURES'][0]) == 2

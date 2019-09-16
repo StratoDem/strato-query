@@ -11,7 +11,13 @@ January 09, 2019
 
 import pandas
 
-from strato_query import SDAPIQuery, APIQueryParams, APIMedianQueryParams, APIMeanQueryParams
+from strato_query import \
+    SDAPIQuery, \
+    APIQueryParams, \
+    APIMedianQueryParams, \
+    APIMeanQueryParams, \
+    APIPureShapeQueryParams, \
+    APIPureShapeUnionQueryParams
 from strato_query.filters import \
     BetweenFilter, \
     GreaterThanOrEqualToFilter, \
@@ -197,6 +203,70 @@ class ExampleQueries(SDAPIQuery):
         print(df.head())
         print('Results truncated')
 
+    @classmethod
+    def example_pure_shape_query(cls):
+        df = SDAPIQuery.query_api_df(
+            query_params=APIPureShapeQueryParams(
+                table='',
+                data_fields=(),
+                data_filters=(dict(
+                    filter_variable='',
+                    filter_type='mile_radius',
+                    filter_value=dict(
+                        latitude=42.256922,
+                        longitude=-71.040571,
+                        miles=3)),),
+                aggregations=(),
+                properties=(),
+                groupby=()))
+
+        print('GeoJSON of a 3 mile ring around the coordinates')
+        print(df.head())
+        print('Results truncated')
+
+    @classmethod
+    def example_pure_shape_union_query(cls):
+        df = SDAPIQuery.query_api_df(
+            query_params=APIPureShapeUnionQueryParams(
+                table='',
+                data_fields=(),
+                data_filters=(),
+                aggregations=(),
+                properties=(),
+                groupby=(),
+                join=[
+                    APIPureShapeQueryParams(
+                        table='',
+                        data_fields=(),
+                        data_filters=(dict(
+                            filter_variable='',
+                            filter_type='mile_radius',
+                            filter_value=dict(
+                                latitude=42.256922,
+                                longitude=-71.040571,
+                                miles=3)),),
+                        aggregations=(),
+                        properties=(),
+                        groupby=()),
+                    APIPureShapeQueryParams(
+                        table='',
+                        data_fields=(),
+                        data_filters=(dict(
+                            filter_variable='',
+                            filter_type='mile_radius',
+                            filter_value=dict(
+                                latitude=42.256922,
+                                longitude=-71.040571,
+                                miles=5)),),
+                        aggregations=(),
+                        properties=(),
+                        groupby=())
+                ]))
+
+        print('GeoJSON of a 3 mile ring, and a 5 mile ring around the coordinates')
+        print(df.head())
+        print('Results truncated')
+
 
 def run_examples():
     ExampleQueries.example_count_query()
@@ -209,7 +279,10 @@ def run_examples():
     print('\n\n')
     ExampleQueries.example_multiple_query()
     print('\n\n')
-    ExampleQueries.example_query_with_intersects_filter()
+    ExampleQueries.example_pure_shape_query()
+    print('\n\n')
+    ExampleQueries.example_pure_shape_union_query()
+    print('\n\n')
 
 
 if __name__ == '__main__':
