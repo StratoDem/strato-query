@@ -74,6 +74,7 @@ class ExampleQueries(SDAPIQuery):
                 aggregations=(dict(aggregation_func='sum', variable_name='population'),),
                 groupby=('cbsa', 'year'),
                 order=('year',),
+                join_type='JOIN',
                 join=APIQueryParams(
                     query_type='AREA',
                     table='geocookbook_metro_na_shapes_full',
