@@ -40,7 +40,8 @@ class APIQueryParams(abc.ABC):
                  query_type: Optional[str] = 'COUNT',
                  order: Optional[Union[Tuple[str, ...], List[str]]] = None,
                  on: Optional[dict] = None,
-                 join: Optional['APIQueryParams'] = None):
+                 join: Optional['APIQueryParams'] = None,
+                 join_type: Optional[str] = 'JOIN'):
         assert isinstance(data_fields, (tuple, list))
         assert isinstance(table, str)
         assert isinstance(groupby, (tuple, list))
@@ -49,6 +50,7 @@ class APIQueryParams(abc.ABC):
         assert isinstance(query_type, str)
         assert order is None or isinstance(order, (tuple, list))
         assert on is None or isinstance(on, dict)
+        assert isinstance(join_type, str)
 
         self._query_type = query_type
         self._data_fields = data_fields
@@ -59,6 +61,7 @@ class APIQueryParams(abc.ABC):
         self._on = on
         self._join = join
         self._order = order
+        self._join_type = join_type
 
     def to_api_struct(self) -> dict:
         """
@@ -76,7 +79,8 @@ class APIQueryParams(abc.ABC):
             data_filters=[f.to_dict() if isinstance(f, BaseFilter) else f
                           for f in self.data_filters],
             aggregations=[agg.to_dict() if isinstance(agg, BaseAggregation) else agg
-                          for agg in self.aggregations])
+                          for agg in self.aggregations],
+            join_type=self.join_type)
 
         if self.on is not None:
             return_dict['on'] = self.on
@@ -120,6 +124,10 @@ class APIQueryParams(abc.ABC):
     @property
     def join(self) -> Union[None, dict]:
         return None if self._join is None else self._join.to_api_struct()
+
+    @property
+    def join_type(self):
+        return self._join_type
 
     @property
     def order(self) -> Union[None, Tuple[str, ...], List[str]]:
@@ -167,7 +175,7 @@ class APIQueryParams(abc.ABC):
 {spacer}data_filters={filters},
 {spacer}query_type='{query_type}',
 {spacer}aggregations={aggregations},
-{spacer}groupby={groupby},{inner_query}{mean_value}{median_value}{order}{on}{join}
+{spacer}groupby={groupby},{inner_query}{mean_value}{median_value}{order}{on}{join_type}{join}
 {spacer})'''.format(
                 query_params_class=query_params_class,
                 table_name=dict_form['table'],
@@ -199,6 +207,10 @@ class APIQueryParams(abc.ABC):
                         query_params=dict_form['join'],
                         spacer=spacer + '    ')
                 ) if 'join' in dict_form else '',
+                join_type='\n{spacer}join_type={var}'.format(
+                    spacer=spacer,
+                    # No need to include the join_type if there's no join
+                    var=dict_form['join_type']) if 'join' in dict_form else '',
                 on='\n{spacer}on={var},'.format(
                     spacer=spacer,
                     var=dict_form['on']) if 'on' in dict_form else '',
@@ -309,7 +321,7 @@ class APIQueryParams(abc.ABC):
 {spacer}dataFields:=Array({fields}), _
 {spacer}dataFilters:=Array({filters}), _
 {spacer}aggregations:=Array({aggregations}), _
-{spacer}groupby:=Array({groupby}){order}{inner_query}{median}{mean}{on}{join}{query_type})
+{spacer}groupby:=Array({groupby}){order}{inner_query}{median}{mean}{on}{join_type}{join}{query_type})
 '''.format(
                 query_params_func=query_params_func,
                 table_name=dict_form['table'],
@@ -338,6 +350,9 @@ class APIQueryParams(abc.ABC):
                         query_params=dict_form['inner_query'],
                         spacer=spacer + '    ')
                 ) if 'inner_query' in dict_form else '',
+                join_type=', _\n{spacer}joinType:="{var}"'.format(
+                    spacer=spacer,
+                    var=dict_form['join_type']) if 'join' in dict_form else '',
                 join=', _\n{spacer}join:={var}'.format(
                     spacer=spacer,
                     var=pretty_print_recursive(
@@ -452,7 +467,7 @@ class APIQueryParams(abc.ABC):
 {spacer}data_fields = api_fields(fields_list = list({fields})),
 {spacer}data_filters = list({filters}),
 {spacer}aggregations = list({aggregations}),
-{spacer}groupby = c({groupby}){mean_value}{median_value}{order}{on}{inner_query}{join}{query_type})
+{spacer}groupby = c({groupby}){mean_value}{median_value}{order}{on}{inner_query}{join_type}{join}{query_type})
 '''.format(
                 query_params_func=query_params_func,
                 table_name=dict_form['table'],
@@ -479,6 +494,9 @@ class APIQueryParams(abc.ABC):
                         query_params=dict_form['inner_query'],
                         spacer=spacer + '    ')
                 ) if 'inner_query' in dict_form else '',
+                join_type=',\n{spacer}join_type = \'{var}\''.format(
+                    spacer=spacer,
+                    var=dict_form['join_type']) if 'join' in dict_form else '',
                 join=',\n{spacer}join = {var}'.format(
                     spacer=spacer,
                     var=pretty_print_recursive(
