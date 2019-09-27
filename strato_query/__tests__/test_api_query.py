@@ -71,6 +71,7 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
                 data_filters=(InFilter(var='cbsa', val=[14454]).to_dict(),),
                 aggregations=(),
                 groupby=(),
+                join_type='JOIN',
                 join=APIQueryParams(
                     table='geocookbook_county_na_county_name',
                     data_fields=('GEOID5', 'GEOID2', 'GEOID5_NAME'),
@@ -78,6 +79,7 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
                     aggregations=(),
                     groupby=(),
                     on=dict(left=('GEOID5',), right=('GEOID5',)),
+                    join_type='JOIN',
                     join=APIQueryParams(
                         table='geocookbook_state_na_state_name',
                         data_fields=('GEOID2', 'GEOID2_INIT'),
