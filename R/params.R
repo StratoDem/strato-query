@@ -24,7 +24,7 @@ library(jsonlite)
 #'   groupby = c('year', 'geoid2'),
 #'   order = c('year', 'geoid2'))
 api_query_params = function(table, query_type = 'COUNT', data_fields, data_filters, aggregations = list(), groupby = list(),
-                            order = list(), median_variable_name = NA, mean_variable_name = NA, join = NA, on = NA) {
+                            order = list(), median_variable_name = NA, mean_variable_name = NA, join_type = 'JOIN', join = NA, on = NA) {
   if (is.na(on) && is.na(join)) {
     query = list(
       table = jsonlite::unbox(table),
@@ -50,6 +50,7 @@ api_query_params = function(table, query_type = 'COUNT', data_fields, data_filte
       order = order,
       median_variable_name = jsonlite::unbox(median_variable_name),
       mean_variable_name = jsonlite::unbox(mean_variable_name),
+      join_type = join_type,
       join = join,
       on = jsonlite::unbox(NA)
     )
@@ -78,6 +79,7 @@ api_query_params = function(table, query_type = 'COUNT', data_fields, data_filte
       order = order,
       median_variable_name = jsonlite::unbox(median_variable_name),
       mean_variable_name = jsonlite::unbox(mean_variable_name),
+      join_type = join_type,
       join = join,
       on = on
     )
@@ -108,7 +110,7 @@ api_query_params = function(table, query_type = 'COUNT', data_fields, data_filte
 #'   groupby = c('geoid5'),
 #'   order = c('geoid5'))
 median_query_params = function(table, data_fields, data_filters, median_variable_name, aggregations = list(),
-                               groupby = list(), order = list(), join = NA, on = NA) {
+                               groupby = list(), order = list(), join_type = 'JOIN', join = NA, on = NA) {
   return(api_query_params(
     table = table,
     query_type = 'MEDIAN',
@@ -118,6 +120,7 @@ median_query_params = function(table, data_fields, data_filters, median_variable
     groupby = groupby,
     order = order,
     median_variable_name = median_variable_name,
+    join_type = join_type,
     join = join,
     on = on
   ))
@@ -144,7 +147,7 @@ median_query_params = function(table, data_fields, data_filters, median_variable
 #'   groupby = c('geoid2'),
 #'   order = c('geoid2'))
 mean_query_params = function(table, data_fields, data_filters, mean_variable_name, aggregations = list(), groupby = list(),
-                             order = list(), join = NA, on = NA) {
+                             order = list(), join_type = 'JOIN', join = NA, on = NA) {
   return(api_query_params(
     table = table,
     query_type = 'MEAN',
@@ -154,6 +157,7 @@ mean_query_params = function(table, data_fields, data_filters, mean_variable_nam
     groupby = groupby,
     mean_variable_name = mean_variable_name,
     order = order,
+    join_type = join_type,
     join = join,
     on = on
   ))
