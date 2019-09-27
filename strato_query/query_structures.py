@@ -207,7 +207,7 @@ class APIQueryParams(abc.ABC):
                         query_params=dict_form['join'],
                         spacer=spacer + '    ')
                 ) if 'join' in dict_form else '',
-                join_type='\n{spacer}join_type={var}'.format(
+                join_type='\n{spacer}join_type=\'{var}\''.format(
                     spacer=spacer,
                     # No need to include the join_type if there's no join
                     var=dict_form['join_type']) if 'join' in dict_form else '',
