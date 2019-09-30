@@ -64,6 +64,7 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
             )
 
     def test_multi_join(self):
+        print('Test multi join')
         df = self.query_api_df(
             query_params=APIQueryParams(
                 table='geocookbook_county_na_county_metro',
@@ -99,6 +100,7 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
         assert df['NAME'].values[1] == 'Plymouth County, MA'
 
     def test_multi_query(self):
+        print('Test multi query')
         df_dict = self.submit_query(
             queries_params=dict(
                 query_1=APIQueryParams(
@@ -122,6 +124,7 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
         assert len(df_dict['query_2']['GEOID5'].values) == 3104
 
     def test_median_query(self):
+        print('Test median query')
         year_filter = GreaterThanOrEqualToFilter(
             var='year',
             val=2013)
@@ -142,6 +145,7 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
             df_sorted['YEAR'].values, [x for x in range(2013, 2019)]))
 
     def test_mean_query(self):
+        print('Test mean query')
         df = self.submit_query(
             query_params=APIMeanQueryParams(
                 table='networth_county_annual_net_worth_age_mean',
@@ -156,12 +160,14 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
         assert df['YEAR'].unique() == 2015
 
     def test_pretty_print(self):
+        print('Test pretty print')
         query_params = APIQueryParams(
             table='geocookbook_county_na_county_metro',
             data_fields=('GEOID5',),
             data_filters=(InFilter(var='cbsa', val=[14454]).to_dict(),),
             aggregations=(),
             groupby=(),
+            join_type='JOIN',
             join=APIQueryParams(
                 table='geocookbook_county_na_county_name',
                 data_fields=('GEOID5', 'GEOID2', 'GEOID5_NAME'),
@@ -169,6 +175,7 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
                 aggregations=(),
                 groupby=(),
                 on=dict(left=('GEOID5',), right=('GEOID5',)),
+                join_type='JOIN',
                 join=APIQueryParams(
                     table='geocookbook_state_na_state_name',
                     data_fields=('GEOID2', 'GEOID2_INIT'),
@@ -245,6 +252,7 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
                                      + (EqualToFilter(var='year', val=2018).to_dict(),),
                         aggregations=(dict(aggregation_func='sum', variable_name='households'),),
                         groupby=('year', 'geoid11'),
+                        join_type='JOIN',
                         join=APIMedianQueryParams(
                             table='incomeforecast_geoid11_annual_income_group',
                             data_fields=({'geoid11': 'geoid_join'},
@@ -267,6 +275,7 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
         assert isinstance(string_form, str)
 
     def test_pretty_print_vba(self):
+        print('Test pretty print VBA')
         query_params = APIQueryParams(
             table='geocookbook_county_na_county_metro',
             data_fields=('GEOID5',),
@@ -274,6 +283,7 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
             aggregations=(),
             groupby=(),
             order=('GEOID5',),
+            join_type='JOIN',
             join=APIQueryParams(
                 table='geocookbook_county_na_county_name',
                 data_fields=('GEOID5', 'GEOID2', 'GEOID5_NAME'),
@@ -281,6 +291,7 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
                 aggregations=(),
                 groupby=(),
                 on=dict(left=('GEOID5',), right=('GEOID5',)),
+                join_type='JOIN',
                 join=APIQueryParams(
                     table='geocookbook_state_na_state_name',
                     data_fields=('GEOID2', 'GEOID2_INIT'),
@@ -310,6 +321,7 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
         self.assertIsInstance(string_form, str)
 
     def test_pretty_print_r(self):
+        print('Test pretty print R')
         query_params = APIQueryParams(
             table='populationforecast_county_annual_population_age_race_ext',
             data_fields=({'custom:GEOID': 1}, 'YEAR', {'population': 'units'}),
@@ -329,6 +341,7 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
             query_type='COUNT',
             aggregations=({'aggregation_func': 'sum', 'variable_name': 'population'},),
             groupby=('YEAR', 'GEOID'),
+            join_type='JOIN',
             join=APIQueryParams(
                 table='geocookbook_county_na_shapes_full',
                 data_fields=({'custom:GEOID': 1}, 'area'),
@@ -360,6 +373,7 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
         self.assertIsInstance(string_form, str)
 
     def test_calculation_query(self):
+        print('Test calculation query')
         df = self.submit_query(
             query_params=APICalculationQueryParams(
                 data_fields=(
@@ -374,6 +388,7 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
                     data_filters=(EqualToFilter(var='year', val=2019).to_dict(),),
                     aggregations=(),
                     groupby=(),
+                    join_type='JOIN',
                     join=APIQueryParams(
                         table='populationforecast_us_annual_population',
                         data_fields=({'custom:joiner_b': 1}, {'population': 'past_pop'}),
@@ -390,6 +405,7 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
         assert df['POP_DIFF'].iloc[0].round(3) == diff
 
     def test_filter_query(self):
+        print('Test filter query')
         df = self.submit_query(
             query_params=APIFilterQueryParams(
                 data_fields=(),
@@ -408,6 +424,7 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
         assert len(df) == 1
 
     def test_filter_pretty_print(self):
+        print('Test filter pretty print')
         query_params = APIFilterQueryParams(
             data_fields=(),
             data_filters=(GreaterThanOrEqualToFilter(var='population', val=1).to_dict(),),
@@ -427,6 +444,7 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
         assert isinstance(string_form, str)
 
     def test_filter_pretty_print_vba(self):
+        print('Test filter pretty print VBA')
         query_params = APIFilterQueryParams(
             data_fields=(),
             data_filters=(GreaterThanOrEqualToFilter(var='population', val=1).to_dict(),),
@@ -446,6 +464,7 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
         assert isinstance(string_form, str)
 
     def test_filter_pretty_print_r(self):
+        print('Test filter pretty print R')
         query_params = APIFilterQueryParams(
             data_fields=(),
             data_filters=(GreaterThanOrEqualToFilter(var='population', val=1).to_dict(),),
@@ -465,6 +484,7 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
         assert isinstance(string_form, str)
 
     def test_intersects_filter(self):
+        print('Test intersects filter')
         df = SDAPIQuery.query_api_df(
             APIQueryParams(
                 table='populationforecast_tract_annual_population',
@@ -488,7 +508,7 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
         assert len(df['GEOID11']) == 252, df
 
     def test_overlaps_filter(self):
-        import json
+        print('Test overlaps filter')
         df = SDAPIQuery.query_api_df(
             query_params=APIQueryParams(
                 table='userupload_1_785b538b2dd64b67a0fcbab710f3',
@@ -535,6 +555,7 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
         assert len(df['C_NAME']) == 2, df
 
     def test_pure_shape_query(self):
+        print('Test pure shape query')
         df = self.submit_query(
             query_params=APIPureShapeQueryParams(
                 table='',
@@ -552,6 +573,7 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
         assert 'geometry' in df['FEATURES'][0][0]
 
     def test_pure_shape_union_query(self):
+        print('Test pure shape union query')
         df = self.submit_query(
             query_params=APIPureShapeUnionQueryParams(
                 table='',
@@ -590,3 +612,5 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
                 ]))
         assert 'geometry' in df['FEATURES'][0][0]
         assert len(df['FEATURES'][0]) == 2
+
+        # TODO why isn't the join_type appearing in some of these print outs?
