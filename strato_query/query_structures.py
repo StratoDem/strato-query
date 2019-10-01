@@ -868,3 +868,7 @@ class APIFilterQueryParams(APICalculationQueryParams):
     @property
     def query_type(self) -> str:
         return 'FILTER'
+
+    @property
+    def join(self) -> Union[None, List[APIQueryParams]]:
+        return None if self._join is None else [query.to_api_struct() for query in self._join]
