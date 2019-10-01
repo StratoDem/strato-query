@@ -710,6 +710,8 @@ class APIMarketShapeQueryParams(APIQueryParams):
 
         if self.market_id is not None:
             return_dict['market_id'] = self.market_id
+        if self.market_name is not None:
+            return_dict['market_name'] = self.market_name
         if self.buffer_type is not None:
             return_dict['buffer_type'] = self.buffer_type
         if self.buffer is not None:
