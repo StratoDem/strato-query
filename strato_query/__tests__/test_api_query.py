@@ -424,6 +424,54 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
 
         assert len(df) == 1
 
+        print('Test filter with market shapes')
+        df = self.submit_query(
+            query_params=APIFilterQueryParams(
+                data_fields=(),
+                data_filters=(),
+                table='',
+                inner_query=APIMarketShapeUnionQueryParams(
+                    table='',
+                    data_fields=(),
+                    data_filters=(),
+                    aggregations=(),
+                    groupby=(),
+                    join=[
+                        APIMarketShapeQueryParams(
+                            market_id=2,
+                            market_name='test_2',
+                            latitude=42.256922,
+                            longitude=-71.040571,
+                            buffer=3,
+                            buffer_type='mile'),
+                        APIMarketShapeQueryParams(
+                            data_fields=[
+                                {'custom:market_id': 1},
+                                {'custom:market_name': 'test'}],
+                            data_filters=[InFilter(var='GEOID5', val=[25025, 25023])],
+                            table='geocookbook_county_na_shapes_full',
+                            aggregations=[],
+                            groupby=[],
+                            order=[])]),
+                aggregations=(),
+                groupby=(),
+                join=[APIMarketShapeQueryParams(
+                    query_type='MARKET_SHAPE',
+                    data_fields=[],
+                    data_filters=[InFilter(var='CBSA', val=[14454])],
+                    table='geocookbook_metro_na_shapes_full',
+                    aggregations=[
+                        dict(
+                            aggregation_func='union',
+                            variable_name='geometry')],
+                    groupby=[],
+                    order=[],
+                    on=dict(left=['market_shape'],
+                            right=['market_shape'],
+                            condition='relate'))]))
+
+        self.assertEqual(len(df), 2)
+
     def test_filter_pretty_print(self):
         print('Test filter pretty print')
         query_params = APIFilterQueryParams(
