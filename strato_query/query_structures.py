@@ -25,6 +25,8 @@ __all__ = [
     'APIGeocoderQueryParams',
     'APICalculationQueryParams',
     'APIFilterQueryParams',
+    'APIMarketShapeQueryParams',
+    'APIMarketShapeUnionQueryParams',
 ]
 
 
@@ -630,6 +632,170 @@ class APIPureShapeUnionQueryParams(APIGeoJSONQueryParams):
 
     @property
     def join(self) -> Union[None, List[APIQueryParams]]:
+        return None if self._join is None else [query.to_api_struct() for query in self._join]
+
+
+class APIMarketShapeQueryParams(APIQueryParams):
+    def __init__(self,
+                 data_fields: Optional[Union[Tuple[Union[str, dict], ...],
+                                             List[Union[str, dict]]]] = None,
+                 table: Optional[str] = '',
+                 groupby: Optional[Union[Tuple[str, ...], List[str]]] = None,
+                 data_filters: Optional[Union[Tuple[Union[dict, BaseFilter], ...],
+                                              List[Union[dict, BaseFilter]]]] = None,
+                 aggregations: Optional[Union[Tuple[Union[dict, BaseAggregation], ...],
+                                              List[Union[dict, BaseAggregation]]]] = None,
+                 query_type: Optional[str] = 'MARKET_SHAPE',
+                 order: Optional[Union[Tuple[str, ...], List[str]]] = None,
+                 on: Optional[dict] = None,
+                 join: Optional['APIQueryParams'] = None,
+                 join_type: Optional[str] = 'JOIN',
+                 market_id: Optional[int] = None,
+                 market_name: Optional[str] = None,
+                 latitude: Optional[float] = None,
+                 longitude: Optional[float] = None,
+                 buffer: Optional[Union[int, float]] = None,
+                 buffer_type: Optional[str] = None):
+        assert isinstance(query_type, str)
+        assert isinstance(join_type, str)
+        assert data_fields is None or isinstance(data_fields, (tuple, list))
+        assert isinstance(table, str)
+        assert groupby is None or isinstance(groupby, (tuple, list))
+        assert data_filters is None or isinstance(data_filters, (tuple, list))
+        assert aggregations is None or isinstance(aggregations, (tuple, list))
+        assert order is None or isinstance(order, (tuple, list))
+        assert on is None or isinstance(on, dict)
+        assert market_id is None or isinstance(market_id, int)
+        assert market_name is None or isinstance(market_name, str)
+        assert buffer_type is None or isinstance(buffer_type, str)
+        assert buffer is None or isinstance(buffer, (int, float))
+        assert latitude is None or isinstance(latitude, float)
+        assert longitude is None or isinstance(longitude, float)
+
+        self._query_type = query_type
+        self._data_fields = data_fields
+        self._table = table
+        self._groupby = groupby
+        self._data_filters = data_filters
+        self._aggregations = aggregations
+        self._on = on
+        self._join = join
+        self._order = order
+        self._join_type = join_type
+        self._market_id = market_id
+        self._market_name = market_name
+        self._buffer_type = buffer_type
+        self._buffer = buffer
+        self._latitude = latitude
+        self._longitude = longitude
+
+    def to_api_struct(self) -> dict:
+        """
+        Converts the query params into a form that the API can work with
+
+        Returns
+        -------
+        The query params as a dict
+        """
+        return_dict = dict(
+            data_fields=self.data_fields if self.data_fields is not None else [],
+            table=self.table,
+            groupby=self.groupby,
+            data_filters=[f.to_dict() if isinstance(f, BaseFilter) else f
+                          for f in self.data_filters] if self.data_filters is not None else [],
+            aggregations=[agg.to_dict() if isinstance(agg, BaseAggregation) else agg
+                          for agg in self.aggregations] if self.aggregations is not None else None,
+            query_type=self.query_type,
+            join_type=self.join_type)
+
+        if self.market_id is not None:
+            return_dict['market_id'] = self.market_id
+        if self.buffer_type is not None:
+            return_dict['buffer_type'] = self.buffer_type
+        if self.buffer is not None:
+            return_dict['buffer'] = self.buffer
+        if self.latitude is not None:
+            return_dict['latitude'] = self.latitude
+        if self.longitude is not None:
+            return_dict['longitude'] = self.longitude
+        if self.on is not None:
+            return_dict['on'] = self.on
+        if self.join is not None:
+            return_dict['join'] = self.join
+        if self.order is not None:
+            return_dict['order'] = self.order
+
+        return return_dict
+
+    @property
+    def query_type(self) -> str:
+        return 'MARKET_SHAPE'
+
+    @property
+    def data_fields(self) -> Union[None, Union[Tuple[Union[str, dict], ...],
+                                               List[Union[str, dict]]]]:
+        return self._data_fields
+
+    @property
+    def table(self) -> Union[None, str]:
+        return self._table
+
+    @property
+    def groupby(self) -> Union[None, Union[Tuple[str, ...], List[str]]]:
+        return self._groupby
+
+    @property
+    def data_filters(self) -> Union[None, Union[Tuple[dict, ...], List[dict]]]:
+        return self._data_filters
+
+    @property
+    def aggregations(self) -> Union[None, Union[Tuple[Union[dict, BaseAggregation], ...],
+                                                List[Union[dict, BaseAggregation]]]]:
+        return self._aggregations
+
+    @property
+    def on(self) -> Union[None, dict]:
+        return self._on
+
+    @property
+    def market_id(self) -> Union[None, int]:
+        return self._market_id
+
+    @property
+    def market_name(self) -> Union[None, str]:
+        return self._market_name
+
+    @property
+    def latitude(self) -> Union[None, float]:
+        return self._latitude
+
+    @property
+    def longitude(self) -> Union[None, float]:
+        return self._longitude
+
+    @property
+    def buffer(self) -> Union[None, Union[int, float]]:
+        return self._buffer
+
+    @property
+    def buffer_type(self) -> Union[None, str]:
+        return self._buffer_type
+
+
+class APIMarketShapeUnionQueryParams(APIQueryParams):
+    def __init__(self, join: List[Union[dict, 'APIQueryParams']], **kwargs):
+        assert isinstance(join, list)
+
+        super().__init__(**kwargs)
+
+        self._join = join
+
+    @property
+    def query_type(self) -> str:
+        return 'MARKET_SHAPE_UNION'
+
+    @property
+    def join(self) -> Union[None, List[Union[dict, APIQueryParams]]]:
         return None if self._join is None else [query.to_api_struct() for query in self._join]
 
 
