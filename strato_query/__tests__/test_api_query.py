@@ -12,6 +12,7 @@ December 26, 2018
 import unittest
 
 from strato_query import *
+from strato_query.exceptions import APIQueryFailedException
 
 
 class TestAPIQuery(unittest.TestCase, SDAPIQuery):
@@ -613,4 +614,27 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
         assert 'geometry' in df['FEATURES'][0][0]
         assert len(df['FEATURES'][0]) == 2
 
-        # TODO why isn't the join_type appearing in some of these print outs?
+    def test_market_shape_query(self):
+        print('Test market shape query')
+        with self.assertRaises(APIQueryFailedException):
+            df = self.submit_query(
+                query_params=APIMarketShapeQueryParams(
+                    query_type='MARKET_SHAPE',
+                    market_id=2,
+                    market_name='test_2',
+                    latitude=42.256922,
+                    longitude=-71.040571,
+                    buffer=3,
+                    buffer_type='mile'))
+
+    def test_market_shape_union_query(self):
+        print('Test market shape union query')
+        with self.assertRaises(APIQueryFailedException):
+            df = self.submit_query(
+                query_params=APIMarketShapeUnionQueryParams(
+                    table='',
+                    data_fields=(),
+                    data_filters=(),
+                    aggregations=(),
+                    groupby=(),
+                    join=[]))
