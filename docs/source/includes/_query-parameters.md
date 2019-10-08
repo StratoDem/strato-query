@@ -188,7 +188,7 @@ df = submit_api_query(
 $ curl -X POST "https://api.stratodem.com/api" \
     -H "accept: application/json" \
     -H "Content-Type: application/json" \
-    - d "{ \"token\": \"my-api-token\", \"query\": {\"query_type\": \"MEDIAN\", \"data_fields\": [\"year\", \"geoid11\", \"median_value\"], \"table\": \"incomeforecast_tract_annual_income_group\", \"groupby\": [\"year\", \"geoid11\"], \"data_filters\": [{\"filter_type\": \"eq\", \"filter_value\": 2019, \"filter_variable\": \"year\"}, {\"filter_type\": \"eq\", \"filter_value\": 25025, \"filter_variable\": \"geoid5\"}], \"aggregations\": [], \"median_variable_name\": \"income_g\"}}"
+    -d "{ \"token\": \"my-api-token\", \"query\": {\"query_type\": \"MEDIAN\", \"data_fields\": [\"year\", \"geoid11\", \"median_value\"], \"table\": \"incomeforecast_tract_annual_income_group\", \"groupby\": [\"year\", \"geoid11\"], \"data_filters\": [{\"filter_type\": \"eq\", \"filter_value\": 2019, \"filter_variable\": \"year\"}, {\"filter_type\": \"eq\", \"filter_value\": 25025, \"filter_variable\": \"geoid5\"}], \"aggregations\": [], \"median_variable_name\": \"income_g\"}}"
 ```
 
 ```vb
@@ -255,7 +255,7 @@ df = submit_api_query(
 $ curl -X POST "https://api.stratodem.com/api" \
     -H "accept: application/json" \
     -H "Content-Type: application/json" \
-    - d "{ \"token\": \"my-api-token\", \"query\": {\"query_type\": \"MEAN\", \"data_fields\": [\"year\", \"geoid11\", \"mean_value\"], \"table\": \"incomeforecast_tract_annual_income_group\", \"groupby\": [\"year\", \"geoid11\"], \"data_filters\": [{\"filter_type\": \"eq\", \"filter_value\": 2019, \"filter_variable\": \"year\"}, {\"filter_type\": \"eq\", \"filter_value\": 25025, \"filter_variable\": \"geoid5\"}], \"aggregations\": [], \"mean_variable_name\": \"income_g\"}}"
+    -d "{ \"token\": \"my-api-token\", \"query\": {\"query_type\": \"MEAN\", \"data_fields\": [\"year\", \"geoid11\", \"mean_value\"], \"table\": \"incomeforecast_tract_annual_income_group\", \"groupby\": [\"year\", \"geoid11\"], \"data_filters\": [{\"filter_type\": \"eq\", \"filter_value\": 2019, \"filter_variable\": \"year\"}, {\"filter_type\": \"eq\", \"filter_value\": 25025, \"filter_variable\": \"geoid5\"}], \"aggregations\": [], \"mean_variable_name\": \"income_g\"}}"
 ```
 
 ```vb
@@ -339,7 +339,7 @@ api_query_params(
 $ curl -X POST "https://api.stratodem.com/api" \
     -H "accept: application/json" \
     -H "Content-Type: application/json" \
-    - d "{ \"token\": \"my-api-token\", \"query\": {\"query_type\": \"COUNT\", \"data_fields\": [\"year\", \"cbsa\", {\"population\": \"population\"}], \"table\": \"populationforecast_metro_annual_population\", \"groupby\": [\"cbsa\", \"year\"], \"data_filters\": [{\"filter_type\": \"lt\", \"filter_value\": 2015, \"filter_variable\": \"year\"}, {\"filter_type\": \"eq\", \"filter_value\": 14454, \"filter_variable\": \"cbsa\"}], \"aggregations\": [{\"aggregation_func\": \"sum\", \"variable_name\": \"population\"}], \"join\": {\"query_type\": \"AREA\", \"data_fields\": [\"cbsa\", \"area\", \"name\"], \"table\": \"geocookbook_metro_na_shapes_full\", \"groupby\": [\"cbsa\", \"name\"], \"data_filters\": [{\"filter_type\": \"eq\", \"filter_value\": 14454, \"filter_variable\": \"cbsa\"}], \"aggregations\": [], \"on\": {\"left\": [\"cbsa\"], \"right\": [\"cbsa\"]}}, \"order\": [\"year\"]}}"
+    -d "{ \"token\": \"my-api-token\", \"query\": {\"query_type\": \"COUNT\", \"data_fields\": [\"year\", \"cbsa\", {\"population\": \"population\"}], \"table\": \"populationforecast_metro_annual_population\", \"groupby\": [\"cbsa\", \"year\"], \"data_filters\": [{\"filter_type\": \"lt\", \"filter_value\": 2015, \"filter_variable\": \"year\"}, {\"filter_type\": \"eq\", \"filter_value\": 14454, \"filter_variable\": \"cbsa\"}], \"aggregations\": [{\"aggregation_func\": \"sum\", \"variable_name\": \"population\"}], \"join\": {\"query_type\": \"AREA\", \"data_fields\": [\"cbsa\", \"area\", \"name\"], \"table\": \"geocookbook_metro_na_shapes_full\", \"groupby\": [\"cbsa\", \"name\"], \"data_filters\": [{\"filter_type\": \"eq\", \"filter_value\": 14454, \"filter_variable\": \"cbsa\"}], \"aggregations\": [], \"on\": {\"left\": [\"cbsa\"], \"right\": [\"cbsa\"]}}, \"order\": [\"year\"]}}"
 ```
 
 ```vb
@@ -424,6 +424,71 @@ To return a GeoJSON `FeatureCollection`, use the `APIGeoJSONQueryParams`. This q
 The example to the right returns the GeoJSON `FeatureCollection` for the one census tract within a 15-minute drive of 42.1,-120.1 (lat, lng).
 
 `{"type": "FeatureCollection", "features": [{"type": "Feature", "geometry": {"type": "Polygon", "coordinates": ["DUMMY DATA HERE"]}, "properties": {"geoid11": 41037960100, "name": "Census Tract: 41037960100", "median_hhi": 42182}}]}`
+
+## Geocoder queries
+
+> This query returns the census tract containing the latitude-longitude coordinates
+
+```python
+from strato_query import SDAPIQuery, APIGeocoderQueryParams
+
+df_tract = SDAPIQuery.query_api_df(
+    APIGeocoderQueryParams(
+        data_fields=('geoid11', 'name'),
+        # The geometry table for census tracts
+        table='geocookbook_tract_na_shapes_full',
+        latitude=42.3498224,
+        longitude=-71.0521391,
+        groupby=(),
+        data_filters=(),
+        aggregations=(),
+    )
+)
+
+df_metro = SDAPIQuery.query_api_df(
+    APIGeocoderQueryParams(
+        data_fields=('cbsa', 'name'),
+        # The geometry table for metros
+        table='geocookbook_metro_na_shapes_full',
+        latitude=42.3498224,
+        longitude=-71.0521391,
+        groupby=(),
+        data_filters=(),
+        aggregations=(),
+    )
+)
+```
+
+```r
+# Not implemented yet
+```
+
+```shell
+$ curl -X POST "https://api.stratodem.com/api" \
+    -H "accept: application/json" \
+    -H "Content-Type: application/json" \
+    -d "{ \"token\": \"my-api-token\", \"query\": {\"query_type\": \"GEOCODER\", \"data_fields\": [\"cbsa\", \"name\"], \"table\": \"geocookbook_metro_na_shapes_full\", \"groupby\": [], \"data_filters\": [], \"aggregations\": [], \"latitude\": 42.3498224, \"longitude\": -71.0521391}}"
+```
+
+```vb
+' Not implemented yet
+```
+
+To identify which geography contains a given location, the `APIGeocoderParams` take a 
+geographic shapes table, a latitude, and a longitude, and construct a query to return the 
+geographic ID.
+
+The first example to the right returns the census tract ID (`GEOID11`) for the latitude-longitude pair.
+
+|GEOID11|NAME|
+|-------|----|
+|25025061200|Census Tract: 25025061200|
+
+The second example returns the metro ID for the latitude-longitude pair:
+
+|CBSA|NAME|
+|----|----|
+|14454|Boston, MA|
 
 ## Advanced queries
 
