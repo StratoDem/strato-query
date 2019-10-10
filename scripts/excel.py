@@ -1,74 +1,79 @@
 import itertools
 import re
-scripts=[]
-s=""
+scripts = []
+s = ""
 
 '''
 Naming Conventions
 
-query = 1 specific type of query for the API -> STRATODEM_HOUSEHOLDS_WITH_INCOME_BETWEEN_FOR_METRO
+query = 1 specific type of query for the API
+i.e STRATODEM_HOUSEHOLDS_WITH_INCOME_BETWEEN_FOR_METRO
 
-function = multiple different variations for different 
+function = multiple different variations for different
 input variables and filters of queries -> queryHouseholdsIncomeAge
 
  many queries -> 1 function
 
 '''
 
-#Values for variables to default to give broad range
-default_values={
-    'AGE':'\t\tAGE_LOW:=1, _ \n\t\tAGE_HIGH:=18, _\n',
-    'INCOME':'\t\tINCOME_LOW:=1, _ \n\t\tINCOME_HIGH:=18, _\n'
+# Values for variables to default to give broad range
+default_values = {
+    'AGE': '\t\tAGE_LOW:=1, _ \n\t\tAGE_HIGH:=18, _\n',
+    'INCOME': '\t\tINCOME_LOW:=1, _ \n\t\tINCOME_HIGH:=18, _\n'
 }
 
 
-#List of all supported filters and their templates
-filters={
-    'BETWEEN':'XXX_LOW as Integer, XXX_HIGH as Integer, '
+# List of all supported filters and their templates
+filters = {
+    'BETWEEN': 'XXX_LOW as Integer, XXX_HIGH as Integer, '
 }
 
-#Templates for all supported filters for the paramaters for functions
-params={
-    'BETWEEN':'\t\tXXX_LOW:=XXX_LOW, _\n\t\tXXX_HIGH:=XXX_HIGH, _\n'
-} 
-
-#List of all supported geo locations 
-upper_geo={'METRO':'METRO_CODE As Long',
-     #'STATE': 'GEOID2',
-     'COUNTY': 'COUNTY_CODE As Long',
-     #'US':'US',
-     #"MICRO":'micro',
-     #'ZIP':"zip",
-     #'TRACT': 'GEOID11',
-     'MILE_RADIUS':"LATITUDE As Double, LONGITUDE As Double, MILES As Double"
-     #'DRIVE_TIME':'drive_time'
+# Templates for all supported filters for the paramaters for functions
+params = {
+    'BETWEEN': '\t\tXXX_LOW:=XXX_LOW, _\n\t\tXXX_HIGH:=XXX_HIGH, _\n'
 }
 
+# List of all supported geo locations
+upper_geo = {
+    'METRO': 'METRO_CODE As Long',
+    #'STATE': 'GEOID2',
+    'COUNTY': 'COUNTY_CODE As Long',
+    #'US':'US',
+    #"MICRO":'micro',
+    #'ZIP':"zip",
+    #'TRACT': 'GEOID11',
+    'MILE_RADIUS': "LATITUDE As Double, LONGITUDE As Double, MILES As Double"
+    #'DRIVE_TIME':'drive_time'
+    }
 
-#Geo templates for function parameters
-lower_geo={
-    'METRO':"\t\tgeoname:=\"metro\", _\n\t\tgeoFilter:=equalToFilter(\"cbsa\",METRO_CODE), _\n",
+
+# Geo templates for function parameters
+lower_geo = {
+    'METRO': '''\t\tgeoname:=\"metro\", _
+    \t\tgeoFilter:=equalToFilter(\"cbsa\",METRO_CODE), _\n''',
     #'STATE':'LOL',
-    'COUNTY': "\t\tgeoname:=\"county\", _\n\t\tgeoFilter:=equalToFilter(\"geoid5\",COUNTY_CODE), _\n",
+    'COUNTY': '''\t\tgeoname:=\"county\", _
+    \t\tgeoFilter:=equalToFilter(\"geoid5\",COUNTY_CODE), _\n''',
     #"US":"Still gotta do",
     #"MICRO":"WILL FINISH",
     #"ZIP":"I PROMISE",
     #"TRACT":"working on replicating the excel example first",
-    "MILE_RADIUS":"\t\tgeoname:=\"tract\", _\n\t\tgeoFilter:=mileRadiusFilter(LATITUDE:=LATITUDE,LONGITUDE:=LONGITUDE, MILES:=MILES), _\n"
+    "MILE_RADIUS": '''\t\tgeoname:=\"tract\", _
+    \t\tgeoFilter:=mileRadiusFilter(LATITUDE:=LATITUDE,LONGITUDE:=LONGITUDE, MILES:=MILES), _\n'''
     #"DRIVE_TIME": "Okay last one"
 }
+# Template for VBA QUERY
+template = '''QUERY_NAME(FILTER_PARAMS, GEO_PARAMS, API_TOKEN As String) As Variant
+              QUERY_NAME = FUNCTION'''
 
-#Template for VBA QUERY
-template="QUERY_NAME(FILTER_PARAMS, GEO_PARAMS, API_TOKEN As String) As Variant\nQUERY_NAME = FUNCTION"
-
-#Template for end of VBA function
-helper_function_template='''   
+# Template for end of VBA function
+helper_function_template = '''
     numCols = dataResults("data")(1).Count
     columnNames = Array("households", "year")
     numObservations = dataResults("data").Count
-    
+
     ReDim dataArray(numObservations - 1, numCols - 1)
-    
+
     idxRow = 0
     For Each Value In dataResults("data")
         For idxCol = 0 To numCols - 1
@@ -76,44 +81,46 @@ helper_function_template='''
         Next idxCol
         idxRow = idxRow + 1
     Next Value
-    
+
     XXX = dataArray
 End Function\n\n'''
 
+
 class stratofunction:
-    #Creates all possible combinations of queries with given input variables
-    def __init__(self,user_variables,function_title):
-        self.user_variables=user_variables
-        self.queries=[]
-        filters_and_data=[]
-        combos=[]
+    # Creates all possible combinations of queries with given input variables
+    def __init__(self, user_variables, function_title):
+        self.user_variables = user_variables
+        self.queries = []
+        filters_and_data = []
+        combos = []
         for _filter in filters.keys():
             for variable in self.user_variables:
                 filters_and_data.append(f"WITH_{variable}_{_filter}_")
-        for i in range(1,len(self.user_variables)+1):
-            combos.append(list(itertools.combinations(filters_and_data,i)))
+        for i in range(1, len(self.user_variables) + 1):
+            combos.append(list(itertools.combinations(filters_and_data, i)))
         for combo in combos:
             for variable in combo:
-                query=''.join(variable)
+                query = ''.join(variable)
                 for geo in upper_geo.keys():
                     self.queries.append(f"STRATODEM_{function_title}_{query}FOR_{geo}")
         for geo in upper_geo.keys():
             self.queries.append(f"STRATODEM_{function_title}_FOR_{geo}")
-    
-    def params(self,query):
+
+    def params(self, query):
         for variable in self.user_variables:
             if variable not in query:
-                query=query+default_values[variable]
-        self.s=query
+                query = query+default_values[variable]
+        self.s = query
+
 
 class households(stratofunction):
     def __init__(self):
-        super().__init__(['AGE','INCOME'],'HOUSEHOLDS')
-        self.s=""
-        self.function_name="queryHouseholdsIncomeAge"
-        self.function_string='''Public Function queryHouseholdsIncomeAge(YEAR_LOW As Integer, YEAR_HIGH As Integer, INCOME_LOW As Integer, INCOME_HIGH As Integer, AGE_LOW As Integer, AGE_HIGH As Integer, geoname As String, geoFilter As Dictionary, API_TOKEN As String) As Variant
+        super().__init__(['AGE', 'INCOME'], 'HOUSEHOLDS')
+        self.s = ""
+        self.function_name = "queryHouseholdsIncomeAge"
+        self.function_string ='''Public Function queryHouseholdsIncomeAge(YEAR_LOW As Integer, YEAR_HIGH As Integer, INCOME_LOW As Integer, INCOME_HIGH As Integer, AGE_LOW As Integer, AGE_HIGH As Integer, geoname As String, geoFilter As Dictionary, API_TOKEN As String) As Variant
     Dim dataResults As Object
-    
+
     Set dataResults = submitAPIQuery( _
                       query:=apiQueryParameters( _
                               table:="incomeforecast_" & geoname & "_annual_income_group_age", _
@@ -128,17 +135,18 @@ class households(stratofunction):
         order:=Array("year")), _
         API_TOKEN:=API_TOKEN)
 ''' + helper_function_template
-        self.function_string=self.function_string.replace("XXX",self.function_name)
+        function_string = self.function_string.replace("XXX", self.function_name)
+        self.function_string = function_string
 
 
 class median_household_income(stratofunction):
     def __init__(self):
-        super().__init__(['AGE',],"MEDIAN_HOUSEHOLD_INCOME")
-        self.s=""
-        self.function_name="queryMedianIncomeAge"
-        self.function_string='''Public Function queryMedianIncomeAge(YEAR_LOW As Integer, YEAR_HIGH As Integer, AGE_LOW As Integer, AGE_HIGH As Integer, geoname As String, geoFilter As Dictionary, API_TOKEN As String) As Variant
+        super().__init__(['AGE'], "MEDIAN_HOUSEHOLD_INCOME")
+        self.s = ""
+        self.function_name = "queryMedianIncomeAge"
+        self.function_string = '''Public Function queryMedianIncomeAge(YEAR_LOW As Integer, YEAR_HIGH As Integer, AGE_LOW As Integer, AGE_HIGH As Integer, geoname As String, geoFilter As Dictionary, API_TOKEN As String) As Variant
     Dim dataResults As Object
-    
+
     Set dataResults = submitAPIQuery( _
                       query:=medianQueryParameters( _
                               table:="incomeforecast_" & geoname & "_annual_income_group_age", _
@@ -153,76 +161,81 @@ class median_household_income(stratofunction):
         order:=Array("year")), _
         API_TOKEN:=API_TOKEN)
     ''' + helper_function_template
-        self.function_string=self.function_string.replace("XXX",self.function_name)
+        function_string = self.function_string.replace("XXX", self.function_name)
+        self.function_string = function_string
 
 
-
-
-#List of all supported function types
-stratodem_functions={
-    'HOUSEHOLDS':households(),
-    'MEDIAN_HOUSEHOLD_INCOME':median_household_income()
+# List of all supported function types
+stratodem_functions = {
+    'HOUSEHOLDS': households(),
+    'MEDIAN_HOUSEHOLD_INCOME': median_household_income()
 }
 
 
 def data_filterParser(s):
-    data_filters=[]
-    data_params=[]
-    x=re.search("(.+?)(?:_WITH)",s)
+    data_filters = []
+    data_params = []
+    x = re.search("(.+?)(?:_WITH)", s)
     if (x is None):
-        return['','']
-    s=s[len(x.group(1))+1:]
-    while(len(s)>1):
-        x=re.search("(?:WITH_)(.+?(?:_).+?)(?:_)",s)
+        return['', '']
+    s = s[len(x.group(1))+1:]
+    while(len(s) > 1):
+        x = re.search("(?:WITH_)(.+?(?:_).+?)(?:_)", s)
         if (x is None):
             break
-        substring=x.group(1)
-        filter_param=substring.split('_')
-        data_filters.append(filters[filter_param[1]].replace("XXX",filter_param[0]))
-        data_params.append(params[filter_param[1]].replace("XXX",filter_param[0]))
-        s=s[len(x.group(0)):]
-    return [''.join(data_params),''.join(data_filters)]
+        substring = x.group(1)
+        filter_param = substring.split('_')
+        data_filters.append(filters[filter_param[1]].replace("XXX", filter_param[0]))
+        data_params.append(params[filter_param[1]].replace("XXX", filter_param[0]))
+        s = s[len(x.group(0)):]
+    return [''.join(data_params), ''.join(data_filters)]
+
 
 def geoParser(s):
-    x=re.search("(?:FOR_).+",s)
-    geo=x.group(0)
-    geo=geo[4:]
-    return [lower_geo[geo],upper_geo[geo]]
+    x = re.search("(?:FOR_).+", s)
+    geo = x.group(0)
+    geo = geo[4:]
+    return [lower_geo[geo], upper_geo[geo]]
+
 
 def functionParser(s):
-    x=re.search("(?:STRATODEM_)(.*?)(?:_WITH|_FOR)",s)
-    function=x.group(1)    
+    x = re.search("(?:STRATODEM_)(.*?)(?:_WITH|_FOR)",s)
+    function = x.group(1)
     return stratodem_functions[function]
-    
+
+
 def stringParser(s):
-    query="Public Function "+s
-    data_filter=data_filterParser(s)
-    query=query+"(YEAR_LOW As Integer, YEAR_HIGH as Integer, " + data_filter[1]
-    function_info=functionParser(s)
-    geo=geoParser(s)
-    query=query+geo[1]+", API_TOKEN As String) As Variant\n"
-    query=query+"\t"+s+"="+function_info.function_name+"( _\n\t\tYEAR_LOW:=YEAR_LOW, _ \n\t\tYEAR_HIGH:=YEAR_HIGH, _\n"+data_filter[0]
+    query = "Public Function "+s
+    data_filter = data_filterParser(s)
+    query = query + f"(YEAR_LOW As Integer, YEAR_HIGH as Integer, {data_filter[1]}"
+    function_info = functionParser(s)
+    geo = geoParser(s)
+    query = query+geo[1]+", API_TOKEN As String) As Variant\n"
+    query = query+f'''\t{s}={function_info.function_name}( _
+    \t\tYEAR_LOW:=YEAR_LOW, _ \n\t\tYEAR_HIGH:=YEAR_HIGH, _
+    {data_filter[0]}'''
     function_info.params(query)
-    query=function_info.s
-    query=query +geo[0] + "\t\tAPI_TOKEN:=API_TOKEN)\nEnd Function\n\n"
+    query = function_info.s
+    query = query + geo[0] + "\t\tAPI_TOKEN:=API_TOKEN)\nEnd Function\n\n"
     return query
 
-VBA_Script=""
+
+VBA_Script = ""
 
 for x in stratodem_functions.values():
     for query in x.queries:
-        VBA_Script=VBA_Script+stringParser(query)
-    VBA_Script=VBA_Script+x.function_string
-VBA_Script=VBA_Script+'''Private Function submitAPIQuery(query As Dictionary, API_TOKEN As String) As Object
+        VBA_Script = VBA_Script+stringParser(query)
+    VBA_Script = VBA_Script + x.function_string
+VBA_Script = VBA_Script+'''Private Function submitAPIQuery(query As Dictionary, API_TOKEN As String) As Object
     'Query the StratoDem Analytics API
-    
+
     Dim httpReq As New WinHttp.WinHttpRequest
     Dim apiToken As String
     Dim apiQuery As Dictionary: Set apiQuery = New Dictionary
     Dim apiQueryString As String
     Dim apiResponse As String
     Dim apiResponseObject As Object
-    
+
     apiQuery.Add "token", API_TOKEN
     apiQuery.Add "query", query
     apiQueryString = JsonConverter.ConvertToJson(apiQuery)
@@ -250,11 +263,11 @@ End Function
 Private Function apiFilter(filterVariable As String, filterType As String, filterValue As Variant) As Dictionary
     ' Helper method to create an API filter
     Dim filterDict As Dictionary: Set filterDict = New Dictionary
-    
+
     filterDict.Add "filter_variable", filterVariable
     filterDict.Add "filter_type", filterType
     filterDict.Add "filter_value", filterValue
-    
+
     Set apiFilter = filterDict
 End Function
 
@@ -306,22 +319,22 @@ End Function
 Private Function drivetimeFilter(LATITUDE As Double, LONGITUDE As Double, minutes As Integer)
     ' Create drivetime filter (within minutes of latitude-longitude pair)
     Dim dtValue As Dictionary: Set dtValue = New Dictionary
-    
+
     dtValue.Add "latitude", LATITUDE
     dtValue.Add "longitude", LONGITUDE
     dtValue.Add "minutes", minutes
-    
+
     Set drivetimeFilter = apiFilter("", "drivetime", dtValue)
 End Function
 
 Private Function mileRadiusFilter(LATITUDE As Double, LONGITUDE As Double, MILES As Double)
     ' Create mile radius filter (within miles of latitude-longitude pair)
     Dim mrValue As Dictionary: Set mrValue = New Dictionary
-    
+
     mrValue.Add "latitude", LATITUDE
     mrValue.Add "longitude", LONGITUDE
     mrValue.Add "miles", MILES
-    
+
     Set mileRadiusFilter = apiFilter("", "mile_radius", mrValue)
 End Function
 
@@ -329,10 +342,10 @@ End Function
 Function apiAggregation(aggregationFunc As String, variableName As String) As Dictionary
     ' Helper method to create an API aggregation
     Dim agg As Dictionary: Set agg = New Dictionary
-    
+
     agg.Add "aggregation_func", aggregationFunc
     agg.Add "variable_name", variableName
-    
+
     Set apiAggregation = agg
 End Function
 
@@ -355,7 +368,7 @@ Function apiQueryParameters(table As String, dataFields As Variant, dataFilters 
                             Optional medianVariableName As String, Optional meanVariableName As String) As Dictionary
     ' Structure apiQueryParameters for submitting to the StratoDem Analytics API
     Dim queryParams As Dictionary: Set queryParams = New Dictionary
-    
+
     queryParams.Add "table", table
     queryParams.Add "query_type", queryType
     queryParams.Add "data_fields", dataFields
@@ -388,10 +401,10 @@ Function apiQueryParameters(table As String, dataFields As Variant, dataFilters 
     If Not IsMissing(LONGITUDE) Then
         queryParams.Add "longitude", LONGITUDE
     End If
-    
+
     queryParams.Add "median_variable_name", medianVariableName
     queryParams.Add "mean_variable_name", meanVariableName
-    
+
     Set apiQueryParameters = queryParams
 End Function
 
@@ -442,16 +455,16 @@ End Function
 Function renameVariable(original As String, renamed As String) As Dictionary
     ' Rename a variable from original to renamed in the database query
     Dim renameDict As Dictionary: Set renameDict = New Dictionary
-    
+
     renameDict.Add original, renamed
-    
+
     Set renameVariable = renameDict
 End Function
 
 Function joinOnStructure(left As Variant, right As Variant) As Dictionary
     ' Create the correct joining structure for queries
     Dim joinOnDict As Dictionary: Set joinOnDict = New Dictionary
-    
+
     joinOnDict.Add "left", left
     joinOnDict.Add "right", right
     Set joinOnStructure = joinOnDict
@@ -495,7 +508,6 @@ Private Function geolevelToGeoname(GEOLEVEL As String) As String
 End Function
 
 '''
-f=open("Strato_Excel_Add_In.txt","w+")
+f = open("Strato_Excel_Add_In.txt", "w+")
 f.write(VBA_Script)
 f.close()
-
