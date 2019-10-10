@@ -229,6 +229,7 @@ def parse_data_filters(function_name: str) -> Tuple[str, str]:
 
 def parse_geolevel(function_name: str) -> Tuple[str, str]:
     """
+    Parse the function name to determine the geographic filters and geographic variable definitions
 
     Parameters
     ----------
