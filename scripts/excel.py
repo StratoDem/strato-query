@@ -25,7 +25,7 @@ helper_function_template='''
         idxRow = idxRow + 1
     Next Value
     
-    queryHouseholdsIncomeAge = dataArray
+    XXX = dataArray
 End Function\n\n'''
 class households:
     def __init__(self):
@@ -43,11 +43,12 @@ class households:
                       betweenFilter("year", Array(YEAR_LOW, YEAR_HIGH)), _
                       betweenFilter("income_g", Array(INCOME_LOW, INCOME_HIGH)), _
                       betweenFilter("age_g", Array(AGE_LOW, AGE_HIGH))), _
-        aggregations:=Array(sumAggregation("house1holds")), _
+        aggregations:=Array(sumAggregation("households")), _
         groupby:=Array("year"), _
         order:=Array("year")), _
         API_TOKEN:=API_TOKEN)
-''' + helper_function_template
+'''+helper_function_template
+        self.function_string=self.function_string.replace("XXX",self.function_name)
 
     def params(self,s):
         if ("AGE_LOW" not in s):
@@ -77,7 +78,8 @@ class median_household_income:
         order:=Array("year")), _
         API_TOKEN:=API_TOKEN)
     ''' + helper_function_template
-
+        self.function_string=self.function_string.replace("XXX",self.function_name)
+        
     def params(self,s):
         self.s=s
 
@@ -94,7 +96,7 @@ stratodem_functions={
 data=['WITH_INCOME_XXX_','WITH_AGE_XXX_']
 #List all supported filters
 filters={
-    'BETWEEN':'XXX_LOW as Integer, XXX_HIGH as Intger'
+    'BETWEEN':'XXX_LOW as Integer, XXX_HIGH as Integer'
 }
 
 params={
@@ -430,8 +432,47 @@ Function joinOnStructure(left As Variant, right As Variant) As Dictionary
     joinOnDict.Add "left", left
     joinOnDict.Add "right", right
     Set joinOnStructure = joinOnDict
-End Function'''
-f=open("test.xlsm","w+")
+End Function
+
+' ----- ///// UTILITIES ///// ----- '
+Private Function geolevelToGeocol(GEOLEVEL As String) As String
+    If GEOLEVEL = "US" Then
+        geolevelToGeocol = ""
+    ElseIf GEOLEVEL = "GEOID2" Then
+        geolevelToGeocol = "geoid2"
+    ElseIf GEOLEVEL = "GEOID5" Then
+        geolevelToGeocol = "geoid5"
+    ElseIf GEOLEVEL = "METRO" Then
+        geolevelToGeocol = "cbsa"
+    ElseIf GEOLEVEL = "ZIP" Then
+        geolevelToGeocol = "zip"
+    ElseIf GEOLEVEL = "GEOID11" Then
+        geolevelToGeocol = "geoid11"
+    Else
+        Err.Raise 5, "geolevelToGeocol", "Failed to map GEOLEVEL " & GEOLEVEL
+    End If
+End Function
+
+Private Function geolevelToGeoname(GEOLEVEL As String) As String
+    If GEOLEVEL = "US" Then
+        geolevelToGeoname = ""
+    ElseIf GEOLEVEL = "GEOID2" Then
+        geolevelToGeoname = "state"
+    ElseIf GEOLEVEL = "GEOID5" Then
+        geolevelToGeoname = "county"
+    ElseIf GEOLEVEL = "METRO" Then
+        geolevelToGeoname = "metro"
+    ElseIf GEOLEVEL = "ZIP" Then
+        geolevelToGeoname = "zip"
+    ElseIf GEOLEVEL = "GEOID11" Then
+        geolevelToGeoname = "tract"
+    Else
+        Err.Raise 5, "geolevelToGeoname", "Failed to map GEOLEVEL " & GEOLEVEL
+    End If
+End Function
+
+'''
+f=open("test.txt","w+")
 f.write(LongString)
 f.close()
 
