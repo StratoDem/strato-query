@@ -3,13 +3,65 @@ import re
 scripts=[]
 s=""
 
+'''
+Naming Conventions
 
-    
+query = 1 specific type of query for the API -> STRATODEM_HOUSEHOLDS_WITH_INCOME_BETWEEN_FOR_METRO
+
+function = multiple different variations for different 
+input variables and filters of queries -> queryHouseholdsIncomeAge
+
+ many queries -> 1 function
+
+'''
+
+#Values for variables to default to give broad range
+default_values={
+    'AGE':'\t\tAGE_LOW:=1, _ \n\t\tAGE_HIGH:=18, _\n',
+    'INCOME':'\t\tINCOME_LOW:=1, _ \n\t\tINCOME_HIGH:=18, _\n'
+}
 
 
+#List of all supported filters and their templates
+filters={
+    'BETWEEN':'XXX_LOW as Integer, XXX_HIGH as Integer, '
+}
 
-#Template for VBA 
+#Templates for all supported filters for the paramaters for functions
+params={
+    'BETWEEN':'\t\tXXX_LOW:=XXX_LOW, _\n\t\tXXX_HIGH:=XXX_HIGH, _\n'
+} 
+
+#List of all supported geo locations 
+upper_geo={'METRO':'METRO_CODE As Long',
+     #'STATE': 'GEOID2',
+     'COUNTY': 'COUNTY_CODE As Long',
+     #'US':'US',
+     #"MICRO":'micro',
+     #'ZIP':"zip",
+     #'TRACT': 'GEOID11',
+     'MILE_RADIUS':"LATITUDE As Double, LONGITUDE As Double, MILES As Double"
+     #'DRIVE_TIME':'drive_time'
+}
+
+
+#Geo templates for function parameters
+lower_geo={
+    'METRO':"\t\tgeoname:=\"metro\", _\n\t\tgeoFilter:=equalToFilter(\"cbsa\",METRO_CODE), _\n",
+    #'STATE':'LOL',
+    'COUNTY': "\t\tgeoname:=\"county\", _\n\t\tgeoFilter:=equalToFilter(\"geoid5\",COUNTY_CODE), _\n",
+    #"US":"Still gotta do",
+    #"MICRO":"WILL FINISH",
+    #"ZIP":"I PROMISE",
+    #"TRACT":"working on replicating the excel example first",
+    "MILE_RADIUS":"\t\tgeoname:=\"tract\", _\n\t\tgeoFilter:=mileRadiusFilter(LATITUDE:=LATITUDE,LONGITUDE:=LONGITUDE, MILES:=MILES), _\n"
+    #"DRIVE_TIME": "Okay last one"
+}
+
+#Template for VBA QUERY
 template="QUERY_NAME(FILTER_PARAMS, GEO_PARAMS, API_TOKEN As String) As Variant\nQUERY_NAME = FUNCTION"
+
+#Template for end of VBA function
 helper_function_template='''   
     numCols = dataResults("data")(1).Count
     columnNames = Array("households", "year")
@@ -27,8 +79,36 @@ helper_function_template='''
     
     XXX = dataArray
 End Function\n\n'''
-class households:
+
+class stratofunction:
+    #Creates all possible combinations of queries with given input variables
+    def __init__(self,user_variables,function_title):
+        self.user_variables=user_variables
+        self.queries=[]
+        filters_and_data=[]
+        combos=[]
+        for _filter in filters.keys():
+            for variable in self.user_variables:
+                filters_and_data.append(f"WITH_{variable}_{_filter}_")
+        for i in range(1,len(self.user_variables)+1):
+            combos.append(list(itertools.combinations(filters_and_data,i)))
+        for combo in combos:
+            for variable in combo:
+                query=''.join(variable)
+                for geo in upper_geo.keys():
+                    self.queries.append(f"STRATODEM_{function_title}_{query}FOR_{geo}")
+        for geo in upper_geo.keys():
+            self.queries.append(f"STRATODEM_{function_title}_FOR_{geo}")
+    
+    def params(self,query):
+        for variable in self.user_variables:
+            if variable not in query:
+                query=query+default_values[variable]
+        self.s=query
+
+class households(stratofunction):
     def __init__(self):
+        super().__init__(['AGE','INCOME'],'HOUSEHOLDS')
         self.s=""
         self.function_name="queryHouseholdsIncomeAge"
         self.function_string='''Public Function queryHouseholdsIncomeAge(YEAR_LOW As Integer, YEAR_HIGH As Integer, INCOME_LOW As Integer, INCOME_HIGH As Integer, AGE_LOW As Integer, AGE_HIGH As Integer, geoname As String, geoFilter As Dictionary, API_TOKEN As String) As Variant
@@ -47,18 +127,13 @@ class households:
         groupby:=Array("year"), _
         order:=Array("year")), _
         API_TOKEN:=API_TOKEN)
-'''+helper_function_template
+''' + helper_function_template
         self.function_string=self.function_string.replace("XXX",self.function_name)
 
-    def params(self,s):
-        if ("AGE_LOW" not in s):
-            s=s+"\t\tAGE_LOW:=1, _ \n\t\tAGE_HIGH:=18, _\n"
-        if ("INCOME_LOW" not in s):
-            s=s+"\t\tINCOME_LOW:=1, _\n\t\tINCOME_HIGH:=18, _\n"
-        self.s=s
-        
-class median_household_income:
+
+class median_household_income(stratofunction):
     def __init__(self):
+        super().__init__(['AGE',],"MEDIAN_HOUSEHOLD_INCOME")
         self.s=""
         self.function_name="queryMedianIncomeAge"
         self.function_string='''Public Function queryMedianIncomeAge(YEAR_LOW As Integer, YEAR_HIGH As Integer, AGE_LOW As Integer, AGE_HIGH As Integer, geoname As String, geoFilter As Dictionary, API_TOKEN As String) As Variant
@@ -79,9 +154,6 @@ class median_household_income:
         API_TOKEN:=API_TOKEN)
     ''' + helper_function_template
         self.function_string=self.function_string.replace("XXX",self.function_name)
-        
-    def params(self,s):
-        self.s=s
 
 
 
@@ -92,84 +164,35 @@ stratodem_functions={
     'MEDIAN_HOUSEHOLD_INCOME':median_household_income()
 }
 
-#List all supported data types for filters
-data=['WITH_INCOME_XXX_','WITH_AGE_XXX_']
-#List all supported filters
-filters={
-    'BETWEEN':'XXX_LOW as Integer, XXX_HIGH as Integer'
-}
-
-params={
-    'BETWEEN':'\t\tXXX_LOW:=XXX_LOW, _\n\t\tXXX_HIGH:=XXX_HIGH, _\n'
-} 
-        
-#List all supported geo levels
-upper_geo={'METRO':'METRO_CODE As Long',
-     #'STATE': 'GEOID2',
-     'COUNTY': 'COUNTY_CODE As Long',
-     #'US':'US',
-     #"MICRO":'micro',
-     #'ZIP':"zip",
-     #'TRACT': 'GEOID11',
-     'MILE_RADIUS':"LATITUDE As Double, LONGITUDE As Double, MILES As Double"
-     #'DRIVE_TIME':'drive_time'
-}
-lower_geo={
-    'METRO':"\t\tgeoname:=\"metro\", _\n\t\tgeoFilter:=equalToFilter(\"cbsa\",METRO_CODE), _\n",
-    #'STATE':'LOL',
-    'COUNTY': "\t\tgeoname:=\"county\", _\n\t\tgeoFilter:=equalToFilter(\"geoid5\",COUNTY_CODE), _\n",
-    #"US":"Still gotta do",
-    #"MICRO":"WILL FINISH",
-    #"ZIP":"I PROMISE",
-    #"TRACT":"working on replicating the excel example first",
-    "MILE_RADIUS":"\t\tgeoname:=\"tract\", _\n\t\tgeoFilter:=mileRadiusFilter(LATITUDE:=LATITUDE,LONGITUDE:=LONGITUDE, MILES:=MILES), _\n"
-    #"DRIVE_TIME": "Okay last one"
-}
-#Generate all possible combinations of data
-filters_and_data=[]
-for x in filters.keys():
-    for y in data:
-        filters_and_data.append(y.replace('XXX',x))
-    
-
-data_combos=[]
-queries=[]
-for i in range(1,len(data)+1):
-    data_combos.append(list(itertools.combinations(filters_and_data,i)))
-for x in data_combos:
-    for y in x:
-        stuff=''.join(y)
-        for i in upper_geo.keys():
-            queries.append("STRATODEM_HOUSEHOLDS_"+stuff+"FOR_"+i)
-print(queries)
 
 def data_filterParser(s):
     data_filters=[]
     data_params=[]
     x=re.search("(.+?)(?:_WITH)",s)
-    test=x.group(1)
+    if (x is None):
+        return['','']
     s=s[len(x.group(1))+1:]
     while(len(s)>1):
         x=re.search("(?:WITH_)(.+?(?:_).+?)(?:_)",s)
         if (x is None):
             break
         substring=x.group(1)
-        stuff=substring.split('_')
-        data_filters.append(filters[stuff[1]].replace("XXX",stuff[0]))
-        data_params.append(params[stuff[1]].replace("XXX",stuff[0]))
+        filter_param=substring.split('_')
+        data_filters.append(filters[filter_param[1]].replace("XXX",filter_param[0]))
+        data_params.append(params[filter_param[1]].replace("XXX",filter_param[0]))
         s=s[len(x.group(0)):]
-    return [''.join(data_params),','.join(data_filters)]
+    return [''.join(data_params),''.join(data_filters)]
 
 def geoParser(s):
     x=re.search("(?:FOR_).+",s)
-    stuff=x.group(0)
-    stuff=stuff[4:]
-    return [lower_geo[stuff],upper_geo[stuff]]
+    geo=x.group(0)
+    geo=geo[4:]
+    return [lower_geo[geo],upper_geo[geo]]
 
 def functionParser(s):
-    x=re.search("(?:STRATODEM_)(.*?)(?:_)",s)
-    stuff=x.group(1)    
-    return stratodem_functions[stuff]
+    x=re.search("(?:STRATODEM_)(.*?)(?:_WITH|_FOR)",s)
+    function=x.group(1)    
+    return stratodem_functions[function]
     
 def stringParser(s):
     query="Public Function "+s
@@ -177,20 +200,20 @@ def stringParser(s):
     query=query+"(YEAR_LOW As Integer, YEAR_HIGH as Integer, " + data_filter[1]
     function_info=functionParser(s)
     geo=geoParser(s)
-    query=query+", "+geo[1]+", API_TOKEN As String) As Variant\n"
+    query=query+geo[1]+", API_TOKEN As String) As Variant\n"
     query=query+"\t"+s+"="+function_info.function_name+"( _\n\t\tYEAR_LOW:=YEAR_LOW, _ \n\t\tYEAR_HIGH:=YEAR_HIGH, _\n"+data_filter[0]
     function_info.params(query)
     query=function_info.s
-    query=query+geo[0] + "\t\tAPI_TOKEN:=API_TOKEN)\nEnd Function\n\n"
+    query=query +geo[0] + "\t\tAPI_TOKEN:=API_TOKEN)\nEnd Function\n\n"
     return query
 
-LongString=""
+VBA_Script=""
 
-for x in queries:
-    LongString=LongString+stringParser(x)
-for x in stratodem_functions.keys():
-    LongString=LongString+stratodem_functions[x].function_string
-LongString=LongString+'''Private Function submitAPIQuery(query As Dictionary, API_TOKEN As String) As Object
+for x in stratodem_functions.values():
+    for query in x.queries:
+        VBA_Script=VBA_Script+stringParser(query)
+    VBA_Script=VBA_Script+x.function_string
+VBA_Script=VBA_Script+'''Private Function submitAPIQuery(query As Dictionary, API_TOKEN As String) As Object
     'Query the StratoDem Analytics API
     
     Dim httpReq As New WinHttp.WinHttpRequest
@@ -472,7 +495,7 @@ Private Function geolevelToGeoname(GEOLEVEL As String) As String
 End Function
 
 '''
-f=open("test.txt","w+")
-f.write(LongString)
+f=open("Strato_Excel_Add_In.txt","w+")
+f.write(VBA_Script)
 f.close()
 
