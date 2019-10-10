@@ -19,6 +19,7 @@ many queries -> 1 function
 October 10, 2019
 """
 
+import abc
 import itertools
 import re
 from types import MappingProxyType
@@ -94,7 +95,7 @@ helper_function_template = '''
 End Function\n\n'''
 
 
-class StratoFunction:
+class StratoFunction(abc.ABC):
     user_variables = None
     function_title = None
 
@@ -126,15 +127,20 @@ class StratoFunction:
                 vba_function_definition_str += map_metric_to_default_filter_values[variable]
         self.vba_function_definition_str = vba_function_definition_str
 
+    @property
+    @abc.abstractmethod
+    def function_string(self):
+        pass
+
 
 class HouseholdsByIncomeStratoFunction(StratoFunction):
     user_variables = ['AGE', 'INCOME']
     function_title = 'HOUSEHOLDS'
+    function_name = 'queryHouseholdsIncomeAge'
 
-    def __init__(self):
-        super().__init__()
-        self.function_name = "queryHouseholdsIncomeAge"
-        self.function_string = '''Public Function queryHouseholdsIncomeAge(YEAR_LOW As Integer, YEAR_HIGH As Integer, INCOME_LOW As Integer, INCOME_HIGH As Integer, AGE_LOW As Integer, AGE_HIGH As Integer, geoname As String, geoFilter As Dictionary, API_TOKEN As String) As Variant
+    @property
+    def function_string(self) -> str:
+        function_string = '''Public Function queryHouseholdsIncomeAge(YEAR_LOW As Integer, YEAR_HIGH As Integer, INCOME_LOW As Integer, INCOME_HIGH As Integer, AGE_LOW As Integer, AGE_HIGH As Integer, geoname As String, geoFilter As Dictionary, API_TOKEN As String) As Variant
     Dim dataResults As Object
 
     Set dataResults = submitAPIQuery( _
@@ -151,18 +157,19 @@ class HouseholdsByIncomeStratoFunction(StratoFunction):
         order:=Array("year")), _
         API_TOKEN:=API_TOKEN)
 ''' + helper_function_template
-        function_string = self.function_string.replace("XXX", self.function_name)
-        self.function_string = function_string
+        function_string = function_string.replace("XXX", self.function_name)
+
+        return function_string
 
 
 class MedianHouseholdIncomeStratoFunction(StratoFunction):
     user_variables = ['AGE']
     function_title = 'MEDIAN_HOUSEHOLD_INCOME'
+    function_name = 'queryMedianIncomeAge'
 
-    def __init__(self):
-        super().__init__()
-        self.function_name = "queryMedianIncomeAge"
-        self.function_string = '''Public Function queryMedianIncomeAge(YEAR_LOW As Integer, YEAR_HIGH As Integer, AGE_LOW As Integer, AGE_HIGH As Integer, geoname As String, geoFilter As Dictionary, API_TOKEN As String) As Variant
+    @property
+    def function_string(self) -> str:
+        function_string = '''Public Function queryMedianIncomeAge(YEAR_LOW As Integer, YEAR_HIGH As Integer, AGE_LOW As Integer, AGE_HIGH As Integer, geoname As String, geoFilter As Dictionary, API_TOKEN As String) As Variant
     Dim dataResults As Object
 
     Set dataResults = submitAPIQuery( _
@@ -179,8 +186,9 @@ class MedianHouseholdIncomeStratoFunction(StratoFunction):
         order:=Array("year")), _
         API_TOKEN:=API_TOKEN)
     ''' + helper_function_template
-        function_string = self.function_string.replace("XXX", self.function_name)
-        self.function_string = function_string
+        function_string = function_string.replace("XXX", self.function_name)
+
+        return function_string
 
 
 # Map the function topic (e.g., 'HOUSEHOLDS') to the StratoFunction instance
