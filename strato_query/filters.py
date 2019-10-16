@@ -173,6 +173,13 @@ class DrivetimeFilter(BaseFilter):
             - 'drivetime_simple': use a drivetime with weights, but using simplified shapes
             - 'drivetime_unweighted': return unweighted results (used to get all geographies
                 intersecting at all with the drive time area)
+            - 'drivetime_destination': use a normal drivetime, which weights results, but the
+                location is the destination instead of the start point
+            - 'drivetime_destination_simple': use a drivetime with weights, but using simplified
+                shapes, and the location as the destination
+            - 'drivetime_destination_unweighted': return unweighted results (used to get all
+                geographies intersecting at all with the drive time area), and use the location as
+                the destination
         with_traffic: bool
             Use traffic estimates to compute the drive time area?
         start_time: str
