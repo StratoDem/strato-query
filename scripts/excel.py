@@ -36,14 +36,14 @@ params = {
 # List of all supported geo locations
 upper_geo = {
     'METRO': 'METRO_CODE As Long',
-    #'STATE': 'GEOID2',
+    'STATE': 'STATE_CODE As Long',
     'COUNTY': 'COUNTY_CODE As Long',
-    #'US':'US',
-    #"MICRO":'micro',
-    #'ZIP':"zip",
-    #'TRACT': 'GEOID11',
-    'MILE_RADIUS': "LATITUDE As Double, LONGITUDE As Double, MILES As Double"
-    #'DRIVE_TIME':'drive_time'
+    'US': '',
+    "MICRO": 'MICRO_CODE As Long',
+    "ZIP": 'ZIP_CODE as Long',
+    'TRACT': 'TRACT_CODE As Long',
+    'MILE_RADIUS': "LATITUDE As Double, LONGITUDE As Double, MILES As Double",
+    'DRIVE_TIME': 'LATITUDE As Double, LONGITUDE As Double, minutes as Intger'
     }
 
 
@@ -51,16 +51,21 @@ upper_geo = {
 lower_geo = {
     'METRO': '''\t\tgeoname:=\"metro\", _
     \t\tgeoFilter:=equalToFilter(\"cbsa\",METRO_CODE), _\n''',
-    #'STATE':'LOL',
+    'STATE': '''\t\tgeonmae:=\"state\", _
+    \t\tgeoFilter:=equalToFilter(\"geoid2\",STATE_CODE), _\n ''',
     'COUNTY': '''\t\tgeoname:=\"county\", _
     \t\tgeoFilter:=equalToFilter(\"geoid5\",COUNTY_CODE), _\n''',
-    #"US":"Still gotta do",
-    #"MICRO":"WILL FINISH",
-    #"ZIP":"I PROMISE",
-    #"TRACT":"working on replicating the excel example first",
+    "US": "",
+    "MICRO": '''\t\tgeoname:=\"micro\", _
+    \t\tgeoFilter:=equalToFilter(\"cbsa\",MICRO_CODE), _ \n ''',
+    "ZIP": '''\t\tgeoname:=\"zip\" , _
+    \t\tgeoFilter:=equalToFilter(\"zip\",ZIP_CODE), _ \n ''',
+    "TRACT": '''\t\tgeoname:=\"tract\", _
+    \t\tgeoFilter:=equalToFilter(\"geoid11\", TRACT_CODE) , _ \n ''',
     "MILE_RADIUS": '''\t\tgeoname:=\"tract\", _
-    \t\tgeoFilter:=mileRadiusFilter(LATITUDE:=LATITUDE,LONGITUDE:=LONGITUDE, MILES:=MILES), _\n'''
-    #"DRIVE_TIME": "Okay last one"
+    \t\tgeoFilter:=mileRadiusFilter(LATITUDE:=LATITUDE,LONGITUDE:=LONGITUDE, MILES:=MILES), _\n''',
+    "DRIVE_TIME": '''\t\tgeoname:=\"tract\", _
+    \t\tgeoFilter:=drivetimeFilter(LATITUDE:=LATITUDE,LONGITUDE:=LONGITUDE, minutes:=minutes), _\n '''
 }
 # Template for VBA QUERY
 template = '''QUERY_NAME(FILTER_PARAMS, GEO_PARAMS, API_TOKEN As String) As Variant
