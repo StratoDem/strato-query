@@ -25,6 +25,7 @@ __all__ = [
     'NotEqualToFilter',
     'NotInFilter',
     'DrivetimeFilter',
+    'WalktimeFilter',
     'MileRadiusFilter',
     'IntersectsFilter',
     'OverlapsMileRadiusFilter',
