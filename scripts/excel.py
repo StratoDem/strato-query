@@ -55,8 +55,7 @@ outer_geo_function_dim = MappingProxyType({
     "ZIP": 'ZIP_CODE as Long',
     'TRACT': 'TRACT_CODE As Long',
     'MILE_RADIUS': "LATITUDE As Double, LONGITUDE As Double, MILES As Double",
-    'DRIVE_TIME': 'LATITUDE As Double, LONGITUDE As Double, minutes as Intger'
-    }
+    'DRIVE_TIME': 'LATITUDE As Double, LONGITUDE As Double, minutes as Integer',
 })
 
 # Map geographic level to geographic filter used in function
@@ -78,31 +77,32 @@ inner_geo_filters = MappingProxyType({
     "MILE_RADIUS": '''\t\tgeoname:=\"tract\", _
     \t\tgeoFilter:=mileRadiusFilter(LATITUDE:=LATITUDE,LONGITUDE:=LONGITUDE, MILES:=MILES), _\n''',
     "DRIVE_TIME": '''\t\tgeoname:=\"tract\", _
-    \t\tgeoFilter:=drivetimeFilter(LATITUDE:=LATITUDE,LONGITUDE:=LONGITUDE, minutes:=minutes), _\n '''
-}
+    \t\tgeoFilter:=drivetimeFilter(LATITUDE:=LATITUDE,LONGITUDE:=LONGITUDE, minutes:=minutes), _\n'''
+})
 # Template for VBA QUERY
 template = '''QUERY_NAME(FILTER_PARAMS, GEO_PARAMS, API_TOKEN As String) As Variant
               QUERY_NAME = FUNCTION'''
 
 
-# Template for end of VBA function
-helper_function_template = '''
-    numCols = dataResults("data")(1).Count
-    columnNames = Array("households", "year")
-    numObservations = dataResults("data").Count
-
-    ReDim dataArray(numObservations - 1, numCols - 1)
-
-    idxRow = 0
-    For Each Value In dataResults("data")
-        For idxCol = 0 To numCols - 1
-            dataArray(idxRow, idxCol) = Value(columnNames(idxCol))
-        Next idxCol
-        idxRow = idxRow + 1
-    Next Value
-
-    XXX = dataArray
-End Function\n\n'''
+def build_helper_function_template(target_variable_name: str) -> str:
+    # Template for end of VBA function
+    return f'''
+        numCols = dataResults("data")(1).Count
+        columnNames = Array("{target_variable_name}", "year")
+        numObservations = dataResults("data").Count
+    
+        ReDim dataArray(numObservations - 1, numCols - 1)
+    
+        idxRow = 0
+        For Each Value In dataResults("data")
+            For idxCol = 0 To numCols - 1
+                dataArray(idxRow, idxCol) = Value(columnNames(idxCol))
+            Next idxCol
+            idxRow = idxRow + 1
+        Next Value
+    
+        XXX = dataArray
+    End Function\n\n'''
 
 
 class StratoFunction(abc.ABC):
@@ -166,7 +166,7 @@ class HouseholdsByIncomeStratoFunction(StratoFunction):
         groupby:=Array("year"), _
         order:=Array("year")), _
         API_TOKEN:=API_TOKEN)
-''' + helper_function_template
+''' + build_helper_function_template('households')
         function_string = function_string.replace("XXX", self.function_name)
 
         return function_string
@@ -185,17 +185,17 @@ class MedianHouseholdIncomeStratoFunction(StratoFunction):
     Set dataResults = submitAPIQuery( _
                       query:=medianQueryParameters( _
                               table:="incomeforecast_" & geoname & "_annual_income_group_age", _
-                      dataFields:=Array(renameVariable(original:="median_value", renamed:="median_hhi"), "year"), _
+                      dataFields:=Array("median_value", "year"), _
                       medianVariableName:="income_g", _
                       dataFilters:=Array( _
                                     geoFilter, _
                       betweenFilter("year", Array(YEAR_LOW, YEAR_HIGH)), _
                       betweenFilter("age_g", Array(AGE_LOW, AGE_HIGH))), _
-        aggregations:=Array(sumAggregation("households")), _
+        aggregations:=Array(), _
         groupby:=Array("year"), _
         order:=Array("year")), _
         API_TOKEN:=API_TOKEN)
-    ''' + helper_function_template
+    ''' + build_helper_function_template('median_value')
         function_string = function_string.replace("XXX", self.function_name)
 
         return function_string
@@ -326,8 +326,13 @@ def generate_vba_function_definition(function_name: str) -> str:
     function_info = parse_function_name_to_function_info(function_name)
     geo = parse_geolevel(function_name)
 
+    if geo[1]:
+        geo_stub = geo[1] + ','
+    else:
+        geo_stub = ''
+
     vba_function_definition = f"""
-Public Function {function_name}(YEAR_LOW As Integer, YEAR_HIGH As Integer, {data_filter[1]}{geo[1]}, API_TOKEN As String) As Variant
+Public Function {function_name}(YEAR_LOW As Integer, YEAR_HIGH As Integer, {data_filter[1]}{geo_stub} API_TOKEN As String) As Variant
     {function_name}={function_info.function_name}( _
         YEAR_LOW:=YEAR_LOW, _
         YEAR_HIGH:=YEAR_HIGH, _
