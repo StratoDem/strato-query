@@ -200,6 +200,54 @@ class DrivetimeFilter(BaseFilter):
                 start_time=start_time))
 
 
+class WalktimeFilter(BaseFilter):
+    def __init__(self,
+                 latitude: float,
+                 longitude: float,
+                 minutes: Union[int, float],
+                 detailed_type: str = 'walktime'):
+        """
+        Filter a query to geographies contained by the walktime area
+
+        Parameters
+        ----------
+        latitude: float
+            Center latitude
+        longitude: float
+            Center longitude
+        minutes: int or float
+            Minutes walk from latitude-longitude center
+        detailed_type: str
+            One of:
+            - 'walktime': use a normal walktime, which weights results
+            - 'walktime_simple': use a walktime with weights, but using simplified shapes
+            - 'walktime_unweighted': return unweighted results (used to get all geographies
+                intersecting at all with the walk time area)
+            - 'walktime_destination': use a normal walktime, which weights results, but the
+                location is the destination instead of the start point
+            - 'walktime_destination_simple': use a walktime with weights, but using simplified
+                shapes, and the location as the destination
+            - 'walktime_destination_unweighted': return unweighted results (used to get all
+                geographies intersecting at all with the walk time area), and use the location as
+                the destination
+        """
+        assert detailed_type in {
+            'walktime',
+            'walktime_simple',
+            'walktime_unweighted',
+            'walktime_destination',
+            'walktime_destination_simple',
+            'walktime_destination_unweighted'}
+
+        super().__init__(
+            filter_type=detailed_type,
+            filter_variable='',
+            filter_value=dict(
+                latitude=latitude,
+                longitude=longitude,
+                minutes=minutes))
+
+
 class IntersectsFilter(BaseFilter):
     def __init__(self, var: str, val: dict):
         super().__init__(
