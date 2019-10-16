@@ -1,9 +1,11 @@
-import itertools
-import re
-scripts = []
-s = ""
+"""
+StratoDem Analytics : excel
+Principal Author(s) : Owen Dreikosen
+Secondary Author(s) :
+Description : VBA package generation for Excel User-Defined Functions
 
-'''
+Notes :
+
 Naming Conventions
 
 query = 1 specific type of query for the API
@@ -12,29 +14,39 @@ i.e STRATODEM_HOUSEHOLDS_WITH_INCOME_BETWEEN_FOR_METRO
 function = multiple different variations for different
 input variables and filters of queries -> queryHouseholdsIncomeAge
 
- many queries -> 1 function
+many queries -> 1 function
 
-'''
+October 10, 2019
+"""
 
-# Values for variables to default to give broad range
-default_values = {
+import abc
+import itertools
+import re
+from types import MappingProxyType
+from typing import Tuple
+
+# Map the metric to the default filter with all possible values of the metric
+# (MappingProxyType so this is immutable)
+map_metric_to_default_filter_values = MappingProxyType({
     'AGE': '\t\tAGE_LOW:=1, _ \n\t\tAGE_HIGH:=18, _\n',
     'INCOME': '\t\tINCOME_LOW:=1, _ \n\t\tINCOME_HIGH:=18, _\n'
-}
+})
 
-
-# List of all supported filters and their templates
-filters = {
+# Map filter type to the filter dim definition in VBA function stub
+# (MappingProxyType so this is immutable)
+map_filter_type_to_filter_dim = MappingProxyType({
     'BETWEEN': 'XXX_LOW as Integer, XXX_HIGH as Integer, '
-}
+})
 
-# Templates for all supported filters for the paramaters for functions
-params = {
+# Templates for all supported filters for the parameters for functions
+# (MappingProxyType so this is immutable)
+map_filter_type_to_filter_template = MappingProxyType({
     'BETWEEN': '\t\tXXX_LOW:=XXX_LOW, _\n\t\tXXX_HIGH:=XXX_HIGH, _\n'
-}
+})
 
-# List of all supported geo locations
-upper_geo = {
+# Map geographic level to dim definition in VBA function stub
+# (MappingProxyType so this is immutable)
+outer_geo_function_dim = MappingProxyType({
     'METRO': 'METRO_CODE As Long',
     'STATE': 'STATE_CODE As Long',
     'COUNTY': 'COUNTY_CODE As Long',
@@ -45,10 +57,11 @@ upper_geo = {
     'MILE_RADIUS': "LATITUDE As Double, LONGITUDE As Double, MILES As Double",
     'DRIVE_TIME': 'LATITUDE As Double, LONGITUDE As Double, minutes as Intger'
     }
+})
 
-
-# Geo templates for function parameters
-lower_geo = {
+# Map geographic level to geographic filter used in function
+# (MappingProxyType so this is immutable)
+inner_geo_filters = MappingProxyType({
     'METRO': '''\t\tgeoname:=\"metro\", _
     \t\tgeoFilter:=equalToFilter(\"cbsa\",METRO_CODE), _\n''',
     'STATE': '''\t\tgeonmae:=\"state\", _
@@ -71,6 +84,7 @@ lower_geo = {
 template = '''QUERY_NAME(FILTER_PARAMS, GEO_PARAMS, API_TOKEN As String) As Variant
               QUERY_NAME = FUNCTION'''
 
+
 # Template for end of VBA function
 helper_function_template = '''
     numCols = dataResults("data")(1).Count
@@ -91,14 +105,20 @@ helper_function_template = '''
 End Function\n\n'''
 
 
-class stratofunction:
+class StratoFunction(abc.ABC):
+    user_variables = None
+    function_title = None
+
     # Creates all possible combinations of queries with given input variables
-    def __init__(self, user_variables, function_title):
-        self.user_variables = user_variables
+    def __init__(self):
         self.queries = []
+        self.vba_function_definition_str = None
+
         filters_and_data = []
         combos = []
-        for _filter in filters.keys():
+
+        # TODO what is all this doing?? :D
+        for _filter in map_filter_type_to_filter_dim.keys():
             for variable in self.user_variables:
                 filters_and_data.append(f"WITH_{variable}_{_filter}_")
         for i in range(1, len(self.user_variables) + 1):
@@ -106,24 +126,31 @@ class stratofunction:
         for combo in combos:
             for variable in combo:
                 query = ''.join(variable)
-                for geo in upper_geo.keys():
-                    self.queries.append(f"STRATODEM_{function_title}_{query}FOR_{geo}")
-        for geo in upper_geo.keys():
-            self.queries.append(f"STRATODEM_{function_title}_FOR_{geo}")
+                for geo in outer_geo_function_dim.keys():
+                    self.queries.append(f"STRATODEM_{self.function_title}_{query}FOR_{geo}")
+        for geo in outer_geo_function_dim.keys():
+            self.queries.append(f"STRATODEM_{self.function_title}_FOR_{geo}")
 
-    def params(self, query):
+    def params(self, vba_function_definition_str):
         for variable in self.user_variables:
-            if variable not in query:
-                query = query+default_values[variable]
-        self.s = query
+            if variable not in vba_function_definition_str:
+                vba_function_definition_str += map_metric_to_default_filter_values[variable]
+        self.vba_function_definition_str = vba_function_definition_str
+
+    @property
+    @abc.abstractmethod
+    def function_string(self):
+        pass
 
 
-class households(stratofunction):
-    def __init__(self):
-        super().__init__(['AGE', 'INCOME'], 'HOUSEHOLDS')
-        self.s = ""
-        self.function_name = "queryHouseholdsIncomeAge"
-        self.function_string ='''Public Function queryHouseholdsIncomeAge(YEAR_LOW As Integer, YEAR_HIGH As Integer, INCOME_LOW As Integer, INCOME_HIGH As Integer, AGE_LOW As Integer, AGE_HIGH As Integer, geoname As String, geoFilter As Dictionary, API_TOKEN As String) As Variant
+class HouseholdsByIncomeStratoFunction(StratoFunction):
+    user_variables = ['AGE', 'INCOME']
+    function_title = 'HOUSEHOLDS'
+    function_name = 'queryHouseholdsIncomeAge'
+
+    @property
+    def function_string(self) -> str:
+        function_string = '''Public Function queryHouseholdsIncomeAge(YEAR_LOW As Integer, YEAR_HIGH As Integer, INCOME_LOW As Integer, INCOME_HIGH As Integer, AGE_LOW As Integer, AGE_HIGH As Integer, geoname As String, geoFilter As Dictionary, API_TOKEN As String) As Variant
     Dim dataResults As Object
 
     Set dataResults = submitAPIQuery( _
@@ -140,16 +167,19 @@ class households(stratofunction):
         order:=Array("year")), _
         API_TOKEN:=API_TOKEN)
 ''' + helper_function_template
-        function_string = self.function_string.replace("XXX", self.function_name)
-        self.function_string = function_string
+        function_string = function_string.replace("XXX", self.function_name)
+
+        return function_string
 
 
-class median_household_income(stratofunction):
-    def __init__(self):
-        super().__init__(['AGE'], "MEDIAN_HOUSEHOLD_INCOME")
-        self.s = ""
-        self.function_name = "queryMedianIncomeAge"
-        self.function_string = '''Public Function queryMedianIncomeAge(YEAR_LOW As Integer, YEAR_HIGH As Integer, AGE_LOW As Integer, AGE_HIGH As Integer, geoname As String, geoFilter As Dictionary, API_TOKEN As String) As Variant
+class MedianHouseholdIncomeStratoFunction(StratoFunction):
+    user_variables = ['AGE']
+    function_title = 'MEDIAN_HOUSEHOLD_INCOME'
+    function_name = 'queryMedianIncomeAge'
+
+    @property
+    def function_string(self) -> str:
+        function_string = '''Public Function queryMedianIncomeAge(YEAR_LOW As Integer, YEAR_HIGH As Integer, AGE_LOW As Integer, AGE_HIGH As Integer, geoname As String, geoFilter As Dictionary, API_TOKEN As String) As Variant
     Dim dataResults As Object
 
     Set dataResults = submitAPIQuery( _
@@ -166,72 +196,154 @@ class median_household_income(stratofunction):
         order:=Array("year")), _
         API_TOKEN:=API_TOKEN)
     ''' + helper_function_template
-        function_string = self.function_string.replace("XXX", self.function_name)
-        self.function_string = function_string
+        function_string = function_string.replace("XXX", self.function_name)
+
+        return function_string
 
 
-# List of all supported function types
-stratodem_functions = {
-    'HOUSEHOLDS': households(),
-    'MEDIAN_HOUSEHOLD_INCOME': median_household_income()
-}
+# Map the function topic (e.g., 'HOUSEHOLDS') to the StratoFunction instance
+map_function_topic_to_stratofunction = MappingProxyType({
+    'HOUSEHOLDS': HouseholdsByIncomeStratoFunction(),
+    'MEDIAN_HOUSEHOLD_INCOME': MedianHouseholdIncomeStratoFunction()
+})
 
 
-def data_filterParser(s):
+def parse_data_filters(function_name: str) -> Tuple[str, str]:
+    """
+    Parse the function name and create the data filters used in the query (and function definition)
+
+    Parameters
+    ----------
+    function_name: str
+        Name of the VBA function, e.g. "STRATODEM_HOUSEHOLDS_WITH_AGE_BETWEEN_FOR_METRO"
+
+    Returns
+    -------
+    str, str
+        Data filters, Data dim in function definition
+    """
     data_filters = []
     data_params = []
-    x = re.search("(.+?)(?:_WITH)", s)
-    if (x is None):
-        return['', '']
-    s = s[len(x.group(1))+1:]
-    while(len(s) > 1):
-        x = re.search("(?:WITH_)(.+?(?:_).+?)(?:_)", s)
-        if (x is None):
+    re_matches = re.search("(.+?)(?:_WITH)", function_name)
+
+    if re_matches is None:
+        return '', ''
+
+    function_name = function_name[len(re_matches.group(1)) + 1:]
+    while len(function_name) > 1:
+        re_matches = re.search("(?:WITH_)(.+?(?:_).+?)(?:_)", function_name)
+        if re_matches is None:
             break
-        substring = x.group(1)
+        substring = re_matches.group(1)
         filter_param = substring.split('_')
-        data_filters.append(filters[filter_param[1]].replace("XXX", filter_param[0]))
-        data_params.append(params[filter_param[1]].replace("XXX", filter_param[0]))
-        s = s[len(x.group(0)):]
-    return [''.join(data_params), ''.join(data_filters)]
+        data_filters.append(
+            map_filter_type_to_filter_dim[filter_param[1]].replace("XXX", filter_param[0]))
+        data_params.append(
+            map_filter_type_to_filter_template[filter_param[1]].replace("XXX", filter_param[0]))
+        function_name = function_name[len(re_matches.group(0)):]
+
+    return ''.join(data_params), ''.join(data_filters)
 
 
-def geoParser(s):
-    x = re.search("(?:FOR_).+", s)
-    geo = x.group(0)
+def parse_geolevel(function_name: str) -> Tuple[str, str]:
+    """
+    Parse the function name to determine the geographic filters and geographic variable definitions
+
+    Parameters
+    ----------
+    function_name: str
+        Name of the VBA function, e.g. "STRATODEM_HOUSEHOLDS_WITH_AGE_BETWEEN_FOR_METRO"
+
+    Returns
+    -------
+    str, str
+        Geographic filters, Geographic dim in function definition
+    """
+    re_matches = re.search("(?:FOR_).+", function_name)
+    geo = re_matches.group(0)
     geo = geo[4:]
-    return [lower_geo[geo], upper_geo[geo]]
+
+    geo_filters = inner_geo_filters[geo]
+    geo_dim = outer_geo_function_dim[geo]
+
+    return geo_filters, geo_dim
 
 
-def functionParser(s):
-    x = re.search("(?:STRATODEM_)(.*?)(?:_WITH|_FOR)",s)
-    function = x.group(1)
-    return stratodem_functions[function]
+def parse_function_name_to_function_info(function_name: str) -> StratoFunction:
+    """
+    Pull the StratoFunction definition associated with the given function name
+
+    Parameters
+    ----------
+    function_name: str
+        Name of the VBA function, e.g. "STRATODEM_HOUSEHOLDS_WITH_AGE_BETWEEN_FOR_METRO"
+
+    Returns
+    -------
+    StratoFunction
+    """
+    re_matches = re.search("(?:STRATODEM_)(.*?)(?:_WITH|_FOR)", function_name)
+    function_topic = re_matches.group(1)
+
+    return map_function_topic_to_stratofunction[function_topic]
 
 
-def stringParser(s):
-    query = "Public Function "+s
-    data_filter = data_filterParser(s)
-    query = query + f"(YEAR_LOW As Integer, YEAR_HIGH as Integer, {data_filter[1]}"
-    function_info = functionParser(s)
-    geo = geoParser(s)
-    query = query+geo[1]+", API_TOKEN As String) As Variant\n"
-    query = query+f'''\t{s}={function_info.function_name}( _
-    \t\tYEAR_LOW:=YEAR_LOW, _ \n\t\tYEAR_HIGH:=YEAR_HIGH, _
-    {data_filter[0]}'''
-    function_info.params(query)
-    query = function_info.s
-    query = query + geo[0] + "\t\tAPI_TOKEN:=API_TOKEN)\nEnd Function\n\n"
-    return query
+def generate_vba_function_definition(function_name: str) -> str:
+    """
+    Generate the VBA function definition for a given function name
+
+    Parameters
+    ----------
+    function_name: str
+        Name of the VBA function, e.g. "STRATODEM_HOUSEHOLDS_WITH_AGE_BETWEEN_FOR_METRO"
+
+    Returns
+    -------
+    str
+        VBA function definition
+
+    Examples
+    --------
+    ```
+    generate_vba_function_definition('STRATODEM_HOUSEHOLDS_WITH_AGE_BETWEEN_FOR_METRO')
+    ```
+    > Returns
+    > Public Function STRATODEM_HOUSEHOLDS_WITH_AGE_BETWEEN_FOR_METRO(YEAR_LOW As Integer, YEAR_HIGH As Integer, AGE_LOW as Integer, AGE_HIGH as Integer, METRO_CODE As Long, API_TOKEN As String) As Variant
+    >     STRATODEM_HOUSEHOLDS_WITH_AGE_BETWEEN_FOR_METRO=queryHouseholdsIncomeAge( _
+    >         YEAR_LOW:=YEAR_LOW, _
+    >         YEAR_HIGH:=YEAR_HIGH, _
+    >         AGE_LOW:=AGE_LOW, _
+    >         AGE_HIGH:=AGE_HIGH, _
+    >         INCOME_LOW:=1, _
+    >         INCOME_HIGH:=18, _
+    >         geoname:="metro", _
+    >         geoFilter:=equalToFilter("cbsa",METRO_CODE), _
+    >         API_TOKEN:=API_TOKEN)
+    End Function
+
+    """
+    data_filter = parse_data_filters(function_name)
+    function_info = parse_function_name_to_function_info(function_name)
+    geo = parse_geolevel(function_name)
+
+    vba_function_definition = f"""
+Public Function {function_name}(YEAR_LOW As Integer, YEAR_HIGH As Integer, {data_filter[1]}{geo[1]}, API_TOKEN As String) As Variant
+    {function_name}={function_info.function_name}( _
+        YEAR_LOW:=YEAR_LOW, _
+        YEAR_HIGH:=YEAR_HIGH, _
+        {data_filter[0]}"""
+
+    # TODO not a fan of the mutation here
+    function_info.params(vba_function_definition)
+
+    vba_function_definition = function_info.vba_function_definition_str
+
+    vba_function_definition += geo[0] + "\t\tAPI_TOKEN:=API_TOKEN)\nEnd Function\n\n"
+
+    return vba_function_definition
 
 
-VBA_Script = ""
-
-for x in stratodem_functions.values():
-    for query in x.queries:
-        VBA_Script = VBA_Script+stringParser(query)
-    VBA_Script = VBA_Script + x.function_string
-VBA_Script = VBA_Script+'''Private Function submitAPIQuery(query As Dictionary, API_TOKEN As String) As Object
+STANDARD_LIBRARY_VBA_CODE = """Private Function submitAPIQuery(query As Dictionary, API_TOKEN As String) As Object
     'Query the StratoDem Analytics API
 
     Dim httpReq As New WinHttp.WinHttpRequest
@@ -511,8 +623,22 @@ Private Function geolevelToGeoname(GEOLEVEL As String) As String
         Err.Raise 5, "geolevelToGeoname", "Failed to map GEOLEVEL " & GEOLEVEL
     End If
 End Function
+"""
 
-'''
-f = open("Strato_Excel_Add_In.txt", "w+")
-f.write(VBA_Script)
-f.close()
+if __name__ == '__main__':
+    vba_script = """
+' StratoDem Analytics Excel Add-in for User-Defined Functions
+' (c) StratoDem Analytics, 2019-
+' Questions? Email team@stratodem.com
+"""
+
+    for function_ in map_function_topic_to_stratofunction.values():
+        for query in function_.queries:
+            vba_script += generate_vba_function_definition(query)
+
+        vba_script += function_.function_string
+
+    vba_script += STANDARD_LIBRARY_VBA_CODE
+
+    with open('Strato_Excel_Add_In.txt', 'w') as f:
+        f.write(vba_script)
