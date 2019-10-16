@@ -166,7 +166,7 @@ class DrivetimeFilter(BaseFilter):
         longitude: float
             Center longitude
         minutes: int or float
-            Minutes drive from latitude-longitude center
+            Minutes drive from or to latitude-longitude center
         detailed_type: str
             One of:
             - 'drivetime': use a normal drivetime, which weights results
