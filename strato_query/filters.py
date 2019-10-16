@@ -179,7 +179,13 @@ class DrivetimeFilter(BaseFilter):
             The departure time for the drivetime, used in concert with "with_traffic" set to True
             e.g., "2019-05-25T18:00:00"
         """
-        assert detailed_type in {'drivetime', 'drivetime_simple', 'drivetime_unweighted'}
+        assert detailed_type in {
+            'drivetime',
+            'drivetime_simple',
+            'drivetime_unweighted',
+            'drivetime_destination',
+            'drivetime_destination_simple',
+            'drivetime_destination_unweighted'}
         assert isinstance(with_traffic, bool)
         assert start_time is None or isinstance(start_time, str)
 
