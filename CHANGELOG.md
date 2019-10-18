@@ -2,6 +2,30 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.3.0] - 2019-09-18
+### Adds
+- Adds new buffer types to the `DrivetimeFilter`. It now supports:
+    - `'drivetime'`
+    - `'drivetime_simple'`
+    - `'drivetime_unweighted'`
+    - `'drivetime_destination'`
+    - `'drivetime_destination_simple'`
+    - `'drivetime_destination_unweighted'`
+- Adds a `WalktimeFilter` which supports the following types:
+    - `'walktime'`
+    - `'walktime_unweighted'`
+    - `'walktime_destination'`
+    - `'walktime_destination_unweighted'`
+- Adds `detailed_type` as a new optional argument to `OverlapsDrivetimeFilter` which allows:
+    - `'overlaps_drivetime'`  
+    - `'overlaps_drivetime_destination'`
+- Adds `detailed_type` as a new optional argument to `OverlapsWalktimeFilter` which allows:
+    - `'overlaps_walktime'`  
+    - `'overlaps_walktime_destination'`  
+
+## Related issues
+- [69](https://github.com/StratoDem/strato-query/issues/69)
+
 ## [3.2.0] - 2019-09-10
 ### Adds
 - Adds new query param classes
