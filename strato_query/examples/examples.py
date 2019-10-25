@@ -59,6 +59,36 @@ class ExampleQueries(SDAPIQuery):
         print('Results truncated')
 
     @classmethod
+    def example_count_query_destination(cls):
+        # Number of households ages 25-39 with net worth of at least $50,000
+        # within 20-minute drive to a location South of Boston in the year 2017
+
+        df = cls.query_api_df(
+            query_params=APIQueryParams(
+                query_type='COUNT',
+                table='networth_tract_annual_net_worth_age',
+                data_fields=('year', 'age_g_bottom_coded', 'net_worth_g', 'households'),
+                data_filters=(
+                    BetweenFilter(var='age_g_bottom_coded', val=[6, 8]).to_dict(),
+                    GreaterThanOrEqualToFilter(var='net_worth_g', val=3).to_dict(),
+                    EqualToFilter(var='year', val=2017).to_dict(),
+                    DrivetimeFilter(
+                        latitude=42.256922,
+                        longitude=-71.040571,
+                        detailed_type='drivetime_destination',
+                        minutes=20).to_dict(),
+                ),
+                groupby=(),
+                order=(),
+                aggregations=(),
+            )
+        )
+
+        print('Number of households 25-39 with $50k+ net worth in 2017 in a 20 min drive to coord:')
+        print(df.head())
+        print('Results truncated')
+
+    @classmethod
     def example_query_with_area_join_and_aggregation(cls):
         # Population density in the Boston MSA by year prior to 2015
 
@@ -270,6 +300,8 @@ class ExampleQueries(SDAPIQuery):
 
 def run_examples():
     ExampleQueries.example_count_query()
+    print('\n\n')
+    ExampleQueries.example_count_query_destination()
     print('\n\n')
     ExampleQueries.example_query_with_area_join_and_aggregation()
     print('\n\n')
