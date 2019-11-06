@@ -348,6 +348,25 @@ IntersectsFilter(
           ]]
       }
     })
+
+# Use this version to get weighted results
+IntersectsFilter(
+    var='geometry', 
+    detailed_type='intersects_weighted',
+    val={
+      "type": "Feature",
+      "properties": {},
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+            [-71.13269805908203, 42.298135272741206],
+            [-70.99433898925781, 42.298135272741206],
+            [-70.99433898925781, 42.385937107381125],
+            [-71.13269805908203, 42.385937107381125],
+            [-71.13269805908203, 42.298135272741206]
+          ]]
+      }
+    })
 ```
 
 ```r

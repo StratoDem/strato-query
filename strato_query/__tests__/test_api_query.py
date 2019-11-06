@@ -485,6 +485,59 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
         assert len(df.columns) == 2, df.columns
         assert len(df['GEOID11']) == 252, df
 
+    def test_intersects_weighted_filter(self):
+        df = SDAPIQuery.query_api_df(
+            APIQueryParams(
+                table='populationforecast_tract_annual_population',
+                data_filters=(
+                    IntersectsFilter(
+                        detailed_type='intersects_weighted',
+                        var='geoid11',
+                        val={"type": "Polygon",
+                             "coordinates": [
+                                 [[-71.17801666259767, 42.43321295705304],
+                                  [-71.0145950317383, 42.43321295705304],
+                                  [-71.0145950317383, 42.3145122534915],
+                                  [-71.17801666259767, 42.3145122534915],
+                                  [-71.17801666259767, 42.43321295705304]]]}).to_dict(),
+                    BetweenFilter(var='year', val=[2010, 2019]).to_dict()),
+                data_fields=('year', 'population'),
+                groupby=('year',),
+                order=('year',),
+                aggregations=(SumAggregation('population'),),
+            ))
+
+        self.assertEqual(len(df.columns), 2, df.columns)
+        self.assertEqual(len(df), 10)
+        self.assertEqual(list(range(2010, 2020)), df['YEAR'].values.tolist())
+
+        df = SDAPIQuery.query_api_df(
+            APIMedianQueryParams(
+                table='incomeforecast_tract_annual_income_group',
+                data_filters=(
+                    IntersectsFilter(
+                        detailed_type='intersects_weighted',
+                        var='geoid11',
+                        val={"type": "Polygon",
+                             "coordinates": [
+                                 [[-71.17801666259767, 42.43321295705304],
+                                  [-71.0145950317383, 42.43321295705304],
+                                  [-71.0145950317383, 42.3145122534915],
+                                  [-71.17801666259767, 42.3145122534915],
+                                  [-71.17801666259767, 42.43321295705304]]]}).to_dict(),
+                    BetweenFilter(var='year', val=[2010, 2019]).to_dict()),
+                data_fields=('year', 'median_value'),
+                groupby=('year',),
+                order=('year',),
+                median_variable_name='income_g',
+                aggregations=(),
+            ))
+
+        self.assertEqual(len(df.columns), 2, df.columns)
+        self.assertEqual(len(df), 10)
+        self.assertEqual(list(range(2010, 2020)), df['YEAR'].values.tolist())
+        self.assertTrue(df['MEDIAN_VALUE'].gt(0).all())
+
     def test_overlaps_filter(self):
         import json
         df = SDAPIQuery.query_api_df(

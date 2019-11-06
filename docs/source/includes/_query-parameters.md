@@ -490,6 +490,64 @@ The second example returns the metro ID for the latitude-longitude pair:
 |----|----|
 |14454|Boston, MA|
 
+## Custom polygon queries
+
+> This query returns the population contained within the custom polygon by year
+
+```python
+from strato_query import SDAPIQuery, APIQueryParams
+from strato_query.filters import IntersectsFilter, BetweenFilter
+from strato_query.aggregations import SumAggregation
+
+df = SDAPIQuery.query_api_df(
+    APIQueryParams(
+        table='populationforecast_tract_annual_population',
+        data_filters=(
+            IntersectsFilter(
+                detailed_type='intersects_weighted',
+                var='geoid11',
+                val={"type": "Polygon",
+                     "coordinates": [
+                         [[-71.17801666259767, 42.43321295705304],
+                          [-71.0145950317383, 42.43321295705304],
+                          [-71.0145950317383, 42.3145122534915],
+                          [-71.17801666259767, 42.3145122534915],
+                          [-71.17801666259767, 42.43321295705304]]]}).to_dict(),
+            BetweenFilter(var='year', val=[2010, 2019]).to_dict()),
+        data_fields=('year', 'population'),
+        groupby=('year',),
+        order=('year',),
+        aggregations=(SumAggregation('population'),),
+    ))
+```
+
+```r
+# Not implemented yet
+```
+
+```shell
+$ curl -X POST "https://api.stratodem.com/api" \
+    -H "accept: application/json" \
+    -H "Content-Type: application/json" \
+    -d "{ \"token\": \"my-api-token\", \"query\": {\"query_type\": \"COUNT\", \"data_fields\": [\"year\", \"population\"], \"table\": \"populationforecast_tract_annual_population\", \"groupby\": [\"year\"], \"data_filters\": [{\"filter_type\": \"intersects_weighted\", \"filter_value\": {\"type\": \"Polygon\", \"coordinates\": [[[-71.17801666259767, 42.43321295705304], [-71.0145950317383, 42.43321295705304], [-71.0145950317383, 42.3145122534915], [-71.17801666259767, 42.3145122534915], [-71.17801666259767, 42.43321295705304]]]}, \"filter_variable\": \"geoid11\"}, {\"filter_type\": \"between\", \"filter_value\": [2010, 2019], \"filter_variable\": \"year\"}], \"aggregations\": [{\"aggregation_func\": \"sum\", \"variable_name\": \"population\"}], \"order\": [\"year\"]}}"
+```
+
+```vb
+' Not implemented yet
+```
+
+To use a provided GeoJSON `Polygon` as a filter, use the `IntersectsFilter`.
+
+The example to the right returns the population by year for the area covered by the provided `Polygon`
+
+`{"type": "Polygon", "coordinates": [[[-71.1326, 42.2981],[-70.9943, 42.2981], [-70.9943, 42.3859],[-71.1326, 42.3859], [-71.1326, 42.2981]]]}`
+
+|YEAR|SUM_POPULATION|
+|-------|----|
+|2010|852183|
+|2011|862990|
+|....|......|
+
 ## Advanced queries
 
 > This query returns GDP per capita estimates for counties

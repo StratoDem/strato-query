@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.4.0] - 2019-11-06
+### Adds
+- Adds new `detailed_type` option to `IntersectsFilter`. It now supports:
+    - `'intersects'` (simple intersection filtering)
+    - `'intersects_weighted'` (ability to create weighted polygon results)
+
+## Related issues
+- [85](https://github.com/StratoDem/strato-query/issues/85)
+
 ## [3.3.0] - 2019-09-18
 ### Adds
 - Adds new buffer types to the `DrivetimeFilter`. It now supports:
