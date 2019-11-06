@@ -252,9 +252,12 @@ class WalktimeFilter(BaseFilter):
 
 
 class IntersectsFilter(BaseFilter):
-    def __init__(self, var: str, val: dict):
+    def __init__(self, var: str, val: dict, detailed_type: str = 'intersects'):
+        assert detailed_type in {'intersects', 'intersects_weighted'}, \
+            f'IntersectsFilter detailed_type must be one of "intersects", "intersects_weighted", ' \
+            f'was {detailed_type}'
         super().__init__(
-            filter_type='intersects',
+            filter_type=detailed_type,
             filter_variable=var,
             filter_value=val)
 
