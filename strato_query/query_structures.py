@@ -378,12 +378,6 @@ class APIQueryParams(abc.ABC):
             else:
                 query_params_func = 'api_query_params'
 
-            query_params_func = 'api_query_params'
-            if 'mean_variable_name' in dict_form:
-                query_params_func = 'mean_query_params'
-            elif 'median_variable_name' in dict_form:
-                query_params_func = 'median_query_params'
-
             def _process_field(field: Union[str, dict]) -> str:
                 if isinstance(field, str):
                     return "'{field}'".format(field=field)
