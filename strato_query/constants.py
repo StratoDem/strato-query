@@ -29,8 +29,6 @@ SPECIAL_FILTER_SET = frozenset({
     'walktime_unweighted',
     'walktime_destination',
     'walktime_destination_unweighted',
-    'intersects',
-    'intersects_weighted',
 })
 
 MAP_SPECIAL_FILTER_TO_FUNC = MappingProxyType({
@@ -47,6 +45,4 @@ MAP_SPECIAL_FILTER_TO_FUNC = MappingProxyType({
     'walktime_unweighted': 'walktime_filter',
     'walktime_destination': 'walktime_filter',
     'walktime_destination_unweighted': 'walktime_filter',
-    'intersects': 'intersects_filter',
-    'intersects_weighted': 'intersects_filter',
 })
