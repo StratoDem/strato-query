@@ -31,6 +31,12 @@ SPECIAL_FILTER_SET = frozenset({
     'walktime_destination_unweighted',
 })
 
+MILE_BUFFER_TYPES = frozenset({
+    'mile_radius',
+    'mile_radius_simple',
+    'mile_radius_unweighted',
+})
+
 MAP_SPECIAL_FILTER_TO_FUNC = MappingProxyType({
     'mile_radius': 'mile_radius_filter',
     'mile_radius_simple': 'mile_radius_filter',
