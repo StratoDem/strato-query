@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.5.0] - 2019-11-13
+### Changes
+- Updates the pretty print behavior to account for new buffer filters
+
+## Related issues
+- [88](https://github.com/StratoDem/strato-query/issues/88)
+
 ## [3.4.0] - 2019-11-06
 ### Adds
 - Adds new `detailed_type` option to `IntersectsFilter`. It now supports:
