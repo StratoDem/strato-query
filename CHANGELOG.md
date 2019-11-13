@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file. This projec
 ## [3.5.0] - 2019-11-13
 ### Changes
 - Updates the pretty print behavior to account for new buffer filters
+- Updates the R filters for new filter types
 
 ## Related issues
 - [88](https://github.com/StratoDem/strato-query/issues/88)
