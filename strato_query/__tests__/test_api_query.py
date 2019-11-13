@@ -264,6 +264,21 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
         print(string_form)
         assert isinstance(string_form, str)
 
+        query_params = APIQueryParams(
+            table='geocookbook_tract_na_shapes_full',
+            data_fields=('GEOID5', 'GEOMETRY', 'NAME'),
+            data_filters=(DrivetimeFilter(
+                longitude=-96.91386923077042,
+                latitude=33.28536026887235,
+                minutes=20,
+                with_traffic=True),),
+            aggregations=(),
+            groupby=())
+
+        string_form = query_params.pretty_print()
+        print(string_form)
+        assert isinstance(string_form, str)
+
     def test_pretty_print_vba(self):
         query_params = APIQueryParams(
             table='geocookbook_county_na_county_metro',
@@ -306,6 +321,21 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
         string_form = median_query_params.pretty_print_vba()
         print(string_form)
         self.assertIsInstance(string_form, str)
+
+        query_params = APIQueryParams(
+            table='geocookbook_tract_na_shapes_full',
+            data_fields=('GEOID5', 'GEOMETRY', 'NAME'),
+            data_filters=(DrivetimeFilter(
+                longitude=-96.91386923077042,
+                latitude=33.28536026887235,
+                minutes=20,
+                with_traffic=True),),
+            aggregations=(),
+            groupby=())
+
+        string_form = query_params.pretty_print_vba()
+        print(string_form)
+        assert isinstance(string_form, str)
 
     def test_pretty_print_r(self):
         query_params = APIQueryParams(
@@ -356,6 +386,21 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
         string_form = median_query_params.pretty_print_r()
         print(string_form)
         self.assertIsInstance(string_form, str)
+
+        query_params = APIQueryParams(
+            table='geocookbook_tract_na_shapes_full',
+            data_fields=('GEOID5', 'GEOMETRY', 'NAME'),
+            data_filters=(DrivetimeFilter(
+                longitude=-96.91386923077042,
+                latitude=33.28536026887235,
+                minutes=20,
+                with_traffic=True),),
+            aggregations=(),
+            groupby=())
+
+        string_form = query_params.pretty_print_r()
+        print(string_form)
+        assert isinstance(string_form, str)
 
     def test_calculation_query(self):
         df = self.submit_query(
