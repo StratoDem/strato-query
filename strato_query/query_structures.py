@@ -248,18 +248,26 @@ class APIQueryParams(abc.ABC):
                 assert isinstance(filt, dict)
 
                 filter_type = filt['filter_type']
-                if filter_type in {'mile_radius', 'drivetime'}:
+                if filter_type in cc.SPECIAL_FILTER_SET:
                     metric = 'miles' if filter_type == 'mile_radius' else 'minutes'
-                    func = {
-                        'mile_radius': 'mileRadiusFilter',
-                        'drivetime': 'drivetimeFilter'}[filter_type]
-                    return '{func}(latitude:={lat}, longitude:={lng}, {metric}:={val})'.format(
-                        func=func,
-                        lat=filt['filter_value']['latitude'],
-                        lng=filt['filter_value']['longitude'],
-                        metric=metric,
-                        val=filt['filter_value'][metric]
-                    )
+                    func = cc.MAP_SPECIAL_FILTER_TO_VBA_FUNC[filter_type]
+                    return '{func}(' \
+                           'latitude:={lat}, ' \
+                           'longitude:={lng}, ' \
+                           '{metric}:={val}' \
+                           '{traffic}' \
+                           '{start_time})'.format(
+                            func=func,
+                            lat=filt['filter_value']['latitude'],
+                            lng=filt['filter_value']['longitude'],
+                            metric=metric,
+                            val=filt['filter_value'][metric],
+                            traffic=', traffic:={}, '.format(
+                                filt['filter_value']['traffic']
+                            ) if 'traffic' in filt['filter_value'] else '',
+                            start_time='start_time:={}'.format(
+                                filt['filter_value']['start_time']
+                            ) if 'start_time' in filt['filter_value'] else '')
                 else:
                     func = {
                         'eq': 'equalToFilter',
@@ -271,6 +279,8 @@ class APIQueryParams(abc.ABC):
                         'in': 'inFilter',
                         'nin': 'notInFilter',
                         'between': 'betweenFilter',
+                        'intersects': 'intersectsFilter',
+                        'intersects_weighted': 'intersectsWeightedFilter',
                     }[filter_type]
 
                     fv = filt['filter_value']
@@ -284,9 +294,9 @@ class APIQueryParams(abc.ABC):
                         filter_value = fv
                     return '{func}(filterVariable:="{filter_variable}", ' \
                            'filterValue:={filter_value})'.format(
-                        func=func,
-                        filter_variable=filt['filter_variable'],
-                        filter_value=filter_value)
+                            func=func,
+                            filter_variable=filt['filter_variable'],
+                            filter_value=filter_value)
 
             def _process_aggregation(agg: dict) -> str:
                 assert isinstance(agg, dict)
@@ -395,7 +405,7 @@ class APIQueryParams(abc.ABC):
                 filter_type = filt['filter_type']
                 if filter_type in cc.SPECIAL_FILTER_SET:
                     metric = 'miles' if filter_type in cc.MILE_BUFFER_TYPES else 'minutes'
-                    func = cc.MAP_SPECIAL_FILTER_TO_FUNC[filter_type]
+                    func = cc.MAP_SPECIAL_FILTER_TO_R_FUNC[filter_type]
                     return '{func}(' \
                            'latitude = {lat}, ' \
                            'longitude = {lng}, ' \
