@@ -125,6 +125,30 @@ between_filter = function(filter_variable, filter_value) {
   return(api_filter(filter_variable = filter_variable, filter_type = 'between', filter_value = filter_value))
 }
 
+#' Helper function to create an intersects filter
+#' @param filter_variable Unused
+#' @param filter_value Geojson value used for filter
+#' @keywords query
+#' @export
+#' @return filter structure
+#' @examples
+#' intersects_filter(filter_variable = '', filter_value)
+intersects_filter = function(filter_variable, filter_value) {
+  return(api_filter(filter_variable = '', filter_type = 'intersects', filter_value = filter_value))
+}
+
+#' Helper function to create an intersects_weighted filter
+#' @param filter_variable Unused
+#' @param filter_value Geojson value used for filter
+#' @keywords query
+#' @export
+#' @return filter structure
+#' @examples
+#' intersects_weighted_filter(filter_variable = '', filter_value)
+intersects_weighted_filter = function(filter_variable, filter_value) {
+  return(api_filter(filter_variable = '', filter_type = 'intersects_weighted', filter_value = filter_value))
+}
+
 #' Helper function to create a drivetime filter
 #' @param latitude Latitude of target
 #' @param longitude Longitude of target
