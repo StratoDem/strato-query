@@ -37,7 +37,7 @@ MILE_BUFFER_TYPES = frozenset({
     'mile_radius_unweighted',
 })
 
-MAP_SPECIAL_FILTER_TO_FUNC = MappingProxyType({
+MAP_SPECIAL_FILTER_TO_R_FUNC = MappingProxyType({
     'mile_radius': 'mile_radius_filter',
     'mile_radius_simple': 'mile_radius_filter',
     'mile_radius_unweighted': 'mile_radius_filter',
@@ -51,4 +51,20 @@ MAP_SPECIAL_FILTER_TO_FUNC = MappingProxyType({
     'walktime_unweighted': 'walktime_filter',
     'walktime_destination': 'walktime_filter',
     'walktime_destination_unweighted': 'walktime_filter',
+})
+
+MAP_SPECIAL_FILTER_TO_VBA_FUNC = MappingProxyType({
+    'mile_radius': 'mileRadiusFilter',
+    'mile_radius_simple': 'mileRadiusFilter',
+    'mile_radius_unweighted': 'mileRadiusFilter',
+    'drivetime': 'drivetimeFilter',
+    'drivetime_simple': 'drivetimeFilter',
+    'drivetime_unweighted': 'drivetimeFilter',
+    'drivetime_destination': 'drivetimeFilter',
+    'drivetime_destination_simple': 'drivetimeFilter',
+    'drivetime_destination_unweighted': 'drivetimeFilter',
+    'walktime': 'walktimeFilter',
+    'walktime_unweighted': 'walktimeFilter',
+    'walktime_destination': 'walktimeFilter',
+    'walktime_destination_unweighted': 'walktimeFilter',
 })
