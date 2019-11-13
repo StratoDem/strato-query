@@ -128,39 +128,66 @@ between_filter = function(filter_variable, filter_value) {
 #' Helper function to create a drivetime filter
 #' @param latitude Latitude of target
 #' @param longitude Longitude of target
+#' @param filter_type Full name of type of filter
 #' @param minutes Minutes drivetime
+#' @param traffic Traffic enabled or disabled
+#' @param start_time What day and time to consider for traffic conditions, NULL for present conditions
 #' @keywords query
 #' @export
 #' @return filter structure
 #' @examples
-#' drivetime_filter(latitude = 42.7, longitude = -120.38, minutes = 30)
-drivetime_filter = function(latitude, longitude, minutes) {
+#' drivetime_filter(latitude = 42.7, longitude = -120.38, filter_type = 'drivetime', minutes = 30, traffic = 'enabled', start_time = NULL)
+drivetime_filter = function(latitude, longitude, filter_type, minutes, traffic, start_time) {
   return(
     api_filter(
       filter_variable = '',
-      filter_type = 'drivetime',
+      filter_type = jsonlite::unbox(filter_type),
       filter_value = list(
         latitude = jsonlite::unbox(latitude),
         longitude = jsonlite::unbox(longitude),
-        minutes = jsonlite::unbox(minutes))))
+        minutes = jsonlite::unbox(minutes),
+        traffic=jsonlite::unbox(traffic),
+        start_time=jsonlite::unbox(start_time))))
 }
 
 #' Helper function to create a mile radius filter
 #' @param latitude Latitude of target
 #' @param longitude Longitude of target
+#' @param filter_type Full name of type of filter
 #' @param miles Size of radius in miles
 #' @keywords query
 #' @export
 #' @return filter structure
 #' @examples
-#' mile_radius_filter(latitude = 42.7, longitude = -120.38, miles = 5)
-mile_radius_filter = function(latitude, longitude, miles) {
+#' mile_radius_filter(latitude = 42.7, longitude = -120.38, filter_type = 'mile_radius', miles = 5)
+mile_radius_filter = function(latitude, longitude, filter_type, miles) {
   return(
     api_filter(
       filter_variable = '',
-      filter_type = 'mile_radius',
+      filter_type = jsonlite::unbox(filter_type),
       filter_value = list(
         latitude = jsonlite::unbox(latitude),
         longitude = jsonlite::unbox(longitude),
         miles = jsonlite::unbox(miles))))
+}
+
+#' Helper function to create a walktime filter
+#' @param latitude Latitude of target
+#' @param longitude Longitude of target
+#' @param filter_type Full name of type of filter
+#' @param minutes Minutes walktime
+#' @keywords query
+#' @export
+#' @return filter structure
+#' @examples
+#' walktime_filter(latitude = 42.7, longitude = -120.38, filter_type = 'walktime', minutes = 30)
+walktime_filter = function(latitude, longitude, filter_type, minutes) {
+  return(
+    api_filter(
+      filter_variable = '',
+      filter_type = jsonlite::unbox(filter_type),
+      filter_value = list(
+        latitude = jsonlite::unbox(latitude),
+        longitude = jsonlite::unbox(longitude),
+        minutes = jsonlite::unbox(minutes))))
 }
