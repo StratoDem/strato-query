@@ -247,6 +247,11 @@ class APIQueryParams(abc.ABC):
             def _process_filter(filt: dict) -> str:
                 assert isinstance(filt, dict)
 
+                def _format_start_time(value) -> str:
+                    if value is None:
+                        return 'Null'
+                    return f'"{value}"'
+
                 filter_type = filt['filter_type']
                 if filter_type in cc.SPECIAL_FILTER_SET:
                     metric = 'miles' if filter_type == 'mile_radius' else 'minutes'
@@ -262,11 +267,11 @@ class APIQueryParams(abc.ABC):
                             lng=filt['filter_value']['longitude'],
                             metric=metric,
                             val=filt['filter_value'][metric],
-                            traffic=', traffic:={}, '.format(
+                            traffic=', traffic:="{}", '.format(
                                 filt['filter_value']['traffic']
                             ) if 'traffic' in filt['filter_value'] else '',
                             start_time='start_time:={}'.format(
-                                filt['filter_value']['start_time']
+                                _format_start_time(filt['filter_value']['start_time'])
                             ) if 'start_time' in filt['filter_value'] else '')
                 else:
                     func = {
@@ -402,6 +407,11 @@ class APIQueryParams(abc.ABC):
             def _process_filter(filt: dict) -> str:
                 assert isinstance(filt, dict)
 
+                def _format_start_time(value) -> str:
+                    if value is None:
+                        return 'NULL'
+                    return f'"{value}"'
+
                 filter_type = filt['filter_type']
                 if filter_type in cc.SPECIAL_FILTER_SET:
                     metric = 'miles' if filter_type in cc.MILE_BUFFER_TYPES else 'minutes'
@@ -409,7 +419,7 @@ class APIQueryParams(abc.ABC):
                     return '{func}(' \
                            'latitude = {lat}, ' \
                            'longitude = {lng}, ' \
-                           'filter_type = {filter_type}, ' \
+                           'filter_type = "{filter_type}", ' \
                            '{metric} = {val}' \
                            '{traffic}' \
                            '{start_time})'.format(
@@ -419,11 +429,11 @@ class APIQueryParams(abc.ABC):
                             filter_type=filter_type,
                             metric=metric,
                             val=filt['filter_value'][metric],
-                            traffic=', traffic = {}, '.format(
+                            traffic=', traffic = "{}", '.format(
                                 filt['filter_value']['traffic']
                             ) if 'traffic' in filt['filter_value'] else '',
                             start_time='start_time = {}'.format(
-                                filt['filter_value']['start_time']
+                                _format_start_time(filt['filter_value']['start_time'])
                             ) if 'start_time' in filt['filter_value'] else '')
                 else:
                     func = {
