@@ -14,6 +14,7 @@ import abc
 from typing import List, Tuple, Optional, Union
 from .filters import BaseFilter
 from .aggregations import BaseAggregation
+from strato_query import constants as cc
 
 __all__ = [
     'APIQueryParams',
@@ -246,19 +247,32 @@ class APIQueryParams(abc.ABC):
             def _process_filter(filt: dict) -> str:
                 assert isinstance(filt, dict)
 
+                def _format_start_time(value) -> str:
+                    if value is None:
+                        return 'Null'
+                    return f'"{value}"'
+
                 filter_type = filt['filter_type']
-                if filter_type in {'mile_radius', 'drivetime'}:
+                if filter_type in cc.SPECIAL_FILTER_SET:
                     metric = 'miles' if filter_type == 'mile_radius' else 'minutes'
-                    func = {
-                        'mile_radius': 'mileRadiusFilter',
-                        'drivetime': 'drivetimeFilter'}[filter_type]
-                    return '{func}(latitude:={lat}, longitude:={lng}, {metric}:={val})'.format(
-                        func=func,
-                        lat=filt['filter_value']['latitude'],
-                        lng=filt['filter_value']['longitude'],
-                        metric=metric,
-                        val=filt['filter_value'][metric]
-                    )
+                    func = cc.MAP_SPECIAL_FILTER_TO_VBA_FUNC[filter_type]
+                    return '{func}(' \
+                           'latitude:={lat}, ' \
+                           'longitude:={lng}, ' \
+                           '{metric}:={val}' \
+                           '{traffic}' \
+                           '{start_time})'.format(
+                            func=func,
+                            lat=filt['filter_value']['latitude'],
+                            lng=filt['filter_value']['longitude'],
+                            metric=metric,
+                            val=filt['filter_value'][metric],
+                            traffic=', traffic:="{}", '.format(
+                                filt['filter_value']['traffic']
+                            ) if 'traffic' in filt['filter_value'] else '',
+                            start_time='start_time:={}'.format(
+                                _format_start_time(filt['filter_value']['start_time'])
+                            ) if 'start_time' in filt['filter_value'] else '')
                 else:
                     func = {
                         'eq': 'equalToFilter',
@@ -270,6 +284,8 @@ class APIQueryParams(abc.ABC):
                         'in': 'inFilter',
                         'nin': 'notInFilter',
                         'between': 'betweenFilter',
+                        'intersects': 'intersectsFilter',
+                        'intersects_weighted': 'intersectsWeightedFilter',
                     }[filter_type]
 
                     fv = filt['filter_value']
@@ -283,9 +299,9 @@ class APIQueryParams(abc.ABC):
                         filter_value = fv
                     return '{func}(filterVariable:="{filter_variable}", ' \
                            'filterValue:={filter_value})'.format(
-                        func=func,
-                        filter_variable=filt['filter_variable'],
-                        filter_value=filter_value)
+                            func=func,
+                            filter_variable=filt['filter_variable'],
+                            filter_value=filter_value)
 
             def _process_aggregation(agg: dict) -> str:
                 assert isinstance(agg, dict)
@@ -378,12 +394,6 @@ class APIQueryParams(abc.ABC):
             else:
                 query_params_func = 'api_query_params'
 
-            query_params_func = 'api_query_params'
-            if 'mean_variable_name' in dict_form:
-                query_params_func = 'mean_query_params'
-            elif 'median_variable_name' in dict_form:
-                query_params_func = 'median_query_params'
-
             def _process_field(field: Union[str, dict]) -> str:
                 if isinstance(field, str):
                     return "'{field}'".format(field=field)
@@ -397,19 +407,34 @@ class APIQueryParams(abc.ABC):
             def _process_filter(filt: dict) -> str:
                 assert isinstance(filt, dict)
 
+                def _format_start_time(value) -> str:
+                    if value is None:
+                        return 'NULL'
+                    return f'"{value}"'
+
                 filter_type = filt['filter_type']
-                if filter_type in {'mile_radius', 'drivetime'}:
-                    metric = 'miles' if filter_type == 'mile_radius' else 'minutes'
-                    func = {
-                        'mile_radius': 'mile_radius_filter',
-                        'drivetime': 'drivetime_filter'}
-                    return '{func}(latitude = {lat}, longitude = {lng}, {metric} = {val})'.format(
-                        func=func,
-                        lat=filt['filter_value']['latitude'],
-                        lng=filt['filter_value']['longitude'],
-                        metric=metric,
-                        val=filt['filter_value'][metric]
-                    )
+                if filter_type in cc.SPECIAL_FILTER_SET:
+                    metric = 'miles' if filter_type in cc.MILE_BUFFER_TYPES else 'minutes'
+                    func = cc.MAP_SPECIAL_FILTER_TO_R_FUNC[filter_type]
+                    return '{func}(' \
+                           'latitude = {lat}, ' \
+                           'longitude = {lng}, ' \
+                           'filter_type = "{filter_type}", ' \
+                           '{metric} = {val}' \
+                           '{traffic}' \
+                           '{start_time})'.format(
+                            func=func,
+                            lat=filt['filter_value']['latitude'],
+                            lng=filt['filter_value']['longitude'],
+                            filter_type=filter_type,
+                            metric=metric,
+                            val=filt['filter_value'][metric],
+                            traffic=', traffic = "{}", '.format(
+                                filt['filter_value']['traffic']
+                            ) if 'traffic' in filt['filter_value'] else '',
+                            start_time='start_time = {}'.format(
+                                _format_start_time(filt['filter_value']['start_time'])
+                            ) if 'start_time' in filt['filter_value'] else '')
                 else:
                     func = {
                         'eq': 'eq_filter',
@@ -421,6 +446,8 @@ class APIQueryParams(abc.ABC):
                         'in': 'in_filter',
                         'nin': 'nin_filter',
                         'between': 'between_filter',
+                        'intersects': 'intersects_filter',
+                        'intersects_weighted': 'intersects_weighted_filter',
                     }[filter_type]
 
                     fv = filt['filter_value']
@@ -434,9 +461,9 @@ class APIQueryParams(abc.ABC):
                         filter_value = fv
                     return '{func}(filter_variable = "{filter_variable}", ' \
                            'filter_value = {filter_value})'.format(
-                        func=func,
-                        filter_variable=filt['filter_variable'],
-                        filter_value=filter_value)
+                            func=func,
+                            filter_variable=filt['filter_variable'],
+                            filter_value=filter_value)
 
             def _process_aggregation(agg: dict) -> str:
                 assert isinstance(agg, dict)
