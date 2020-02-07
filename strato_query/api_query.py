@@ -122,6 +122,7 @@ class SDAPIQuery:
     @staticmethod
     def query_api_multiple(queries: Dict[str, APIQueryParams],
                            timeout: Optional[float] = 60.0,
+                           chunksize: int = 500,
                            headers: Optional[Dict[str, str]] = None) -> Dict[str, pandas.DataFrame]:
         """
         Submits the query params and returns the resulting data
@@ -132,6 +133,8 @@ class SDAPIQuery:
             The query params to be used in the POST request
         timeout: Optional[float]=60.0
             The time allowed before a request times out, where 1 second is 1.0
+        chunksize: int=500
+            The maximum size of chunks submitted to the API service at once
         headers: Optional[Dict[str, str]] = None
             Optional request headers
 
@@ -139,18 +142,26 @@ class SDAPIQuery:
         -------
         A dict with pandas dataframes as the values for each of the query params in the input dict
         """
-        json_data = _submit_post_request(
-            json_dict=dict(
-                token=get_api_token(),
-                queries={k: v.to_api_struct() for k, v in queries.items()}),
-            headers=headers,
-            timeout=timeout)
+        assert isinstance(chunksize, int) and chunksize > 0, \
+            f'Chunksize must be a positive integer, is {chunksize}'
+
+        keys_list = list(queries.keys())
 
         df_dict = {}
-        for k, v in json_data['data'].items():
-            df_ = pandas.DataFrame(v)
-            df_.columns = [c.upper() for c in df_.columns]
-            df_dict[k] = df_
+
+        for idx_chunk in range(0, len(keys_list), chunksize):
+            keys_chunk = keys_list[idx_chunk:idx_chunk + chunksize]
+
+            json_data = _submit_post_request(
+                json_dict=dict(
+                    token=get_api_token(),
+                    queries={k: queries[k].to_api_struct() for k in keys_chunk}),
+                headers=headers,
+                timeout=timeout)
+            for k, v in json_data['data'].items():
+                df_ = pandas.DataFrame(v)
+                df_.columns = [c.upper() for c in df_.columns]
+                df_dict[k] = df_
 
         return df_dict
 
