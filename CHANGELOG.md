@@ -7,7 +7,7 @@ All notable changes to this project will be documented in this file. This projec
 - `SDAPIQuery.query_api_multiple` now chunks queries into 500-size batches by default, configurable with `chunksize`
 
 ## Related issues
-- [88](https://github.com/StratoDem/strato-query/issues/88)
+- [94](https://github.com/StratoDem/strato-query/issues/94)
 
 ## [3.5.0] - 2019-11-13
 ### Changes
