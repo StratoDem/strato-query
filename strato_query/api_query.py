@@ -199,6 +199,9 @@ def _submit_post_request(json_dict: dict,
 
             return json_data
         except (requests.exceptions.ConnectionError, requests.Timeout) as e:
+            raise APIQueryFailedException(
+                'Query has timed out.',
+                {**json_dict, 'token': '**********'})
             if retry_num >= cc.MAX_RETRIES:
                 raise e
             else:
