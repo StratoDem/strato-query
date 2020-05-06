@@ -26,7 +26,7 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
         authenticate_to_api()
 
     def test_query_call(self):
-        import requests
+        from strato_query.exceptions import APIQueryFailedException
 
         age_filter = EqualToFilter(
             var='age_g',
@@ -50,7 +50,7 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
         assert all(x == y for x, y in zip(
             df_sorted['YEAR'].values, [x for x in range(2013, 2019)]))
 
-        with self.assertRaises(requests.exceptions.ConnectionError):
+        with self.assertRaises(APIQueryFailedException):
             df = self.submit_query(
                 query_params=APIQueryParams(
                     data_fields=('year', 'population'),
