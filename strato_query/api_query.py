@@ -200,6 +200,12 @@ def _submit_post_request(json_dict: dict,
             return json_data
         except (requests.exceptions.ConnectionError, requests.Timeout) as e:
             if retry_num >= cc.MAX_RETRIES:
-                raise e
+                raise APIQueryFailedException(
+                    'Query has timed out. The most likely cause is a query calling for '
+                    'too much data at once. Please check the filters and avoid calling for '
+                    'unnecessary data. Also possible are that the timeout value may have been set '
+                    'too low, or a network error could be preventing proper communication with '
+                    'the API server.',
+                    {**json_dict, 'token': '**********'})
             else:
                 time.sleep(0.5 * (1 + retry_num))
