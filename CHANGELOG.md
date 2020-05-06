@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.6.1] - 2019-05-04
+### Changes
+- Changes the error raised when the max number of query retries has been exceeded so it more clearly alerts API users that a timeout has occurred.
+
+## Related issues
+- [104](https://github.com/StratoDem/strato-query/issues/104)
+
 ## [3.6.0] - 2019-02-07
 ### Changes
 - `SDAPIQuery.query_api_multiple` now chunks queries into 500-size batches by default, configurable with `chunksize`
