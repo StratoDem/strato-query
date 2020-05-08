@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.6.2] - 2019-05-08
+### Changes
+- Checks specifically for a 520 error and immediately raises a timeout
+
+## Related issues
+- [107](https://github.com/StratoDem/strato-query/issues/107)
+
 ## [3.6.1] - 2019-05-04
 ### Changes
 - Changes the error raised when the max number of query retries has been exceeded so it more clearly alerts API users that a timeout has occurred.
