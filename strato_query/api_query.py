@@ -187,6 +187,12 @@ def _submit_post_request(json_dict: dict,
             r = requests.post(url=cc.API_URL, json=json_dict, headers=headers, timeout=timeout)
 
             if not r.status_code == 200:
+                if r.status_code == 520:
+                    raise APIQueryFailedException(
+                        'Query has timed out. The most likely cause is a query calling for '
+                        'too much data at once. Please check the filters and avoid calling for '
+                        'unnecessary data.',
+                        {**json_dict, 'token': '**********'})
                 raise APIQueryFailedException(
                     r.status_code,
                     r.content,
