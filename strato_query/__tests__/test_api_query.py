@@ -717,7 +717,7 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
                 end_latitude=42.35339843570063,
                 end_longitude=-71.06788516044617))
         assert 'DISTANCE' in df
-        self.assertAlmostEqual(df['DISTANCE'][0], 44.96875), df['DISTANCE'][0]
+        self.assertAlmostEqual(df['DISTANCE'][0], 44.4448863636), df['DISTANCE'][0]
         assert 'TIME' in df
         self.assertAlmostEqual(df['TIME'][0], 55.7333333333), df['TIME'][0]
 
