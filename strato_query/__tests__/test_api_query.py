@@ -694,8 +694,8 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
                 start_longitude=-71.41338050365448,
                 end_latitude=42.35339843570063,
                 end_longitude=-71.06788516044617))
-        assert 'distance' in df
-        assert df['distance'] == 40.316396387
+        assert 'DISTANCE' in df
+        assert df['DISTANCE'][0] == 40.3163963879, df['DISTANCE'][0]
 
     def test_driving_distance_query(self):
         df = self.submit_query(
@@ -704,10 +704,10 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
                 start_longitude=-71.41338050365448,
                 end_latitude=42.35339843570063,
                 end_longitude=-71.06788516044617))
-        assert 'distance' in df
-        assert df['distance'] == 44.96875
-        assert 'time' in df
-        assert df['time'] == 60.0833333
+        assert 'DISTANCE' in df
+        assert df['DISTANCE'][0] == 44.96875, df['DISTANCE'][0]
+        assert 'TIME' in df
+        assert df['TIME'][0] == 60.0833333333, df['TIME'][0]
 
         df = self.submit_query(
             query_params=APIDrivingDistanceQueryParams(
@@ -716,10 +716,10 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
                 start_longitude=-71.41338050365448,
                 end_latitude=42.35339843570063,
                 end_longitude=-71.06788516044617))
-        assert 'distance' in df
-        assert df['distance'] == 44.96875
-        assert 'time' in df
-        assert df['time'] == 60.0833333
+        assert 'DISTANCE' in df
+        assert df['DISTANCE'][0] == 44.96875, df['DISTANCE'][0]
+        assert 'TIME' in df
+        assert df['TIME'][0] == 55.7333333333, df['TIME'][0]
 
     def test_walking_distance_query(self):
         df = self.submit_query(
@@ -728,7 +728,7 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
                 start_longitude=-71.41338050365448,
                 end_latitude=41.8222540665299,
                 end_longitude=-71.41181409358978))
-        assert 'distance' in df
-        assert df['distance'] == 0.57613636
-        assert 'time' in df
-        assert df['time'] == 17.43333333
+        assert 'DISTANCE' in df
+        assert df['DISTANCE'][0] == 0.5761363636, df['DISTANCE'][0]
+        assert 'TIME' in df
+        assert df['TIME'][0] == 17.4333333333, df['TIME'][0]
