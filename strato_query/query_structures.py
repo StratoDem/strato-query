@@ -745,6 +745,7 @@ class APIDistanceQueryParams(APIQueryParams):
             start_longitude=self.start_longitude,
             end_latitude=self.end_latitude,
             end_longitude=self.end_longitude,
+            query_type=self.query_type,
         )
 
         return return_dict
