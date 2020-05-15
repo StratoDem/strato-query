@@ -686,3 +686,49 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
                 ]))
         assert 'geometry' in df['FEATURES'][0][0]
         assert len(df['FEATURES'][0]) == 2
+
+    def test_miles_distance_query(self):
+        df = self.submit_query(
+            query_params=APIMilesDistanceQueryParams(
+                start_latitude=41.82937349570897,
+                start_longitude=-71.41338050365448,
+                end_latitude=42.35339843570063,
+                end_longitude=-71.06788516044617))
+        assert 'distance' in df
+        assert df['distance'] == 40.316396387
+
+    def test_driving_distance_query(self):
+        df = self.submit_query(
+            query_params=APIDrivingDistanceQueryParams(
+                start_latitude=41.82937349570897,
+                start_longitude=-71.41338050365448,
+                end_latitude=42.35339843570063,
+                end_longitude=-71.06788516044617))
+        assert 'distance' in df
+        assert df['distance'] == 44.96875
+        assert 'time' in df
+        assert df['time'] == 60.0833333
+
+        df = self.submit_query(
+            query_params=APIDrivingDistanceQueryParams(
+                traffic=True,
+                start_latitude=41.82937349570897,
+                start_longitude=-71.41338050365448,
+                end_latitude=42.35339843570063,
+                end_longitude=-71.06788516044617))
+        assert 'distance' in df
+        assert df['distance'] == 44.96875
+        assert 'time' in df
+        assert df['time'] == 60.0833333
+
+    def test_walking_distance_query(self):
+        df = self.submit_query(
+            query_params=APIWalkingDistanceQueryParams(
+                start_latitude=41.82937349570897,
+                start_longitude=-71.41338050365448,
+                end_latitude=41.8222540665299,
+                end_longitude=-71.41181409358978))
+        assert 'distance' in df
+        assert df['distance'] == 0.57613636
+        assert 'time' in df
+        assert df['time'] == 17.43333333
