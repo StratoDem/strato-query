@@ -26,6 +26,9 @@ __all__ = [
     'APIGeocoderQueryParams',
     'APICalculationQueryParams',
     'APIFilterQueryParams',
+    'APIMilesDistanceQueryParams',
+    'APIDrivingDistanceQueryParams',
+    'APIWalkingDistanceQueryParams',
 ]
 
 
@@ -711,3 +714,154 @@ class APIFilterQueryParams(APICalculationQueryParams):
     @property
     def query_type(self) -> str:
         return 'FILTER'
+
+
+class APIDistanceQueryParams(APIQueryParams):
+    def __init__(self,
+                 start_latitude: Union[int, float],
+                 start_longitude: Union[int, float],
+                 end_latitude: Union[int, float],
+                 end_longitude: Union[int, float]):
+        assert isinstance(start_latitude, (int, float))
+        assert isinstance(start_longitude, (int, float))
+        assert isinstance(end_latitude, (int, float))
+        assert isinstance(end_longitude, (int, float))
+
+        self._start_latitude = start_latitude
+        self._start_longitude = start_longitude
+        self._end_latitude = end_latitude
+        self._end_longitude = end_longitude
+
+    def to_api_struct(self) -> dict:
+        """
+        Converts the query params into a form that the API can work with
+
+        Returns
+        -------
+        The query params as a dict
+        """
+        return_dict = dict(
+            start_latitude=self.start_latitude,
+            start_longitude=self.start_longitude,
+            end_latitude=self.end_latitude,
+            end_longitude=self.end_longitude,
+            query_type=self.query_type,
+        )
+
+        return return_dict
+
+    # /// Properties
+    @property
+    def query_type(self) -> str:
+        return 'DISTANCE'
+
+    @property
+    def start_latitude(self) -> Union[float, int]:
+        return self._start_latitude
+
+    @property
+    def start_longitude(self) -> Union[float, int]:
+        return self._start_longitude
+
+    @property
+    def end_latitude(self) -> Union[float, int]:
+        return self._end_latitude
+
+    @property
+    def end_longitude(self) -> Union[float, int]:
+        return self._end_longitude
+
+    @staticmethod
+    def _dict_form(query_params) -> dict:
+        if isinstance(query_params, APIQueryParams):
+            dict_form = query_params.to_api_struct()
+        elif isinstance(query_params, dict):
+            dict_form = query_params
+        else:
+            raise ValueError(query_params)
+
+        return dict_form
+
+
+class APIMilesDistanceQueryParams(APIDistanceQueryParams):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def to_api_struct(self) -> dict:
+        """
+        Converts the query params into a form that the API can work with
+
+        Returns
+        -------
+        The query params as a dict
+        """
+        return_dict = super().to_api_struct()
+        return_dict['distance_type'] = self.distance_type
+
+        return return_dict
+
+    @property
+    def distance_type(self) -> str:
+        return 'miles'
+
+
+class APIDrivingDistanceQueryParams(APIDistanceQueryParams):
+    def __init__(self,
+                 start_time: Optional[str] = 'now',
+                 traffic: Optional[bool] = False,
+                 **kwargs):
+        assert isinstance(start_time, str)
+        assert isinstance(traffic, bool)
+
+        super().__init__(**kwargs)
+
+        self._start_time = start_time
+        self._traffic = traffic
+
+    def to_api_struct(self) -> dict:
+        """
+        Converts the query params into a form that the API can work with
+
+        Returns
+        -------
+        The query params as a dict
+        """
+        return_dict = super().to_api_struct()
+        return_dict['distance_type'] = self.distance_type
+        return_dict['start_time'] = self.start_time
+
+        return return_dict
+
+    @property
+    def distance_type(self) -> str:
+        return 'drive' if not self.traffic else 'drive_traffic'
+
+    @property
+    def traffic(self) -> bool:
+        return self._traffic
+
+    @property
+    def start_time(self) -> str:
+        return self._start_time
+
+
+class APIWalkingDistanceQueryParams(APIDistanceQueryParams):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def to_api_struct(self) -> dict:
+        """
+        Converts the query params into a form that the API can work with
+
+        Returns
+        -------
+        The query params as a dict
+        """
+        return_dict = super().to_api_struct()
+        return_dict['distance_type'] = self.distance_type
+
+        return return_dict
+
+    @property
+    def distance_type(self) -> str:
+        return 'walk'

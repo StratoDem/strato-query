@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.7.0] - 2019-05-15
+### Adds
+- Adds new query param classes:
+  - `APIMilesDistanceQueryParams`
+  - `APIDrivingDistanceQueryParams`
+  - `APIWalkingDistanceQueryParams`
+
+## Related issues
+- [109](https://github.com/StratoDem/strato-query/issues/109)
+
 ## [3.6.2] - 2019-05-08
 ### Changes
 - Checks specifically for a 520 error and immediately raises a timeout
