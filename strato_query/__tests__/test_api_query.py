@@ -719,7 +719,7 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
         assert 'DISTANCE' in df
         self.assertAlmostEqual(df['DISTANCE'][0], 44.4448863636), df['DISTANCE'][0]
         assert 'TIME' in df
-        self.assertAlmostEqual(df['TIME'][0], 55.7333333333), df['TIME'][0]
+        self.assertAlmostEqual(df['TIME'][0], 56.7833333333), df['TIME'][0]
 
     def test_walking_distance_query(self):
         df = self.submit_query(
