@@ -695,7 +695,7 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
                 end_latitude=42.35339843570063,
                 end_longitude=-71.06788516044617))
         assert 'DISTANCE' in df
-        assert df['DISTANCE'][0] == 40.3163963879, df['DISTANCE'][0]
+        assert round(df['DISTANCE'][0], 6) == round(40.3163963879, 6), df['DISTANCE'][0]
 
     def test_driving_distance_query(self):
         df = self.submit_query(
@@ -705,9 +705,9 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
                 end_latitude=42.35339843570063,
                 end_longitude=-71.06788516044617))
         assert 'DISTANCE' in df
-        assert df['DISTANCE'][0] == 44.96875, df['DISTANCE'][0]
+        assert round(df['DISTANCE'][0], 4) == round(44.96875, 4), df['DISTANCE'][0]
         assert 'TIME' in df
-        assert df['TIME'][0] == 60.0833333333, df['TIME'][0]
+        assert round(df['TIME'][0], 6) == round(60.0833333333, 6), df['TIME'][0]
 
         df = self.submit_query(
             query_params=APIDrivingDistanceQueryParams(
@@ -717,9 +717,9 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
                 end_latitude=42.35339843570063,
                 end_longitude=-71.06788516044617))
         assert 'DISTANCE' in df
-        assert df['DISTANCE'][0] == 44.96875, df['DISTANCE'][0]
+        assert round(df['DISTANCE'][0], 4) == round(44.96875, 4), df['DISTANCE'][0]
         assert 'TIME' in df
-        assert df['TIME'][0] == 55.7333333333, df['TIME'][0]
+        assert round(df['TIME'][0], 6) == round(55.7333333333, 6), df['TIME'][0]
 
     def test_walking_distance_query(self):
         df = self.submit_query(
@@ -729,6 +729,6 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
                 end_latitude=41.8222540665299,
                 end_longitude=-71.41181409358978))
         assert 'DISTANCE' in df
-        assert df['DISTANCE'][0] == 0.5761363636, df['DISTANCE'][0]
+        assert round(df['DISTANCE'][0], 6) == round(0.5761363636, 6), df['DISTANCE'][0]
         assert 'TIME' in df
-        assert df['TIME'][0] == 17.4333333333, df['TIME'][0]
+        assert round(df['TIME'][0], 6) == round(17.4333333333, 6), df['TIME'][0]
