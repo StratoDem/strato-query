@@ -1,5 +1,5 @@
 # Core requirements
-Cython==0.29.18
+Cython==0.29.19
 numpy==1.18.4
 pandas==1.0.3
 requests
