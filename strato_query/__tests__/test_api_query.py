@@ -712,14 +712,15 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
         df = self.submit_query(
             query_params=APIDrivingDistanceQueryParams(
                 traffic=True,
+                start_time='2019-05-25T18:00:00',
                 start_latitude=41.82937349570897,
                 start_longitude=-71.41338050365448,
                 end_latitude=42.35339843570063,
                 end_longitude=-71.06788516044617))
         assert 'DISTANCE' in df
-        self.assertAlmostEqual(df['DISTANCE'][0], 44.4448863636), df['DISTANCE'][0]
+        self.assertAlmostEqual(df['DISTANCE'][0], 44.96875), df['DISTANCE'][0]
         assert 'TIME' in df
-        self.assertAlmostEqual(df['TIME'][0], 56.7833333333), df['TIME'][0]
+        self.assertAlmostEqual(df['TIME'][0], 60.08333333333), df['TIME'][0]
 
     def test_walking_distance_query(self):
         df = self.submit_query(

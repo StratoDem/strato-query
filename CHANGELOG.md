@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.8.0] - 2020-07-31
+### Adds
+- Adds a new arg, `time_between_chunks`, to the `query_api_multiple` method
+  By default, this arg is set to `None`, which will preserve existing behavior for unchanged queries. When given a value, the method will sleep for the specified time after each chunk is POSTed, and will continue to do so until all chunks have been submitted. The method will not sleep after the final chunk
+
+## Related issues
+- [121](https://github.com/StratoDem/strato-query/issues/121)
+
 ## [3.7.0] - 2019-05-15
 ### Adds
 - Adds new query param classes:

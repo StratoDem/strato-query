@@ -123,6 +123,7 @@ class SDAPIQuery:
     def query_api_multiple(queries: Dict[str, APIQueryParams],
                            timeout: Optional[float] = 60.0,
                            chunksize: int = 500,
+                           time_between_chunks: Optional[float] = None,
                            headers: Optional[Dict[str, str]] = None) -> Dict[str, pandas.DataFrame]:
         """
         Submits the query params and returns the resulting data
@@ -135,6 +136,8 @@ class SDAPIQuery:
             The time allowed before a request times out, where 1 second is 1.0
         chunksize: int=500
             The maximum size of chunks submitted to the API service at once
+        time_between_chunks: Optional[float] = None
+            The time (where 1 second is 1.0) to wait between sending chunks
         headers: Optional[Dict[str, str]] = None
             Optional request headers
 
@@ -162,6 +165,8 @@ class SDAPIQuery:
                 df_ = pandas.DataFrame(v)
                 df_.columns = [c.upper() for c in df_.columns]
                 df_dict[k] = df_
+            if time_between_chunks is not None and (idx_chunk + chunksize) < len(keys_list):
+                time.sleep(time_between_chunks)
 
         return df_dict
 
