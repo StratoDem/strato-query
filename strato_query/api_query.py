@@ -165,7 +165,7 @@ class SDAPIQuery:
                 df_ = pandas.DataFrame(v)
                 df_.columns = [c.upper() for c in df_.columns]
                 df_dict[k] = df_
-            if time_between_chunks is not None and idx_chunk + chunksize < len(keys_list):
+            if time_between_chunks is not None and (idx_chunk + chunksize) < len(keys_list):
                 time.sleep(time_between_chunks)
 
         return df_dict
