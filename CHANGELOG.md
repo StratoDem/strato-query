@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.8.1] - 2020-09-11
+### Adds
+- Adds support for `walktime_simple` and `walktime_destination_simple`
+
 ## [3.8.0] - 2020-07-31
 ### Adds
 - Adds a new arg, `time_between_chunks`, to the `query_api_multiple` method

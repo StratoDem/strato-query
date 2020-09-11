@@ -228,18 +228,22 @@ class WalktimeFilter(BaseFilter):
         detailed_type: str
             One of:
             - 'walktime': use a normal walktime, which weights results
+            - 'walktime_simple': use a walktime to filter a geometry table
             - 'walktime_unweighted': return unweighted results (used to get all geographies
                 intersecting at all with the walk time area)
             - 'walktime_destination': use a normal walktime, which weights results, but the
                 location is the destination instead of the start point
+            - 'walktime_destination_simple': use a walktime destination to filter a geometry table
             - 'walktime_destination_unweighted': return unweighted results (used to get all
                 geographies intersecting at all with the walk time area), and use the location as
                 the destination
         """
         assert detailed_type in {
             'walktime',
+            'walktime_simple',
             'walktime_unweighted',
             'walktime_destination',
+            'walktime_destination_simple',
             'walktime_destination_unweighted'}
 
         super().__init__(

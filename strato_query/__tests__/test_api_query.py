@@ -707,7 +707,7 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
         assert 'DISTANCE' in df
         self.assertAlmostEqual(df['DISTANCE'][0], 44.96875), df['DISTANCE'][0]
         assert 'TIME' in df
-        self.assertAlmostEqual(df['TIME'][0], 60.0833333333), df['TIME'][0]
+        self.assertAlmostEqual(df['TIME'][0], 60.3, places=2), df['TIME'][0]
 
         df = self.submit_query(
             query_params=APIDrivingDistanceQueryParams(
@@ -720,7 +720,7 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
         assert 'DISTANCE' in df
         self.assertAlmostEqual(df['DISTANCE'][0], 44.96875), df['DISTANCE'][0]
         assert 'TIME' in df
-        self.assertAlmostEqual(df['TIME'][0], 60.08333333333), df['TIME'][0]
+        self.assertAlmostEqual(df['TIME'][0], 60.3, places=2), df['TIME'][0]
 
     def test_walking_distance_query(self):
         df = self.submit_query(
@@ -733,3 +733,23 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
         self.assertAlmostEqual(df['DISTANCE'][0], 0.5761363636), df['DISTANCE'][0]
         assert 'TIME' in df
         self.assertAlmostEqual(df['TIME'][0], 17.4333333333), df['TIME'][0]
+
+    def test_walktime_simple_query(self):
+        df = self.submit_query(
+            query_params=APIQueryParams(
+                table='simplepoi_na_na_point_of_interest_locations',
+                data_filters=(
+                    EqualToFilter('category', 1),
+                    WalktimeFilter(
+                        detailed_type='walktime_simple',
+                        latitude=42.34991,
+                        longitude=-71.0522193,
+                        minutes=15),
+                ),
+                aggregations=(),
+                groupby=(),
+                data_fields=('category', 'address')))
+        self.assertTrue(len(df) > 0)
+
+        self.assertTrue(df['CATEGORY'].eq(1).all())
+        self.assertTrue(df[df['ADDRESS'].map(lambda x: 'Trader Joe\'s' in x)]['ADDRESS'].any())
