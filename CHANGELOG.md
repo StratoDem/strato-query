@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.9.1] - 2020-09-24
+### Fixes
+- (internal) Adds `long_description` to `setup.py` to display description on PyPI
+
 ## [3.9.0] - 2020-09-24
 ### Adds
 - Adds `SDJobRunner`, a utility object that allows for querying StratoDem Analytics models by creating jobs
