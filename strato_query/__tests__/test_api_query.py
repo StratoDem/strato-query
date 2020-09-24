@@ -10,6 +10,7 @@ December 26, 2018
 """
 
 import unittest
+import time
 
 from strato_query import *
 
@@ -753,3 +754,37 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
 
         self.assertTrue(df['CATEGORY'].eq(1).all())
         self.assertTrue(df[df['ADDRESS'].map(lambda x: 'Trader Joe\'s' in x)]['ADDRESS'].any())
+
+    def test_job_runner(self):
+        job_runner = SDJobRunner()
+        job_runner.create_job(
+            # Same job
+            model_id='5ADyVKql',
+            geolevel='METRO',
+            geoid_list=[14454, 48620, 12420])
+
+        time.sleep(5)
+
+        df = job_runner.download_job_to_dataframe()
+        self.assertEqual(len(df['GEOID'].unique()), 3, df)
+
+        # Test with JSON file
+        job_runner.create_job(
+            # Same job
+            model_id='5ADyVKql',
+            geolevel='METRO',
+            response_format='json',
+            geoid_list=[14454, 48620])
+
+        time.sleep(5)
+
+        df = job_runner.download_job_to_dataframe()
+        self.assertEqual(len(df['GEOID'].unique()), 2)
+
+        # One line to run entire job pipeline
+        df = SDJobRunner().load_df_from_job_pipeline(
+            # Same job
+            model_id='5ADyVKql',
+            geolevel='METRO',
+            geoid_list=[14454, 48620, 12420])
+        self.assertEqual(len(df['GEOID'].unique()), 3, df)

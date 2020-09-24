@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.9.0] - 2020-09-24
+### Adds
+- Adds `SDJobRunner`, a utility object that allows for querying StratoDem Analytics models by creating jobs
+```python
+from strato_query import SDJobRunner, authenticate_to_api
+
+authenticate_to_api('my-api-token')
+
+# This loads a query set defined in the client portal for the Boston and Austin MSAs
+df = SDJobRunner().load_df_from_job_pipeline(
+    model_id='5ADyVKql',
+    geolevel='METRO',
+    geoid_list=[14454, 12420]
+)
+```
+
 ## [3.8.1] - 2020-09-11
 ### Adds
 - Adds support for `walktime_simple` and `walktime_destination_simple`
