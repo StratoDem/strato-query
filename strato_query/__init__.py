@@ -9,7 +9,7 @@ Notes :
 December 26, 2018
 """
 
-from .api_query import SDAPIQuery
+from .api_query import SDAPIQuery, SDJobRunner
 from .authentication import authenticate_to_api
 from .filters import *
 from .aggregations import *

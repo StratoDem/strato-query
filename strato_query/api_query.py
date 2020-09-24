@@ -10,8 +10,9 @@ August 21, 2019
 """
 
 import time
+import io
 
-from typing import Dict, Optional, Union
+from typing import Dict, Optional, Union, List
 
 import requests
 
@@ -22,7 +23,7 @@ from .query_structures import *
 from .authentication import get_api_token
 from .exceptions import APIQueryFailedException
 
-__all__ = ['SDAPIQuery']
+__all__ = ['SDAPIQuery', 'SDJobRunner']
 
 T_DF = pandas.DataFrame
 
@@ -169,6 +170,133 @@ class SDAPIQuery:
                 time.sleep(time_between_chunks)
 
         return df_dict
+
+
+class SDJobRunner:
+    def __init__(self):
+        self._job_id = None
+        self._response_format = 'csv'
+
+    @property
+    def status(self) -> str:
+        """Get the status for the job"""
+        return self._check_job_status()
+
+    def load_df_from_job_pipeline(self,
+                                  model_id: str,
+                                  geolevel: Optional[str] = None,
+                                  response_format: str = 'csv',
+                                  portfolio_id: Optional[str] = None,
+                                  geoid_list: Optional[List[int]] = None) -> pandas.DataFrame:
+        self.create_job(
+            model_id=model_id,
+            geolevel=geolevel,
+            response_format=response_format,
+            portfolio_id=portfolio_id,
+            geoid_list=geoid_list)
+
+        for idx in range(100):
+            job_status = self.status
+            if job_status == 'Completed':
+                return self.download_job_to_dataframe()
+            elif job_status == 'Processing':
+                time.sleep(10)
+            else:
+                raise APIQueryFailedException('Job failed', job_status)
+
+        raise APIQueryFailedException('Job never completed successfully')
+
+    def create_job(self,
+                   model_id: str,
+                   geolevel: Optional[str] = None,
+                   response_format: str = 'csv',
+                   portfolio_id: Optional[str] = None,
+                   geoid_list: Optional[List[int]] = None) -> None:
+        assert isinstance(model_id, str), f'model_id must be str (was {model_id})'
+        assert portfolio_id is None or isinstance(portfolio_id, str), \
+            f'portfolio_id must be str (was {portfolio_id})'
+        assert isinstance(geolevel, str), f'geolevel must be str (was {geolevel})'
+        assert response_format in {'csv', 'json'}
+        assert geoid_list is None or isinstance(geoid_list, list)
+        assert geoid_list is None or all(isinstance(geoid, int) for geoid in geoid_list)
+
+        # Must either be a geolevel, geoid_list combo or a portfolio_id
+        if not geolevel and not portfolio_id:
+            raise ValueError('Job requires either "geolevel" or "portfolio_id"')
+
+        if geolevel:
+            assert geolevel in {'US', 'METRO', 'GEOID2', 'GEOID5', 'ZIP', 'GEOID11'}, \
+                '"geolevel" must be one of "US", "METRO", "GEOID2", "GEOID5", "ZIP", "GEOID11"'
+            assert portfolio_id is None, 'Cannot have both "geolevel" and "portfolio_id"'
+
+        r = requests.post(
+            'https://api.stratodem.com/jobs/create',
+            headers=dict(
+                Authorization=f'Bearer {get_api_token()}',
+            ),
+            json=dict(
+                model_id=model_id,
+                portfolio_id=portfolio_id,
+                geolevel=geolevel,
+                response_format=response_format,
+                geoid_list=geoid_list,
+            )
+        )
+
+        res = r.json()
+        if res['success']:
+            self._job_id = res['message']['job_id']
+            self._response_format = response_format
+        else:
+            raise APIQueryFailedException(res['message'])
+
+    def _check_job_status(self) -> str:
+        self._assert_job_created()
+
+        r = requests.post(
+            'https://api.stratodem.com/jobs/status',
+            headers=dict(
+                Authorization=f'Bearer {get_api_token()}',
+            ),
+            json=dict(job_id=self._job_id)
+        )
+
+        if not r.status_code == 200:
+            raise APIQueryFailedException('Failed to determine job status')
+
+        r = r.json()
+
+        if not r['success']:
+            raise APIQueryFailedException(r)
+        else:
+            return r['message']
+
+    def download_job_to_dataframe(self) -> pandas.DataFrame:
+        self._assert_job_created()
+
+        r = requests.post(
+            'https://api.stratodem.com/jobs/download',
+            headers=dict(
+                Authorization=f'Bearer {get_api_token()}',
+            ),
+            json=dict(job_id=self._job_id)
+        )
+
+        if not r.status_code == 200:
+            raise APIQueryFailedException('Failed to download file')
+
+        if self._response_format == 'csv':
+            df = pandas.read_csv(io.BytesIO(r.content))
+        elif self._response_format == 'json':
+            df = pandas.read_json(r.content)
+        else:
+            raise NotImplementedError(self._response_format)
+
+        return df
+
+    def _assert_job_created(self) -> None:
+        assert isinstance(self._job_id, str), 'Must run create_job successfully first ' \
+                                              '-- no job id found'
 
 
 def _submit_post_request(json_dict: dict,
