@@ -215,7 +215,8 @@ class SDJobRunner:
         assert isinstance(model_id, str), f'model_id must be str (was {model_id})'
         assert portfolio_id is None or isinstance(portfolio_id, str), \
             f'portfolio_id must be str (was {portfolio_id})'
-        assert isinstance(geolevel, str), f'geolevel must be str (was {geolevel})'
+        assert geolevel is None or isinstance(geolevel, str), \
+            f'geolevel must be str (was {geolevel})'
         assert response_format in {'csv', 'json'}
         assert geoid_list is None or isinstance(geoid_list, list)
         assert geoid_list is None or all(isinstance(geoid, int) for geoid in geoid_list)

@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.9.2] - 2020-09-24
+### Fixes
+- (internal) Allows for `geolevel` to be `None` if specifying a `portfolio_id` in `SDJobRunner`
+
 ## [3.9.1] - 2020-09-24
 ### Fixes
 - (internal) Adds `long_description` to `setup.py` to display description on PyPI
