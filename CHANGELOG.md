@@ -2,7 +2,11 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
-## [3.9.2] - 2020-09-24
+## [3.9.3] - 2020-09-29
+### Fixes
+- Default `geoid_list` to `[]` instead of `None` to API service
+
+## [3.9.2] - 2020-09-29
 ### Fixes
 - (internal) Allows for `geolevel` to be `None` if specifying a `portfolio_id` in `SDJobRunner`
 

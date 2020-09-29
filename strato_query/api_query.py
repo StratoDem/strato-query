@@ -230,6 +230,9 @@ class SDJobRunner:
                 '"geolevel" must be one of "US", "METRO", "GEOID2", "GEOID5", "ZIP", "GEOID11"'
             assert portfolio_id is None, 'Cannot have both "geolevel" and "portfolio_id"'
 
+        if geoid_list is None:
+            geoid_list = []
+
         r = requests.post(
             'https://api.stratodem.com/jobs/create',
             headers=dict(
