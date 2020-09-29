@@ -173,7 +173,18 @@ class SDAPIQuery:
 
 
 class SDJobRunner:
-    def __init__(self):
+    def __init__(self, logging: bool = True):
+        """
+        Job runner to create a data query to the StratoDem Analytics API and get the
+        result as a pandas DataFrame
+
+        Parameters
+        ----------
+        logging: bool
+            Noisy logging of process?
+        """
+        assert isinstance(logging, bool)
+        self._logging = logging
         self._job_id = None
         self._response_format = 'csv'
 
@@ -196,6 +207,9 @@ class SDJobRunner:
             geoid_list=geoid_list)
 
         for idx in range(100):
+            if self._logging:
+                print('Checking if job is complete...')
+
             job_status = self.status
             if job_status == 'Completed':
                 return self.download_job_to_dataframe()
@@ -233,6 +247,9 @@ class SDJobRunner:
         if geoid_list is None:
             geoid_list = []
 
+        if self._logging:
+            print('Sending create job request to API service')
+
         r = requests.post(
             'https://api.stratodem.com/jobs/create',
             headers=dict(
@@ -251,6 +268,9 @@ class SDJobRunner:
         if res['success']:
             self._job_id = res['message']['job_id']
             self._response_format = response_format
+
+            if self._logging:
+                print('Successfully created job request')
         else:
             raise APIQueryFailedException(res['message'])
 

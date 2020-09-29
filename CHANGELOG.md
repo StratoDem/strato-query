@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.9.4] - 2020-09-29
+### Adds
+- Adds optional logging to `SDJobRunner` to track job creation and polling
+
 ## [3.9.3] - 2020-09-29
 ### Fixes
 - Default `geoid_list` to `[]` instead of `None` to API service
