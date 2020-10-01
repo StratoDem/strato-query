@@ -198,12 +198,14 @@ class SDJobRunner:
                                   geolevel: Optional[str] = None,
                                   response_format: str = 'csv',
                                   portfolio_id: Optional[str] = None,
+                                  buffers: Optional[List[str]] = None,
                                   geoid_list: Optional[List[int]] = None) -> pandas.DataFrame:
         self.create_job(
             model_id=model_id,
             geolevel=geolevel,
             response_format=response_format,
             portfolio_id=portfolio_id,
+            buffers=buffers,
             geoid_list=geoid_list)
 
         for idx in range(100):
@@ -225,7 +227,8 @@ class SDJobRunner:
                    geolevel: Optional[str] = None,
                    response_format: str = 'csv',
                    portfolio_id: Optional[str] = None,
-                   geoid_list: Optional[List[int]] = None) -> None:
+                   geoid_list: Optional[List[int]] = None,
+                   buffers: Optional[List[str]] = None) -> None:
         assert isinstance(model_id, str), f'model_id must be str (was {model_id})'
         assert portfolio_id is None or isinstance(portfolio_id, str), \
             f'portfolio_id must be str (was {portfolio_id})'
@@ -234,6 +237,9 @@ class SDJobRunner:
         assert response_format in {'csv', 'json'}
         assert geoid_list is None or isinstance(geoid_list, list)
         assert geoid_list is None or all(isinstance(geoid, int) for geoid in geoid_list)
+        assert buffers is None or isinstance(buffers, list)
+        assert buffers is None or all(buffer in cc.BUFFERS_TUPLE for buffer in buffers), \
+            f'Invalid buffers: {buffers} (must be from {cc.BUFFERS_TUPLE})'
 
         # Must either be a geolevel, geoid_list combo or a portfolio_id
         if not geolevel and not portfolio_id:
@@ -246,6 +252,9 @@ class SDJobRunner:
 
         if geoid_list is None:
             geoid_list = []
+
+        if buffers is None:
+            buffers = []
 
         if self._logging:
             print('Sending create job request to API service')
@@ -261,6 +270,7 @@ class SDJobRunner:
                 geolevel=geolevel,
                 response_format=response_format,
                 geoid_list=geoid_list,
+                buffers=buffers,
             )
         )
 

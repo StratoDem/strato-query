@@ -788,3 +788,13 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
             geolevel='METRO',
             geoid_list=[14454, 48620, 12420])
         self.assertEqual(len(df['GEOID'].unique()), 3, df)
+
+    def test_job_runner_with_portfolio(self):
+        # One line to run entire job pipeline
+        df = SDJobRunner().load_df_from_job_pipeline(
+            # Same job
+            portfolio_id='nk7M1E7A',
+            model_id='5ADyVKql',
+            buffers=['three-mile', 'ten-min'])
+        self.assertEqual(len(df['GEOID'].unique()), 2, df)
+        self.assertEqual(len(df['BUFFER'].unique()), 2, df)

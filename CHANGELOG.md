@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.9.5] - 2020-09-29
+### Adds
+- Adds support for `buffers` to `SDJobRunner` for portfolio queries
+
 ## [3.9.4] - 2020-09-29
 ### Adds
 - Adds optional logging to `SDJobRunner` to track job creation and polling
