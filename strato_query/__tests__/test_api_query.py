@@ -795,8 +795,8 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
         # One line to run entire job pipeline
         df = SDJobRunner().load_df_from_job_pipeline(
             # Same job
-            portfolio_id='nk7M1E7A',
+            portfolio_id='WMqA42Dw',
             model_id='Z07RGYoR',
             buffers=['three-mile', 'ten-min'])
-        self.assertEqual(len(df['GEOID'].unique()), 2, df)
+        self.assertEqual(len(df['GEOID'].unique()), 5, df)
         self.assertEqual(len(df['BUFFER'].unique()), 2, df)
