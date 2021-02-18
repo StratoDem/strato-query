@@ -12,7 +12,7 @@ August 21, 2019
 import time
 import io
 
-from typing import Dict, Optional, Union, List
+from typing import Dict, Optional, Union, List, Tuple
 
 import requests
 
@@ -198,6 +198,7 @@ class SDJobRunner:
                                   geolevel: Optional[str] = None,
                                   response_format: str = 'csv',
                                   portfolio_id: Optional[str] = None,
+                                  sites: Optional[List[Tuple[float, float, str]]] = None,
                                   buffers: Optional[List[str]] = None,
                                   geoid_list: Optional[List[int]] = None) -> pandas.DataFrame:
         self.create_job(
@@ -205,6 +206,7 @@ class SDJobRunner:
             geolevel=geolevel,
             response_format=response_format,
             portfolio_id=portfolio_id,
+            sites=sites,
             buffers=buffers,
             geoid_list=geoid_list)
 
@@ -226,6 +228,7 @@ class SDJobRunner:
                    model_id: str,
                    geolevel: Optional[str] = None,
                    response_format: str = 'csv',
+                   sites: Optional[List[Tuple[float, float, str]]] = None,
                    portfolio_id: Optional[str] = None,
                    geoid_list: Optional[List[int]] = None,
                    buffers: Optional[List[str]] = None) -> None:
@@ -240,13 +243,16 @@ class SDJobRunner:
         assert buffers is None or isinstance(buffers, list)
         assert buffers is None or all(buffer in cc.BUFFERS_TUPLE for buffer in buffers), \
             f'Invalid buffers: {buffers} (must be from {cc.BUFFERS_TUPLE})'
+        assert sites is None or isinstance(sites, list)
+        assert sites is None or all(isinstance(site, tuple) for site in sites)
 
         # Must either be a geolevel, geoid_list combo or a portfolio_id
         if not geolevel and not portfolio_id:
             raise ValueError('Job requires either "geolevel" or "portfolio_id"')
 
         if geolevel:
-            assert geolevel in {'US', 'METRO', 'GEOID2', 'GEOID5', 'ZIP', 'GEOID11'}, \
+            assert geolevel in {
+                'US', 'METRO', 'GEOID2', 'GEOID5', 'ZIP', 'GEOID11', 'site-addresses'}, \
                 '"geolevel" must be one of "US", "METRO", "GEOID2", "GEOID5", "ZIP", "GEOID11"'
             assert portfolio_id is None, 'Cannot have both "geolevel" and "portfolio_id"'
 
@@ -271,6 +277,7 @@ class SDJobRunner:
                 response_format=response_format,
                 geoid_list=geoid_list,
                 buffers=buffers,
+                sites=sites,
             )
         )
 
