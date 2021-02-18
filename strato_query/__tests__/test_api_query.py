@@ -761,7 +761,7 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
         job_runner = SDJobRunner()
         job_runner.create_job(
             # Same job
-            model_id='5ADyVKql',
+            model_id='Z07RGYoR',
             geolevel='METRO',
             geoid_list=[14454, 48620, 12420])
 
@@ -773,7 +773,7 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
         # Test with JSON file
         job_runner.create_job(
             # Same job
-            model_id='5ADyVKql',
+            model_id='Z07RGYoR',
             geolevel='METRO',
             response_format='json',
             geoid_list=[14454, 48620])
@@ -786,7 +786,7 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
         # One line to run entire job pipeline
         df = SDJobRunner().load_df_from_job_pipeline(
             # Same job
-            model_id='5ADyVKql',
+            model_id='Z07RGYoR',
             geolevel='METRO',
             geoid_list=[14454, 48620, 12420])
         self.assertEqual(len(df['GEOID'].unique()), 3, df)
@@ -796,7 +796,7 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
         df = SDJobRunner().load_df_from_job_pipeline(
             # Same job
             portfolio_id='nk7M1E7A',
-            model_id='5ADyVKql',
+            model_id='Z07RGYoR',
             buffers=['three-mile', 'ten-min'])
         self.assertEqual(len(df['GEOID'].unique()), 2, df)
         self.assertEqual(len(df['BUFFER'].unique()), 2, df)
