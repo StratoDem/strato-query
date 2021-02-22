@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.9.6] - 2021-02-18
+### Adds
+- Adds support for site addresses to `SDJobRunner`
+
 ## [3.9.5] - 2020-09-29
 ### Adds
 - Adds support for `buffers` to `SDJobRunner` for portfolio queries
