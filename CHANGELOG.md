@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.9.7] - 2021-02-23
+### Changes
+- Restores test that was commented out
+
+### Fixes
+- Fixes `sites` value when it is not received as part of a query by setting it to an empty list
+
 ## [3.9.6] - 2021-02-18
 ### Adds
 - Adds support for site addresses to `SDJobRunner`
