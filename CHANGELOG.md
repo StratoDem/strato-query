@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.9.8] - 2021-02-24
+### Adds
+- Adds new allowed buffer values
+
 ## [3.9.7] - 2021-02-23
 ### Changes
 - Restores test that was commented out
