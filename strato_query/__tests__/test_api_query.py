@@ -801,13 +801,12 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
         self.assertEqual(len(df['GEOID'].unique()), 5, df)
         self.assertEqual(len(df['BUFFER'].unique()), 2, df)
 
-    # TODO add test back in once API has been updated so this can pass
-    # def test_job_runner_with_sites(self):
-    #     df = SDJobRunner().load_df_from_job_pipeline(
-    #         # Same job
-    #         model_id='Z07RGYoR',
-    #         geolevel='site-addresses',
-    #         sites=[(42.34978, -71.05004, '281 Summer St, Boston, MA')],
-    #         buffers=['three-mile', 'ten-min'],)
-    #     self.assertEqual(len(df['GEOID'].unique()), 1, df)
-    #     self.assertEqual(len(df['BUFFER'].unique()), 2, df)
+    def test_job_runner_with_sites(self):
+        df = SDJobRunner().load_df_from_job_pipeline(
+            # Same job
+            model_id='Z07RGYoR',
+            geolevel='site-addresses',
+            sites=[(42.34978, -71.05004, '281 Summer St, Boston, MA')],
+            buffers=['three-mile', 'ten-min'],)
+        self.assertEqual(len(df['GEOID'].unique()), 1, df)
+        self.assertEqual(len(df['BUFFER'].unique()), 2, df)

@@ -262,6 +262,9 @@ class SDJobRunner:
         if buffers is None:
             buffers = []
 
+        if sites is None:
+            sites = []
+
         if self._logging:
             print('Sending create job request to API service')
 
