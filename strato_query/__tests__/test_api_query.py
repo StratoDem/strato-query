@@ -13,6 +13,7 @@ import unittest
 import time
 
 from strato_query import *
+from strato_query.api_query import api_configuration
 
 
 class TestAPIQuery(unittest.TestCase, SDAPIQuery):
@@ -98,6 +99,7 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
         assert df['NAME'].values[1] == 'Plymouth County, MA'
 
     def test_multi_query(self):
+        api_configuration['chunksize'] = 250
         df_dict = self.submit_query(
             queries_params=dict(
                 query_1=APIQueryParams(
@@ -699,7 +701,7 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
         self.assertAlmostEqual(df['DISTANCE'][0], 40.3163963879), df['DISTANCE'][0]
 
     def test_driving_distance_query(self):
-        expected_drivetime = 60.133
+        expected_drivetime = 60.117
 
         df = self.submit_query(
             query_params=APIDrivingDistanceQueryParams(
@@ -796,9 +798,25 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
         df = SDJobRunner().load_df_from_job_pipeline(
             # Same job
             portfolio_id='WMqA42Dw',
-            model_id='Z07RGYoR',
+            model_id='XYjooEDw',
             buffers=['three-mile', 'ten-min'])
+
         self.assertEqual(len(df['GEOID'].unique()), 5, df)
+        self.assertEqual(len(df['BUFFER'].unique()), 2, df)
+
+    def test_job_runner_with_portfolio_time_series(self):
+        # One line to run entire job pipeline
+        df = SDJobRunner().load_df_from_job_pipeline(
+            # Same job
+            portfolio_id='WMqA42Dw',
+            model_id='XYjooEDw',  # This is a time series query
+            buffers=['three-mile', 'ten-min'])
+
+        self.assertEqual(len(df['GEOID'].unique()), 5, df)
+        self.assertEqual(
+            list(df['METRIC'].unique()),
+            ['Employment (payroll survey) * (Time Series)'])
+        self.assertTrue(df['YEAR'].between(2005, 2050).all())
         self.assertEqual(len(df['BUFFER'].unique()), 2, df)
 
     def test_job_runner_with_sites(self):
