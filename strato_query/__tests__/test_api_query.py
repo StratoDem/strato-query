@@ -798,7 +798,7 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
         df = SDJobRunner().load_df_from_job_pipeline(
             # Same job
             portfolio_id='WMqA42Dw',
-            model_id='XYjooEDw',
+            model_id='Z07RGYoR',
             buffers=['three-mile', 'ten-min'])
 
         self.assertEqual(len(df['GEOID'].unique()), 5, df)
