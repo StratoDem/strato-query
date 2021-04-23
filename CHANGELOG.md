@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.9.9] - 2021-04-23
+### Changes
+- `chunksize` may now be set globally for multiple queries with configuration variable in `api_query.api_configuration['chunksize']`
+- `timeout` may now be set globally for multiple queries with configuration variable in `api_query.api_configuration['timeout']`
+
 ## [3.9.8] - 2021-02-24
 ### Adds
 - Adds new allowed buffer values

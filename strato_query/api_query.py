@@ -23,9 +23,15 @@ from .query_structures import *
 from .authentication import get_api_token
 from .exceptions import APIQueryFailedException
 
-__all__ = ['SDAPIQuery', 'SDJobRunner']
+__all__ = ['SDAPIQuery', 'SDJobRunner', 'api_configuration']
 
 T_DF = pandas.DataFrame
+
+
+api_configuration = {
+    'chunksize': 500,
+    'timeout': 60.0,
+}
 
 
 class SDAPIQuery:
@@ -33,7 +39,7 @@ class SDAPIQuery:
     def submit_query(cls,
                      query_params: Optional[APIQueryParams] = None,
                      queries_params: Optional[Dict[str, APIQueryParams]] = None,
-                     timeout: Optional[float] = 60.0,
+                     timeout: Optional[float] = None,
                      headers: Optional[Dict[str, str]] = None) -> Union[T_DF, Dict[str, T_DF]]:
         """
         Determines the proper method to use and passes values along for request submission
@@ -59,6 +65,9 @@ class SDAPIQuery:
         assert not (query_params is None and queries_params is None)
         assert not (query_params is not None and queries_params is not None)
 
+        if timeout is None:
+            timeout = api_configuration['timeout']
+
         if query_params is not None:
             return cls.query_api_df(query_params=query_params, headers=headers, timeout=timeout)
         elif queries_params is not None:
@@ -66,7 +75,7 @@ class SDAPIQuery:
 
     @staticmethod
     def query_api_json(query_params: APIQueryParams,
-                       timeout: Optional[float] = 60.0,
+                       timeout: Optional[float] = None,
                        headers: Optional[Dict[str, str]] = None) -> dict:
         """
         Submits the query params and returns the resulting data
@@ -83,6 +92,9 @@ class SDAPIQuery:
         -------
         A dict containing the query result
         """
+        if timeout is None:
+            timeout = api_configuration['timeout']
+
         json_data = _submit_post_request(
             json_dict=dict(token=get_api_token(), query=query_params.to_api_struct()),
             headers=headers,
@@ -92,7 +104,7 @@ class SDAPIQuery:
 
     @staticmethod
     def query_api_df(query_params: APIQueryParams,
-                     timeout: Optional[float] = 60.0,
+                     timeout: Optional[float] = None,
                      headers: Optional[Dict[str, str]] = None) -> pandas.DataFrame:
         """
         Submits the query params and returns the resulting data
@@ -110,6 +122,9 @@ class SDAPIQuery:
         -------
         A pandas dataframe containing the query result
         """
+        if timeout is None:
+            timeout = api_configuration['timeout']
+
         json_data = _submit_post_request(
             json_dict=dict(token=get_api_token(), query=query_params.to_api_struct()),
             headers=headers,
@@ -122,8 +137,8 @@ class SDAPIQuery:
 
     @staticmethod
     def query_api_multiple(queries: Dict[str, APIQueryParams],
-                           timeout: Optional[float] = 60.0,
-                           chunksize: int = 500,
+                           timeout: Optional[float] = None,
+                           chunksize: int = None,
                            time_between_chunks: Optional[float] = None,
                            headers: Optional[Dict[str, str]] = None) -> Dict[str, pandas.DataFrame]:
         """
@@ -146,6 +161,12 @@ class SDAPIQuery:
         -------
         A dict with pandas dataframes as the values for each of the query params in the input dict
         """
+        if chunksize is None:
+            chunksize = api_configuration['chunksize']
+
+        if timeout is None:
+            timeout = api_configuration['timeout']
+
         assert isinstance(chunksize, int) and chunksize > 0, \
             f'Chunksize must be a positive integer, is {chunksize}'
 
