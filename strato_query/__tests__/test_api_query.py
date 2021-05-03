@@ -739,26 +739,6 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
         assert 'TIME' in df
         self.assertAlmostEqual(df['TIME'][0], 17.4333333333), df['TIME'][0]
 
-    def test_walktime_simple_query(self):
-        df = self.submit_query(
-            query_params=APIQueryParams(
-                table='simplepoi_na_na_point_of_interest_locations',
-                data_filters=(
-                    EqualToFilter('category', 1),
-                    WalktimeFilter(
-                        detailed_type='walktime_simple',
-                        latitude=42.34991,
-                        longitude=-71.0522193,
-                        minutes=15),
-                ),
-                aggregations=(),
-                groupby=(),
-                data_fields=('category', 'address')))
-        self.assertTrue(len(df) > 0)
-
-        self.assertTrue(df['CATEGORY'].eq(1).all())
-        self.assertTrue(df[df['ADDRESS'].map(lambda x: 'Trader Joe\'s' in x)]['ADDRESS'].any())
-
     def test_job_runner(self):
         job_runner = SDJobRunner()
         job_runner.create_job(
