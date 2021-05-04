@@ -219,14 +219,37 @@ class SDJobRunner:
                                   geolevel: Optional[str] = None,
                                   response_format: str = 'csv',
                                   portfolio_id: Optional[str] = None,
+                                  market_id: Optional[str] = None,
                                   sites: Optional[List[Tuple[float, float, str]]] = None,
                                   buffers: Optional[List[str]] = None,
                                   geoid_list: Optional[List[int]] = None) -> pandas.DataFrame:
+        """
+        This method handles all steps of the job pipeline to produce a dataframe, or error if the
+        job fails. From a client's request, this method will start a job, and repeatedly check its
+        status until it finishes, fails, or the maximum wait time expires. If the job completes,
+        this method will download the resulting dataframe and return it to the calling client.
+
+        Parameters
+        ----------
+        model_id
+        geolevel
+        response_format
+        portfolio_id
+        market_id
+        sites
+        buffers
+        geoid_list
+
+        Returns
+        -------
+        pandas.DataFrame
+        """
         self.create_job(
             model_id=model_id,
             geolevel=geolevel,
             response_format=response_format,
             portfolio_id=portfolio_id,
+            market_id=market_id,
             sites=sites,
             buffers=buffers,
             geoid_list=geoid_list)
@@ -251,11 +274,33 @@ class SDJobRunner:
                    response_format: str = 'csv',
                    sites: Optional[List[Tuple[float, float, str]]] = None,
                    portfolio_id: Optional[str] = None,
+                   market_id: Optional[str] = None,
                    geoid_list: Optional[List[int]] = None,
                    buffers: Optional[List[str]] = None) -> None:
+        """
+        This method handles the call to create a job through the API, and will log the result of its
+        request.
+
+        Parameters
+        ----------
+        model_id
+        geolevel
+        response_format
+        sites
+        portfolio_id
+        market_id
+        geoid_list
+        buffers
+
+        Returns
+        -------
+        None
+        """
         assert isinstance(model_id, str), f'model_id must be str (was {model_id})'
         assert portfolio_id is None or isinstance(portfolio_id, str), \
             f'portfolio_id must be str (was {portfolio_id})'
+        assert market_id is None or isinstance(market_id, str), \
+            f'market_id must be str (was {market_id})'
         assert geolevel is None or isinstance(geolevel, str), \
             f'geolevel must be str (was {geolevel})'
         assert response_format in {'csv', 'json'}
@@ -267,15 +312,16 @@ class SDJobRunner:
         assert sites is None or isinstance(sites, list)
         assert sites is None or all(isinstance(site, tuple) for site in sites)
 
-        # Must either be a geolevel, geoid_list combo or a portfolio_id
-        if not geolevel and not portfolio_id:
-            raise ValueError('Job requires either "geolevel" or "portfolio_id"')
+        # Must either be a geolevel, geoid_list combo, or a portfolio_id, or market_id
+        if not geolevel and not any([portfolio_id, market_id]):
+            raise ValueError('Job requires one of "geolevel", "portfolio_id", or "market_id"')
 
         if geolevel:
             assert geolevel in {
                 'US', 'METRO', 'GEOID2', 'GEOID5', 'ZIP', 'GEOID11', 'site-addresses'}, \
                 '"geolevel" must be one of "US", "METRO", "GEOID2", "GEOID5", "ZIP", "GEOID11"'
             assert portfolio_id is None, 'Cannot have both "geolevel" and "portfolio_id"'
+            assert market_id is None, 'Cannot have both "geolevel" and "market_id"'
 
         if geoid_list is None:
             geoid_list = []
@@ -297,6 +343,7 @@ class SDJobRunner:
             json=dict(
                 model_id=model_id,
                 portfolio_id=portfolio_id,
+                market_id=market_id,
                 geolevel=geolevel,
                 response_format=response_format,
                 geoid_list=geoid_list,
@@ -316,6 +363,14 @@ class SDJobRunner:
             raise APIQueryFailedException(res['message'])
 
     def _check_job_status(self) -> str:
+        """
+        This method will request the status of the job related to an instance of this class and
+        return the status string.
+
+        Returns
+        -------
+        str
+        """
         self._assert_job_created()
 
         r = requests.post(
@@ -337,6 +392,14 @@ class SDJobRunner:
             return r['message']
 
     def download_job_to_dataframe(self) -> pandas.DataFrame:
+        """
+        This method will handle the API request to download the job related to an instance of this
+        class, and return the dataframe
+
+        Returns
+        -------
+        pandas.DataFrame
+        """
         self._assert_job_created()
 
         r = requests.post(

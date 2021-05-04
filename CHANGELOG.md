@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.10.0] - 2021-05-03
+### Adds
+- Adds support for using saved custom markets with the jobs API
+- Adds docstrings to methods in the SDJobRunner class
+
 ## [3.9.9] - 2021-04-23
 ### Changes
 - `chunksize` may now be set globally for multiple queries with configuration variable in `api_query.api_configuration['chunksize']`
