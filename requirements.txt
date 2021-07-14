@@ -2,4 +2,4 @@
 Cython==0.29.23
 numpy==1.20.3
 pandas==1.2.4
-requests==2.25.1
+requests==2.26.0
