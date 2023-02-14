@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.11.0] - 2023-02-14
+### Changes
+- Changes the API URL to make it configurable using an environment variable
+
 ## [3.10.0] - 2021-05-03
 ### Adds
 - Adds support for using saved custom markets with the jobs API
