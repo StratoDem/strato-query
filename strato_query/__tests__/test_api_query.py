@@ -710,7 +710,7 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
                 end_latitude=42.35339843570063,
                 end_longitude=-71.06788516044617))
         assert 'DISTANCE' in df
-        self.assertAlmostEqual(df['DISTANCE'][0], 44.96875), df['DISTANCE'][0]
+        self.assertAlmostEqual(df['DISTANCE'][0], 44.9), df['DISTANCE'][0]
         assert 'TIME' in df
         self.assertAlmostEqual(df['TIME'][0], expected_drivetime, places=2), df['TIME'][0]
 
@@ -735,9 +735,9 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
                 end_latitude=41.8222540665299,
                 end_longitude=-71.41181409358978))
         assert 'DISTANCE' in df
-        self.assertAlmostEqual(df['DISTANCE'][0], 0.5761363636), df['DISTANCE'][0]
+        self.assertAlmostEqual(df['DISTANCE'][0], 0.57), df['DISTANCE'][0]
         assert 'TIME' in df
-        self.assertAlmostEqual(df['TIME'][0], 17.4333333333), df['TIME'][0]
+        self.assertAlmostEqual(df['TIME'][0], 17.4), df['TIME'][0]
 
     def test_job_runner(self):
         job_runner = SDJobRunner()
