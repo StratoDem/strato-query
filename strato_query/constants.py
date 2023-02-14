@@ -9,9 +9,12 @@ Notes :
 December 26, 2018
 """
 
+import os
 from types import MappingProxyType
 
-API_URL = 'https://api.stratodem.com/api'
+ROUTE_PREFIX = os.environ.get('API_ROUTE_PREFIX', 'api')
+
+API_URL = f'https://{ROUTE_PREFIX}.stratodem.com/api'
 
 MAX_RETRIES = 3
 
