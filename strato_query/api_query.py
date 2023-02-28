@@ -336,7 +336,7 @@ class SDJobRunner:
             print('Sending create job request to API service')
 
         r = requests.post(
-            'https://api.stratodem.com/jobs/create',
+            f'https://{cc.ROUTE_PREFIX}.stratodem.com/jobs/create',
             headers=dict(
                 Authorization=f'Bearer {get_api_token()}',
             ),
@@ -374,7 +374,7 @@ class SDJobRunner:
         self._assert_job_created()
 
         r = requests.post(
-            'https://api.stratodem.com/jobs/status',
+            f'https://{cc.ROUTE_PREFIX}.stratodem.com/jobs/status',
             headers=dict(
                 Authorization=f'Bearer {get_api_token()}',
             ),
@@ -403,7 +403,7 @@ class SDJobRunner:
         self._assert_job_created()
 
         r = requests.post(
-            'https://api.stratodem.com/jobs/download',
+            f'https://{cc.ROUTE_PREFIX}.stratodem.com/jobs/download',
             headers=dict(
                 Authorization=f'Bearer {get_api_token()}',
             ),
