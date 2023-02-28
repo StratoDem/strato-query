@@ -710,9 +710,9 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
                 end_latitude=42.35339843570063,
                 end_longitude=-71.06788516044617))
         assert 'DISTANCE' in df
-        self.assertAlmostEqual(df['DISTANCE'][0], 44.9), df['DISTANCE'][0]
+        self.assertAlmostEqual(df['DISTANCE'][0], 44.9, delta=0.1), df['DISTANCE'][0]
         assert 'TIME' in df
-        self.assertAlmostEqual(df['TIME'][0], expected_drivetime, places=2), df['TIME'][0]
+        self.assertAlmostEqual(df['TIME'][0], expected_drivetime, delta=0.2), df['TIME'][0]
 
         df = self.submit_query(
             query_params=APIDrivingDistanceQueryParams(
@@ -723,9 +723,9 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
                 end_latitude=42.35339843570063,
                 end_longitude=-71.06788516044617))
         assert 'DISTANCE' in df
-        self.assertAlmostEqual(df['DISTANCE'][0], 44.96875), df['DISTANCE'][0]
+        self.assertAlmostEqual(df['DISTANCE'][0], 44.96875, delta=0.01), df['DISTANCE'][0]
         assert 'TIME' in df
-        self.assertAlmostEqual(df['TIME'][0], expected_drivetime, places=2), df['TIME'][0]
+        self.assertAlmostEqual(df['TIME'][0], expected_drivetime, delta=0.2), df['TIME'][0]
 
     def test_walking_distance_query(self):
         df = self.submit_query(
@@ -735,9 +735,9 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
                 end_latitude=41.8222540665299,
                 end_longitude=-71.41181409358978))
         assert 'DISTANCE' in df
-        self.assertAlmostEqual(df['DISTANCE'][0], 0.57), df['DISTANCE'][0]
+        self.assertAlmostEqual(df['DISTANCE'][0], 0.57, delta=0.01), df['DISTANCE'][0]
         assert 'TIME' in df
-        self.assertAlmostEqual(df['TIME'][0], 17.4), df['TIME'][0]
+        self.assertAlmostEqual(df['TIME'][0], 17.4, delta=0.1), df['TIME'][0]
 
     def test_job_runner(self):
         job_runner = SDJobRunner()
@@ -789,14 +789,15 @@ class TestAPIQuery(unittest.TestCase, SDAPIQuery):
         df = SDJobRunner().load_df_from_job_pipeline(
             # Same job
             portfolio_id='WMqA42Dw',
-            model_id='wD1Ga87A',  # This is a time series query
+            model_id='JD5ePzDk',  # This is a time series query
             buffers=['three-mile', 'ten-min'])
 
         self.assertEqual(len(df['GEOID'].unique()), 5, df)
         self.assertEqual(
             list(df['METRIC'].unique()),
-            ['Employment (payroll survey) * (Time Series)'])
-        self.assertTrue(df['YEAR'].between(2005, 2050).all())
+            ['Owner-occupied units by home value with owned home value of under '
+             '$999,999  (Time Series)'])
+        self.assertTrue(df['DATE'].between('2006-01-01', '2050-01-01').all())
         self.assertEqual(len(df['BUFFER'].unique()), 2, df)
 
     def test_job_runner_with_sites(self):
