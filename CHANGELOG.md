@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.10.2] - 2023-02-28
+### Changes
+- Changes the jobsAPI URLs to update with the new environment variable as well
+
 ## [3.10.1] - 2023-02-14
 ### Changes
 - Changes the API URL to make it configurable using an environment variable
