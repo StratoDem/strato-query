@@ -462,6 +462,7 @@ def _submit_post_request(json_dict: dict,
             json_data = r.json()
 
             if not json_data['success']:
+                print(f'The APIQueryFailed token value is {json_dict["token"]}')
                 raise APIQueryFailedException(json_data)
 
             return json_data

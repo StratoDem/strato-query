@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file. This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [3.10.4] - 2024-05-14
+### Changes
+- Added code to log Stratodem API Token for debugging unwhitelisted Token Error
+
 ## [3.10.3] - 2024-05-07
 ### Changes
 - Updated Stratodem API Token due to unwhitelisted Token Error
